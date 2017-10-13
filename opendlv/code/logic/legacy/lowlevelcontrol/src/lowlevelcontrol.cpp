@@ -83,11 +83,11 @@ void LowLevelControl::nextContainer(odcore::data::Container &a_container)
   } else if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
 
   } 
-  // else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
+  else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
 
-  // } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
+  } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
     
-  // }
+  }
   // VelocityRequestReading
   // Read path
 }
