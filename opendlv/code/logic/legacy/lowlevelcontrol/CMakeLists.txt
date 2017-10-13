@@ -16,7 +16,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-project(opendlv-logic-legacy-vehiclesim)
+project(opendlv-logic-legacy-lowlevelcontrol)
 
 include_directories(include)
 

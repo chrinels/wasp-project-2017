@@ -16,23 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef LOGIC_LEGACY_VEHICLESIM_TESTSUITE_HPP
-#define LOGIC_LEGACY_VEHICLESIM_TESTSUITE_HPP
+#include "lowlevelcontrol.hpp"
 
-#include "cxxtest/TestSuite.h"
-
-// Include local header files.
-#include "../include/vehiclesim.hpp"
-
-class VehicleSimTest : public CxxTest::TestSuite {
-   public:
-    void setUp() {}
-
-    void tearDown() {}
-
-    void testApplication() {
-        TS_ASSERT(true);
-    }
-};
-
-#endif
+int32_t main(int32_t argc, char **argv) {
+  opendlv::logic::legacy::LowLevelControl app(argc, argv);
+  return app.runModule();
+}

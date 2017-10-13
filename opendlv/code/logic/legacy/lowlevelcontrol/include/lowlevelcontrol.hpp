@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef LOGIC_LEGACY_VEHICLEFOLLOWER_VEHICLESIM_HPP
-#define LOGIC_LEGACY_VEHICLEFOLLOWER_VEHICLESIM_HPP
+#ifndef LOGIC_LEGACY_LOWLEVELCONTROL_LOWLEVELCONTROL_HPP
+#define LOGIC_LEGACY_LOWLEVELCONTROL_LOWLEVELCONTROL_HPP
 
 #include <memory>
 
@@ -30,12 +30,12 @@ namespace opendlv {
 namespace logic {
 namespace legacy {
 
-class VehicleSim : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class LowLevelControl : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
-  VehicleSim(int32_t const &, char **);
-  VehicleSim(VehicleSim const &) = delete;
-  VehicleSim &operator=(VehicleSim const &) = delete;
-  virtual ~VehicleSim();
+  LowLevelControl(int32_t const &, char **);
+  LowLevelControl(LowLevelControl const &) = delete;
+  LowLevelControl &operator=(LowLevelControl const &) = delete;
+  virtual ~LowLevelControl();
 
   virtual void nextContainer(odcore::data::Container &c);
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
