@@ -54,7 +54,14 @@ LowLevelControl::LowLevelControl(int32_t const &a_argc, char **a_argv)
   m_inputMutex(),
   m_inputAcceleration(),
   m_inputSteeringWheelAngle(),
-  m_wgs84Reference()
+  m_wgs84Reference(),
+  m_referenceMutex(),
+  m_velocityReference(0),
+  m_velocitySumReference(0),
+  m_longitudinalGain(0),
+  m_maxAccelerationLimit(0),
+  m_minAccelerationLimit(0),
+  m_velocitySumLimit(0)
 {
 }
 
@@ -70,6 +77,15 @@ void LowLevelControl::setUp()
       "global.reference.WGS84.longitude");
   m_wgs84Reference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
 
+  m_longitudinalGain = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-lowlevelcontrol.longitudinal-gain");
+  m_maxAccelerationLimit = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-lowlevelcontrol.longitudinal-max-acceleration");
+  m_minAccelerationLimit = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-lowlevelcontrol.longitudinal-min-acceleration");
+  m_velocitySumLimit = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum");
+
 }
 
 void LowLevelControl::tearDown()
@@ -81,14 +97,22 @@ void LowLevelControl::nextContainer(odcore::data::Container &a_container)
   if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
       
   } else if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
+    odcore::base::Lock l(m_stateMutex);
+    auto groundSpeedReading = a_container.getData<opendlv::proxy::GroundSpeedReading>();
+    m_velocity.setX(groundSpeedReading.getGroundSpeed());
+    cout << "Recieved GroundSpeedReading: " << groundSpeedReading.getGroundSpeed() << endl;
 
-  } 
-  else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
+  } else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
 
   } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
     
+  } else if (a_container.getDataType() == opendlv::logic::legacy::VelocityRequest::ID()) {
+    odcore::base::Lock l(m_referenceMutex);
+    auto velocityRequest = a_container.getData<opendlv::logic::legacy::VelocityRequest>();
+    m_velocityReference = velocityRequest.getVelocity();
+    cout << "Recieved VelocityReference: " << m_velocityReference << endl;
   }
-  // VelocityRequestReading
+
   // Read path
 }
 
@@ -103,57 +127,37 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
   getConference().send(initC);
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-    
 
-    {
-      // odcore::base::Lock li(m_inputMutex);
-      // odcore::base::Lock ls(m_stateMutex);
-      // double const dt = 1.0 / static_cast<double>(getFrequency());
+      double const dt = 1.0 / static_cast<double>(getFrequency());
 
-      // double const g = 9.82;
-      
-      // // chassis params
-      // double const m = 2100;
-      // double const lf = 1.3;
-      // double const lr = 1.5;
-      // // double const w = 0.8;
-      // double const Izz = 3900;
-      // double const k = 1.0/45.0; //Steering ratio
+      // PI velocity control
+      {
+        // May needs something for large velocity differences, fallback to P only?
+        double const kp = m_longitudinalGain;
+        double const ki = kp/4;
 
-      // // Pacejka Tire Parameters
-      // double const muxf = 1.2;
-      // double const muxr = 1.2;
-      // // double const Bxf = 11.7;
-      // // double const Bxr = 11.1;
-      // // double const Cxf = 1.69;
-      // // double const Cxr = 1.69;
-      // // double const Exf = 0.377;
-      // // double const Exr = 0.362;
-      // double const muyf = 0.935;
-      // double const muyr = 0.961;
-      // double const Byf = 8.86;
-      // double const Byr = 9.3;
-      // double const Cyf = 1.19;
-      // double const Cyr = 1.19;
-      // double const Eyf = -1.21;
-      // double const Eyr = -1.11;
-
-      // // Vertical force
-      // double const Fzf = lr/(lf+lr)*m*g;
-      // double const Fzr = lf/(lf+lr)*m*g;
+        auto dv = m_velocity.getX() - m_velocityReference;
+        m_velocitySumReference += dt*dv;
+        m_velocitySumReference = fmin(m_velocitySumReference,m_velocitySumLimit);
+        m_velocitySumReference = fmax(m_velocitySumReference,-m_velocitySumLimit);
+        m_inputAcceleration = -kp*dv - ki*m_velocitySumReference;
+        m_inputAcceleration = fmin(m_inputAcceleration,m_maxAccelerationLimit);
+        m_inputAcceleration = fmax(m_inputAcceleration,m_minAccelerationLimit);
+      }
 
 
-      double accelerationRequest = 0;
-      double steeringWheelAngleRequest = 0;
+
+
+      cout << "Send AccelerationRequest: " << m_inputAcceleration << endl;
+      cout << "Send SteringRequest: " << m_inputSteeringWheelAngle << endl;
 
       // Send ActuationRequest
       opendlv::proxy::ActuationRequest ar;
-      ar.setAcceleration(static_cast<float>(accelerationRequest));
-      ar.setSteering(static_cast<float>(steeringWheelAngleRequest));
+      ar.setAcceleration(static_cast<float>(m_inputAcceleration));
+      ar.setSteering(static_cast<float>(m_inputSteeringWheelAngle));
       ar.setIsValid(true);
       odcore::data::Container c = odcore::data::Container(ar);
       getConference().send(c);
-    }
 
   }
 

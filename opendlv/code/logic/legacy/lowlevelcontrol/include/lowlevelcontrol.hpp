@@ -55,6 +55,15 @@ class LowLevelControl : public odcore::base::module::TimeTriggeredConferenceClie
   double m_inputSteeringWheelAngle;
 
   opendlv::data::environment::WGS84Coordinate m_wgs84Reference;
+
+  odcore::base::Mutex m_referenceMutex;
+  double m_velocityReference;
+  double m_velocitySumReference;
+
+  double m_longitudinalGain;
+  double m_maxAccelerationLimit;
+  double m_minAccelerationLimit;
+  double m_velocitySumLimit;
 };
 
 }
