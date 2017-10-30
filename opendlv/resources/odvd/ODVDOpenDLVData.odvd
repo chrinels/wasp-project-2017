@@ -228,3 +228,10 @@ message opendlv.system.diagnostics.HealthStatus [id = 200] {
     map<string,string> status [id = 1];
 }
 
+message opendlv.logic.legacy.TimeSlot [id = 201] {
+
+}
+
+message opendlv.logic.legacy.VelocityRequest [id = 202] {
+  double velocity [id = 1];
+}
