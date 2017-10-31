@@ -132,15 +132,19 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
 
       // PI velocity control
       {
-        // May needs something for large velocity differences, fallback to P only?
         double const kp = m_longitudinalGain;
         double const ki = kp/4;
 
         auto dv = m_velocity.getX() - m_velocityReference;
-        m_velocitySumReference += dt*dv;
-        m_velocitySumReference = fmin(m_velocitySumReference,m_velocitySumLimit);
-        m_velocitySumReference = fmax(m_velocitySumReference,-m_velocitySumLimit);
         m_inputAcceleration = -kp*dv - ki*m_velocitySumReference;
+
+        // Anti windup (clamp)
+        if (m_inputAcceleration < m_maxAccelerationLimit && m_inputAcceleration > m_minAccelerationLimit) {
+          m_inputAcceleration += dt*dv;
+          m_velocitySumReference += dt*dv;
+          m_velocitySumReference = fmin(m_velocitySumReference,m_velocitySumLimit);
+          m_velocitySumReference = fmax(m_velocitySumReference,-m_velocitySumLimit);
+        }
         m_inputAcceleration = fmin(m_inputAcceleration,m_maxAccelerationLimit);
         m_inputAcceleration = fmax(m_inputAcceleration,m_minAccelerationLimit);
       }
