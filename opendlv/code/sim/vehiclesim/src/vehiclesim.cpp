@@ -100,23 +100,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
 
       double const g = 9.82;
       
+      // XC90 chassis parameters
       // chassis params
-      double const m = 2100;
-      double const lf = 1.3;
-      double const lr = 1.5;
-      // double const w = 0.8;
-      double const Izz = 3900;
-      double const k = 1.0/45.0; //Steering ratio
+      double const m = 2194;
+      double const lf = 1.41;
+      double const lr = 1.576;
+      double const Izz = 4770;
+      double const k = 1.0/16.0; //Steering ratio
 
-      // Pacejka Tire Parameters
+      // Pacejka Tire Parameters (from some other car than XC90)
       double const muxf = 1.2;
       double const muxr = 1.2;
-      // double const Bxf = 11.7;
-      // double const Bxr = 11.1;
-      // double const Cxf = 1.69;
-      // double const Cxr = 1.69;
-      // double const Exf = 0.377;
-      // double const Exr = 0.362;
       double const muyf = 0.935;
       double const muyr = 0.961;
       double const Byf = 8.86;
