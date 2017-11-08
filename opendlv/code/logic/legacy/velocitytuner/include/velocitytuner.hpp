@@ -56,6 +56,7 @@ class VelocityTuner : public odcore::base::module::TimeTriggeredConferenceClient
   odcore::base::Mutex m_referenceMutex;
 
   double m_maxAccleleration;
+  double m_acclerationPlanningFactor;
   double m_maxVelocity;
   odcore::data::TimeStamp m_timeSlotStart;
   double m_timeToIntersection;
