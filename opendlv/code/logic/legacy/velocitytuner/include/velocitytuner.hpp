@@ -26,6 +26,8 @@
 #include <opendlv/data/environment/Point3.h>
 #include <opendlv/data/environment/WGS84Coordinate.h>
 
+#include <opendavinci/odcore/data/TimeStamp.h>
+
 namespace opendlv {
 namespace logic {
 namespace legacy {
@@ -49,8 +51,16 @@ class VelocityTuner : public odcore::base::module::TimeTriggeredConferenceClient
   double m_orientation;
   opendlv::data::environment::Point3 m_velocity;
   double m_yawrate;
-  
+
   opendlv::data::environment::WGS84Coordinate m_wgs84Reference;
+  odcore::base::Mutex m_referenceMutex;
+
+  double m_maxAccleleration;
+  double m_maxVelocity;
+  odcore::data::TimeStamp m_timeSlotStart;
+  double m_timeToIntersection;
+  double m_targetVelocity;
+  double m_distanceToIntersection;
 };
 
 }

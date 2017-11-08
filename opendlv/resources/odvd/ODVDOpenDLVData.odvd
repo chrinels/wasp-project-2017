@@ -229,9 +229,15 @@ message opendlv.system.diagnostics.HealthStatus [id = 200] {
 }
 
 message opendlv.logic.legacy.TimeSlot [id = 201] {
-
+	odcore::data::TimeStamp entryTime [id = 1];
+	odcore::data::TimeStamp exitTime [id = 2];
 }
 
 message opendlv.logic.legacy.VelocityRequest [id = 202] {
   double velocity [id = 1];
+}
+
+message opendlv.logic.legacy.LocationOnPathToIntersection [id = 203]{
+	double currentLocation [id = 1];
+	double intersectionLocation [id = 2];
 }

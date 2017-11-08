@@ -1,4 +1,4 @@
-/**
+  /**
  * Copyright (C) 2017 Ola Benderius
  *
  * This program is free software; you can redistribute it and/or
@@ -36,6 +36,8 @@
 #include <odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h>
 #include <odvdimu/GeneratedHeaders_ODVDIMU.h>
 
+//#include <opendavinci/odcore/data/TimeStamp.h>
+
 #include "velocitytuner.hpp"
 
 namespace opendlv {
@@ -43,14 +45,21 @@ namespace logic {
 namespace legacy {
 
 VelocityTuner::VelocityTuner(int32_t const &a_argc, char **a_argv)
-  : TimeTriggeredConferenceClientModule(a_argc, a_argv, 
+  : TimeTriggeredConferenceClientModule(a_argc, a_argv,
       "logic-legacy-velocitytuner"),
   m_stateMutex(),
   m_position(0,0,0),
   m_orientation(0),
   m_velocity(1,0,0),
   m_yawrate(0),
-  m_wgs84Reference()
+  m_wgs84Reference(),
+  m_referenceMutex(),
+	m_maxAccleleration(0),
+	m_maxVelocity(0),
+	m_timeSlotStart(),
+  m_timeToIntersection(0),
+	m_targetVelocity(0),
+	m_distanceToIntersection(0)
 {
 }
 
@@ -66,24 +75,49 @@ void VelocityTuner::setUp()
       "global.reference.WGS84.longitude");
   m_wgs84Reference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
 
+  m_maxVelocity = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-velocitytuner.max-velocity");
+  m_targetVelocity = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-velocitytuner.target-velocity-at-intersection");
+  m_maxAccleleration = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-velocitytuner.max-acceleration");
+  odcore::data::TimeStamp currentTime;
+  double testTimeToIntersection = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-velocitytuner.test-time-to-intersection");
+  m_timeSlotStart = currentTime + odcore::data::TimeStamp(testTimeToIntersection,0);
+
 }
 
 void VelocityTuner::tearDown()
 {
 }
-    
-void VelocityTuner::nextContainer(odcore::data::Container &a_container) 
+
+void VelocityTuner::nextContainer(odcore::data::Container &a_container)
 {
   if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
-      
+
   } else if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
+    odcore::base::Lock l(m_stateMutex);
+    auto groundSpeedReading = a_container.getData<opendlv::proxy::GroundSpeedReading>();
+    m_velocity.setX(groundSpeedReading.getGroundSpeed());
+    cout << "Recieved GroundSpeedReading: " << groundSpeedReading.getGroundSpeed() << endl;
 
   } else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
 
   } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
-    
-  } else if (a_container.getDataType() == opendlv::logic::legacy::TimeSlot::ID()) {
 
+  }
+  else if (a_container.getDataType() == opendlv::logic::legacy::TimeSlot::ID()) {
+    odcore::base::Lock l(m_referenceMutex);
+    auto timeSlot = a_container.getData<opendlv::logic::legacy::TimeSlot>();
+    m_timeSlotStart = timeSlot.getEntryTime();
+    cout << "Recieved TimeSlot, SlotStart: " << m_timeSlotStart << endl;
+
+  }
+  else if (a_container.getDataType() == opendlv::logic::legacy::LocationOnPathToIntersection::ID()) {
+    odcore::base::Lock l(m_stateMutex);
+    auto locationOnPathToIntersection = a_container.getData<opendlv::logic::legacy::LocationOnPathToIntersection>();
+    m_distanceToIntersection = locationOnPathToIntersection.getIntersectionLocation() - locationOnPathToIntersection.getCurrentLocation();
   }
 }
 
