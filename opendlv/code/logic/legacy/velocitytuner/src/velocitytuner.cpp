@@ -253,12 +253,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
         }
 
       }
-      if (t1 <= T) {
+      //if(t1 <= T) was faulty code? always use the first part plan
+      if (t1 <= Tint) {//decision based on point for next timeinterval
         commandAcc = (v2-v1)/t1;
-        commandV = v1+commandAcc*(Tint*2);
+        commandV = v1+commandAcc*(Tint);
       } else {
         commandAcc = (v3-v2)/(T-t1);
-        commandV = vout - commandAcc*(T-Tint*2);
+        commandV = vout - commandAcc*(T-Tint);
       }
       if (abs(commandAcc) > m_maxAccleleration)
         std::cout << "commandacc to high: " << commandAcc << '\n';
@@ -270,9 +271,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
         commandV = 0;
         // mm(i) = 15;
       }
+      if (Tint > T) {//the intersection should be passed
+        commandV = vout;
+      }
       std::cout << "commandAcc: " << commandAcc << '\n';
       cout << "commandV: " << commandV << endl;
-
+      // double commandV;
+      // if (T > 0) {
+      //   commandV = 7;
+      // } else {
+      //   commandV = 10;
+      // }
+      // cout << "commandV: " << commandV << endl;
       // Set velocity
       opendlv::logic::legacy::VelocityRequest velocityRequest;
       velocityRequest.setVelocity(commandV);
