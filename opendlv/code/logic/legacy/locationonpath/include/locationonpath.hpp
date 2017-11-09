@@ -53,6 +53,7 @@ class LocationOnPath : public odcore::base::module::TimeTriggeredConferenceClien
   opendlv::data::environment::WGS84Coordinate m_wgs84Reference;
   odcore::base::Mutex m_referenceMutex;
 
+  opendlv::data::environment::Point3 m_intersectionPosition;
 };
 
 }

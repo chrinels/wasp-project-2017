@@ -126,12 +126,17 @@ void VelocityTuner::nextContainer(odcore::data::Container &a_container)
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
 {
+  double const Tint = 1.0/static_cast<double>(getFrequency());
+  std::cout << "Tint: " << Tint << '\n';
+
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     // Calculate what velocity to set
     if (m_distanceToIntersection > 0) {
       double s = m_distanceToIntersection;
+      std::cout << "s: " << s << '\n';
       odcore::data::TimeStamp currentTime;
       auto T = (m_timeSlotStart - currentTime).toMicroseconds()*1.0/1000000L;
+      std::cout << "T: " << T << '\n';
       double v1 = m_velocity.getX();
       double vout = m_targetVelocity;
       double a = m_maxAccleleration*m_acclerationPlanningFactor;
@@ -142,13 +147,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
       double mindistance = fmin(v1,vout)*(T-acctime)+(vout+v1)/2*acctime;
       //maximum distance for maneuvers --\, /--
       double maxdistance = fmax(v1,vout)*(T-acctime)+(vout+v1)/2*acctime;
-      cout << "Calculated min and max distance for maneuvers ___/: " << mindistance << maxdistance << endl;
+      cout << "Calculated min and max distance for maneuvers ___/: " << mindistance << ", " << maxdistance << endl;
       double averagedistance = (vout+v1)/2*T;
 
       double v2,v3,v4;
       double t1,t2,t3;
       double commandAcc, commandV;
-      double Tint = 1.0/100;
 
       if (mindistance > maxdistance)
         cout << "acceleration over limit is required" << endl;
@@ -222,7 +226,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
           }
           std::cout << "s>maxdistance, scal:  " << scal << '\n';
         }
-        if (s < maxdistance) {
+        if (s < mindistance) {
           //decelerate
           double desireda = (-2*s + T*v1 + T*vout +  sqrt(2)*
               sqrt(2*pow(s,2) - 2*s*T*v1 + pow(T,2)*pow(v1,2) - 2*s*T*vout + pow(T,2)*pow(vout,2)))/pow(T,2);
@@ -245,19 +249,19 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
             scal = (v1+v2)/2*t1+(v3+v4)/2*t2;
             // mm(i) = 13;
           }
-          std::cout << "s<maxdistance, scal:  " << scal << '\n';
+          std::cout << "s<mindistance, scal:  " << scal << '\n';
         }
 
       }
       if (t1 <= T) {
         commandAcc = (v2-v1)/t1;
-        commandV = v1+commandAcc*Tint;
+        commandV = v1+commandAcc*(Tint*2);
       } else {
         commandAcc = (v3-v2)/(T-t1);
-        commandV = vout - commandAcc*(T-Tint);
+        commandV = vout - commandAcc*(T-Tint*2);
       }
       if (abs(commandAcc) > m_maxAccleleration)
-        std::cout << "commandacc to high" << '\n';
+        std::cout << "commandacc to high: " << commandAcc << '\n';
       if ((commandV-v1)/Tint > m_maxAccleleration)
         commandV=v1+m_maxAccleleration*Tint;
       if ((v1-commandV)/Tint  > m_maxAccleleration)
@@ -266,6 +270,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
         commandV = 0;
         // mm(i) = 15;
       }
+      std::cout << "commandAcc: " << commandAcc << '\n';
       cout << "commandV: " << commandV << endl;
 
       // Set velocity
