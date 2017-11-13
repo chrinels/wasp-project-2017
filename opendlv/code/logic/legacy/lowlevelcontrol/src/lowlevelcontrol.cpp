@@ -94,18 +94,22 @@ void LowLevelControl::tearDown()
     
 void LowLevelControl::nextContainer(odcore::data::Container &a_container) 
 {
-  if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
+  // if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
       
-  } else if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
+  // } else if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
+  //   odcore::base::Lock l(m_stateMutex);
+  //   auto groundSpeedReading = a_container.getData<opendlv::proxy::GroundSpeedReading>();
+  //   m_velocity.setX(groundSpeedReading.getGroundSpeed());
+  //   cout << "Recieved GroundSpeedReading: " << groundSpeedReading.getGroundSpeed() << endl;
+
+  // } else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
+
+  // } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
+  if (a_container.getDataType() == opendlv::logic::legacy::StateEstimate::ID()) {
     odcore::base::Lock l(m_stateMutex);
-    auto groundSpeedReading = a_container.getData<opendlv::proxy::GroundSpeedReading>();
-    m_velocity.setX(groundSpeedReading.getGroundSpeed());
-    cout << "Recieved GroundSpeedReading: " << groundSpeedReading.getGroundSpeed() << endl;
-
-  } else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
-
-  } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
-    
+    auto stateEstimate = a_container.getData<opendlv::logic::legacy::StateEstimate>();
+    m_velocity.setX(stateEstimate.getVelocityX());
+    cout << "Recieved velocity: " << m_velocity.getX() << endl;
   } else if (a_container.getDataType() == opendlv::logic::legacy::VelocityRequest::ID()) {
     odcore::base::Lock l(m_referenceMutex);
     auto velocityRequest = a_container.getData<opendlv::logic::legacy::VelocityRequest>();

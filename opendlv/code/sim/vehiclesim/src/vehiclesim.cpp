@@ -166,7 +166,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       m_velocity += opendlv::data::environment::Point3(dvx,dvy,0)*dt;
       m_yawrate += dt*dr;
 
-      // Send GPS coordinate
+      // Send GPS coordinate (not accurate at all)
       auto wgs84Coordinate = m_wgs84Reference.transform(m_position);
       odcore::data::Container c_coordinate(wgs84Coordinate);
       getConference().send(c_coordinate);
@@ -177,9 +177,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       odcore::data::Container c_velocity(groundSpeed);
       getConference().send(c_velocity);
 
+      auto pos = m_wgs84Reference.transform(wgs84Coordinate);
       std::cout << "position: (" << std::to_string(m_position.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;
-      std::cout << "orientation: " << std::to_string(m_orientation) << std::endl;
       std::cout << "velocity: (" << std::to_string(m_velocity.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;
+      std::cout << "orientation: " << std::to_string(m_orientation) << std::endl;
       std::cout << "yaw rate: " << std::to_string(m_yawrate) << std::endl;
     }
 

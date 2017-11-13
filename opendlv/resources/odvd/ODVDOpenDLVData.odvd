@@ -235,3 +235,12 @@ message opendlv.logic.legacy.TimeSlot [id = 201] {
 message opendlv.logic.legacy.VelocityRequest [id = 202] {
   double velocity [id = 1];
 }
+
+message opendlv.logic.legacy.StateEstimate [id = 205] {
+  double positionX [id = 1];
+  double positionY [id = 2];
+  double velocityX [id = 3];
+  double velocityY [id = 4];
+  double orientation [id = 5];
+  double yawRate [id = 6];
+}
