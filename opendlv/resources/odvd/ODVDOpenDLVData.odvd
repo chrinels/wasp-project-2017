@@ -234,7 +234,8 @@ message opendlv.logic.legacy.TimeSlot [id = 201] {
 }
 
 message opendlv.logic.legacy.VelocityRequest [id = 202] {
-  double velocity [id = 1];
+  list<double> velocity [id = 1];
+  list<double> time [id = 2];
 }
 
 message opendlv.logic.legacy.LocationOnPathToIntersection [id = 203]{
