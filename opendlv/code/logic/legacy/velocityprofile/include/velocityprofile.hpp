@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef LOGIC_LEGACY_STATEESTIMATOR_STATEESTIMATOR_HPP
-#define LOGIC_LEGACY_STATEESTIMATOR_STATEESTIMATOR_HPP
+#ifndef LOGIC_LEGACY_VELOCITYPROFILE_VELOCITYPROFILE_HPP
+#define LOGIC_LEGACY_VELOCITYPROFILE_VELOCITYPROFILE_HPP
 
 #include <memory>
 
@@ -25,17 +25,18 @@
 #include <opendavinci/odcore/base/Mutex.h>
 #include <opendlv/data/environment/Point3.h>
 #include <opendlv/data/environment/WGS84Coordinate.h>
+#include <opendavinci/odcore/data/TimeStamp.h>
 
 namespace opendlv {
 namespace logic {
 namespace legacy {
 
-class StateEstimator : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class VelocityProfile : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
-  StateEstimator(int32_t const &, char **);
-  StateEstimator(StateEstimator const &) = delete;
-  StateEstimator &operator=(StateEstimator const &) = delete;
-  virtual ~StateEstimator();
+  VelocityProfile(int32_t const &, char **);
+  VelocityProfile(VelocityProfile const &) = delete;
+  VelocityProfile &operator=(VelocityProfile const &) = delete;
+  virtual ~VelocityProfile();
 
   virtual void nextContainer(odcore::data::Container &c);
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
@@ -44,11 +45,11 @@ class StateEstimator : public odcore::base::module::TimeTriggeredConferenceClien
   virtual void setUp();
   virtual void tearDown();
 
-  odcore::base::Mutex m_stateMutex;
-  opendlv::data::environment::Point3 m_position;
-  double m_orientation;
-  opendlv::data::environment::Point3 m_velocity;
-  double m_yawrate;
+  odcore::data::TimeStamp testStartTime;
+  odcore::data::TimeStamp testEndTime;
+  double m_velocitykmh;
+
+
 };
 
 }
