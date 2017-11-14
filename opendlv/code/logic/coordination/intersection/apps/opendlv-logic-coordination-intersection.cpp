@@ -16,9 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "scheduler.hpp"
+#include "intersection.hpp"
 
 int32_t main(int32_t argc, char **argv) {
-  //opendlv::logic::legacy::LowLevelControl app(argc, argv);
-  return 1;
+  opendlv::logic::coordination::Intersection app(argc, argv);
+  return app.runModule();
 }
