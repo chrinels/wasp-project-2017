@@ -43,7 +43,7 @@ namespace logic {
 namespace legacy {
 
 VelocityProfile::VelocityProfile(int32_t const &a_argc, char **a_argv)
-  : TimeTriggeredConferenceClientModule(a_argc, a_argv, 
+  : TimeTriggeredConferenceClientModule(a_argc, a_argv,
       "logic-legacy-velocityprofile"),
   m_testStartTime(),
   m_testEndTime(),
@@ -57,11 +57,11 @@ VelocityProfile::~VelocityProfile()
 
 void VelocityProfile::setUp()
 {
-  double const latitude = getKeyValueConfiguration().getValue<double>(
-      "global.reference.WGS84.latitude");
-  double const longitude = getKeyValueConfiguration().getValue<double>(
-      "global.reference.WGS84.longitude");
-  m_wgs84Reference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
+  // double const latitude = getKeyValueConfiguration().getValue<double>(
+  //     "global.reference.WGS84.latitude");
+  // double const longitude = getKeyValueConfiguration().getValue<double>(
+  //     "global.reference.WGS84.longitude");
+  // m_wgs84Reference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
 
   double const testTimeDelay = getKeyValueConfiguration().getValue<double>(
       "logic-legacy-velocityprofile.test-time-delay");
@@ -69,8 +69,8 @@ void VelocityProfile::setUp()
       "logic-legacy-velocityprofile.test-time-duration");
 
   odcore::data::TimeStamp currentTime;
-  m_testStartTime = currentTime + odcore::data:TimeStamp(testTimeDelay,0);
-  m_testEndTime = currentTime + odcore::data:TimeStamp(testTimeDelay+testTimeDuration,0);
+  m_testStartTime = currentTime + odcore::data::TimeStamp(testTimeDelay,0);
+  m_testEndTime = currentTime + odcore::data::TimeStamp(testTimeDelay+testTimeDuration,0);
 
   m_velocitykmh = getKeyValueConfiguration().getValue<double>(
       "logic-legacy-velocityprofile.velocitykmh");
@@ -79,19 +79,19 @@ void VelocityProfile::setUp()
 void VelocityProfile::tearDown()
 {
 }
-    
-void VelocityProfile::nextContainer(odcore::data::Container &a_container) 
-{
 
-}
+// void VelocityProfile::nextContainer(odcore::data::Container &a_container)
+// {
+//
+// }
 
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityProfile::body()
 {
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     odcore::data::TimeStamp currentTime;
     double velocity = 0.0;
     if (currentTime > m_testStartTime && currentTime < m_testEndTime) {
-      velocity = m_velocitykmh*3.6;
+      velocity = m_velocitykmh/3.6;
     }
 
     // Set velocity

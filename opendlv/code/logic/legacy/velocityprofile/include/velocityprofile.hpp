@@ -38,15 +38,15 @@ class VelocityProfile : public odcore::base::module::TimeTriggeredConferenceClie
   VelocityProfile &operator=(VelocityProfile const &) = delete;
   virtual ~VelocityProfile();
 
-  virtual void nextContainer(odcore::data::Container &c);
+  // virtual void nextContainer(odcore::data::Container &c);
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
   virtual void setUp();
   virtual void tearDown();
 
-  odcore::data::TimeStamp testStartTime;
-  odcore::data::TimeStamp testEndTime;
+  odcore::data::TimeStamp m_testStartTime;
+  odcore::data::TimeStamp m_testEndTime;
   double m_velocitykmh;
 
 
