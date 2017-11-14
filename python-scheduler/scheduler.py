@@ -1,6 +1,7 @@
 #! /usr/bin python3
 
 import numpy as np
+import datetime as dt
 
 CONST_SLOT_INTERVAL = 5.0 # [sec]
 CONST_SCHEDULED_SLOTS = 20 # Schedule for the next 20 slot.
@@ -26,7 +27,8 @@ trajectory_compatibility_graph = {  # Coming from West
                                     'NR': ['SR', 'ER', 'SS', 'WL', 'WS', 'EL', 'WR'],
                                     'NL': ['ER', 'WR', 'SL']}
 
-slot_start_times = np.arange(CONST_SCHEDULED_SLOTS)*CONST_SLOT_INTERVAL
+# Slot start times relative to the CURRENT_TIME_SLOT_END
+relative_slot_start_times = np.arange(CONST_SCHEDULED_SLOTS)*CONST_SLOT_INTERVAL
 
 time_slots_table = [[]  for i in range(CONST_SCHEDULED_SLOTS)]
 
@@ -35,7 +37,7 @@ def assign_time_slot(access_time, planned_trajectory):
     # Find the time slot that starts just after the access time
     earliest_slot_index = 0
     for slot_index in range(CONST_SCHEDULED_SLOTS):
-        if access_time > CURRENT_TIME_SLOT_END + slot_start_times[slot_index]:
+        if access_time > CURRENT_TIME_SLOT_END + relative_slot_start_times[slot_index]:
             earliest_slot_index = earliest_slot_index + 1
         else:
             break
