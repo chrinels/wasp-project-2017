@@ -14,8 +14,7 @@
 
 
 ###############################################################################
-###############################################################################
-#
+################################################################################
 # GLOBAL CONFIGURATION
 #
 
@@ -139,5 +138,23 @@ proxy-xc90.read-only = 0            # 1 = read-only , 0 = read/write
 # CONFIGURATION FOR velocity profile
 #
 logic-legacy-velocityprofile.test-time-delay = 3;
-logic-legacy-velocityprofile.test-time-duration = 5;
-logic-legacy-velocityprofile.velocitykmh = 3.0;
+logic-legacy-velocityprofiletest-time-duration = 30;
+logic-legacy-velocityprofile.velocitykmh = 20;
+
+
+#
+# CONFIGURATION FOR ODRECORDERH264
+#
+#odrecorderh264.output = file://recorder.rec # 
+odrecorderh264.remoteControl = 0;
+odrecorderh264.dumpSharedData = 0;
+odrecorderh264.lossless = 1;
+odrecorderh264.portbaseforchildprocesses = 29000;
+
+###############################################################################
+#
+# CONFIGURATION FOR proxy-applanix
+#
+proxy-applanix.ip = 10.42.42.40    # Change to Applanix IP.
+proxy-applanix.port = 5602
+
