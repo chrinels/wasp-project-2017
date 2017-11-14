@@ -241,3 +241,12 @@ message opendlv.logic.legacy.LocationOnPathToIntersection [id = 203]{
 	double currentLocation [id = 1];
 	double intersectionLocation [id = 2];
 }
+
+message opendlv.logic.legacy.StateEstimate [id = 204] {
+  double positionX [id = 1];
+  double positionY [id = 2];
+  double velocityX [id = 3];
+  double velocityY [id = 4];
+  double orientation [id = 5];
+  double yawRate [id = 6];
+}

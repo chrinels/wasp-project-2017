@@ -14,8 +14,7 @@
 
 
 ###############################################################################
-###############################################################################
-#
+################################################################################
 # GLOBAL CONFIGURATION
 #
 
@@ -116,5 +115,46 @@ logic-legacy-lowlevelcontrol.longitudinal-max-acceleration = 3
 logic-legacy-lowlevelcontrol.longitudinal-min-acceleration = -3
 logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum = 1
 
+
+#
+# CONFIGURATION FOR state estimator
+#
 logic-legacy-stateestimator.position.smoothing = 0.1;
 logic-legacy-stateestimator.velocity.smoothing = 0.1;
+
+
+#
+# CONFIGURATION FOR proxy-xc90
+#
+proxy-xc90.devicenode = can0        # Socket CAN device.
+proxy-xc90.debug = 0                # Enable debug output to console.
+proxy-xc90.record_gcm = 0           # 1 = Dump generic CAN messages.
+proxy-xc90.record_mapped_data = 0   # 1 = Record mapped containers.
+proxy-xc90.record_asc = 0           # 1 = Dump ASC data from CAN.
+proxy-xc90.read-only = 0            # 1 = read-only , 0 = read/write
+
+
+#
+# CONFIGURATION FOR velocity profile
+#
+logic-legacy-velocityprofile.test-time-delay = 3;
+logic-legacy-velocityprofiletest-time-duration = 30;
+logic-legacy-velocityprofile.velocitykmh = 20;
+
+
+#
+# CONFIGURATION FOR ODRECORDERH264
+#
+#odrecorderh264.output = file://recorder.rec # 
+odrecorderh264.remoteControl = 0;
+odrecorderh264.dumpSharedData = 0;
+odrecorderh264.lossless = 1;
+odrecorderh264.portbaseforchildprocesses = 29000;
+
+###############################################################################
+#
+# CONFIGURATION FOR proxy-applanix
+#
+proxy-applanix.ip = 10.42.42.40    # Change to Applanix IP.
+proxy-applanix.port = 5602
+

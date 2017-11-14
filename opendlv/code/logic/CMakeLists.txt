@@ -86,14 +86,9 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
 #add_subdirectory(legacy/simpledriver)
 add_subdirectory(legacy/lowlevelcontrol)
 add_subdirectory(legacy/velocitytuner)
+add_subdirectory(legacy/stateestimator)
+add_subdirectory(legacy/velocityprofile)
 add_subdirectory(legacy/locationonpath)
-#add_subdirectory(perception/detectlane)
-#add_subdirectory(perception/detectvehicle)
-#add_subdirectory(sensation/audition)
-#add_subdirectory(sensation/directionofmovement)
-#add_subdirectory(sensation/echolocation)
-#add_subdirectory(sensation/geolocation)
-#add_subdirectory(sensation/opticalflow)
 
 ###########################################################################
 # Create packages for selected Linux distributions.
