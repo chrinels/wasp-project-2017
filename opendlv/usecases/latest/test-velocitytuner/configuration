@@ -1,0 +1,130 @@
+# This is the "one-and-only" configuration for OpenDaVINCI.
+# Its format is like:
+#
+# section.key=value
+#
+# If you have several modules of the same type, the following configuration
+# scheme applies:
+#
+# global.key=value # <-- This configuration applies for all modules.
+#
+# section.key=value # <-- This configuration applies for all modules of type "section".
+#
+# section:ID.key=value # <-- This configuration applies for the module "ID" of type "section".
+
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+
+# The following attributes define the buffer sizes for recording and
+# replaying. You need to adjust these parameters depending on the
+# camera resolution for example (640x480x3 --> 1000000 for memorySegment,
+# 1280x720x3 --> 2800000).
+global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
+global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
+
+# The following key describes the list of modules expected to participate in this --cid session.
+global.session.expectedModules = knowledge-scene,perception-detectlane,core-tool-camera-replay
+
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS.
+#
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODSUPERCOMPONENT
+#
+
+# If the managed level is pulse_shift, all connected modules will be informed
+# about the supercomponent's real time by this increment per module. Thus, the
+# execution times per modules are better aligned with supercomponent and the
+# data exchange is somewhat more predictable.
+#odsupercomponent.pulseshift.shift = 10000 # (in microseconds)
+
+# If the managed level is pulse_time_ack, this is the timeout for waiting for
+# an ACK message from a connected client.
+#odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
+
+# If the managed level is pulse_time_ack, the modules are triggered sequentially
+# by sending pulses and waiting for acknowledgment messages. To allow the modules
+# to deliver their respective containers, this yielding time is used to sleep
+# before supercomponent sends the pulse messages the next module in this execution
+# cycle. This value needs to be adjusted for networked simulations to ensure
+# deterministic execution.
+#odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
+
+# List of modules (without blanks) that will not get a pulse message from odsupercomponent.
+#odsupercomponent.pulsetimeack.exclude = odcockpit
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS.
+#
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+
+#global.scenario = file://Track.scnx
+
+# AstaZero Garage Area:
+#global.reference.WGS84.latitude = 57.777025
+#global.reference.WGS84.longitude = 12.781155
+
+# AstaZero High Speed Area:
+#global.reference.WGS84.latitude = 57.780860
+#global.reference.WGS84.longitude = 12.773900
+
+# AstaZero City Area:
+#global.reference.WGS84.latitude = 57.772840
+#global.reference.WGS84.longitude = 12.769964
+
+# AstaZero Rural Road:
+#global.reference.WGS84.latitude = 57.77145065
+#global.reference.WGS84.longitude = 12.77508563
+
+# Revere lab:
+global.reference.WGS84.latitude = 57.709134
+global.reference.WGS84.longitude = 11.947603
+
+# Umea:
+#global.reference.WGS84.latitude = 63.792379
+#global.reference.WGS84.longitude = 20.285961
+
+
+# The following attributes define the buffer sizes for recording and
+# replaying. You need to adjust these parameters depending on the
+# camera resolution for example (640x480x3 --> 1000000 for memorySegment,
+# 1280x720x3 --> 2800000).
+global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
+global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
+
+# The following key describes the list of modules expected to participate in this --cid session.
+global.session.expectedModules = example
+
+logic-legacy-lowlevelcontrol.longitudinal-gain = 0.5
+logic-legacy-lowlevelcontrol.longitudinal-max-acceleration = 3
+logic-legacy-lowlevelcontrol.longitudinal-min-acceleration = -3
+logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum = 1
+
+#logic-legacy-velocitytuner.max-acceleration = 1.25
+logic-legacy-velocitytuner.max-acceleration = 2.5
+logic-legacy-velocitytuner.acceleration-planning-factor = 0.8
+logic-legacy-velocitytuner.test-time-to-intersection = 12 #s
+logic-legacy-velocitytuner.target-velocity-at-intersection = 10 #m/s
+logic-legacy-velocitytuner.max-velocity = 13.89 #m/s
+
+#global.intlat = 57.708474
+#global.intlong = 11.946842
+# Revera lab Anders Carlssons gata intersection
+logic-legacy-locationonpath.intersection-latitude = 57.708474
+logic-legacy-locationonpath.intersection-longitude = 11.946842
