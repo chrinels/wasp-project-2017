@@ -55,8 +55,6 @@ Intersection::~Intersection()
 
 void Intersection::setUp()
 {
-
-
 }
 
 void Intersection::tearDown()
@@ -67,13 +65,6 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
 {
   if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
   }
-}
-
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Intersection::body()
-{
-
-
-  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
 

@@ -38,7 +38,6 @@ class Intersection : public odcore::base::module::TimeTriggeredConferenceClientM
   virtual ~Intersection();
 
   virtual void nextContainer(odcore::data::Container &c);
-  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
   virtual void setUp();
