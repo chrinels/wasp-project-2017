@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef LOGIC_LEGACY_VELOCITYTUNER_VELOCITYTUNER_HPP
-#define LOGIC_LEGACY_VELOCITYTUNER_VELOCITYTUNER_HPP
+#ifndef LOGIC_LEGACY_LOCATIONONPATH_LOCATIONONPATH_HPP
+#define LOGIC_LEGACY_LOCATIONONPATH_LOCATIONONPATH_HPP
 
 #include <memory>
 
@@ -26,18 +26,16 @@
 #include <opendlv/data/environment/Point3.h>
 #include <opendlv/data/environment/WGS84Coordinate.h>
 
-#include <opendavinci/odcore/data/TimeStamp.h>
-
 namespace opendlv {
 namespace logic {
 namespace legacy {
 
-class VelocityTuner : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class LocationOnPath : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
-  VelocityTuner(int32_t const &, char **);
-  VelocityTuner(VelocityTuner const &) = delete;
-  VelocityTuner &operator=(VelocityTuner const &) = delete;
-  virtual ~VelocityTuner();
+  LocationOnPath(int32_t const &, char **);
+  LocationOnPath(LocationOnPath const &) = delete;
+  LocationOnPath &operator=(LocationOnPath const &) = delete;
+  virtual ~LocationOnPath();
 
   virtual void nextContainer(odcore::data::Container &c);
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
@@ -55,13 +53,7 @@ class VelocityTuner : public odcore::base::module::TimeTriggeredConferenceClient
   opendlv::data::environment::WGS84Coordinate m_wgs84Reference;
   odcore::base::Mutex m_referenceMutex;
 
-  double m_maxAccleleration;
-  double m_acclerationPlanningFactor;
-  double m_maxVelocity;
-  odcore::data::TimeStamp m_timeSlotStart;
-  double m_timeToIntersection;
-  double m_targetVelocity;
-  double m_distanceToIntersection;
+  opendlv::data::environment::Point3 m_intersectionPosition;
 };
 
 }
