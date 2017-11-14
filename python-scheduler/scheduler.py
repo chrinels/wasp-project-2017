@@ -62,4 +62,4 @@ def assign_time_slot(access_time, planned_trajectory):
             # Update slot index counter
             schedulable_slot_index = schedulable_slot_index + 1
 
-    return schedulable_slot_index
+    return (schedulable_slot_index, scheduling_successful)
