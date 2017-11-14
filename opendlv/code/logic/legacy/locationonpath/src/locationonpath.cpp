@@ -30,6 +30,7 @@
 #include <opendlv/data/environment/Obstacle.h>
 #include <opendlv/data/environment/Polygon.h>
 #include <opendlv/data/environment/WGS84Coordinate.h>
+#include <odvdvehicle/generated/opendlv/proxy/ActuationRequest.h>
 
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
@@ -70,11 +71,14 @@ void LocationOnPath::setUp()
   // double testTimeToIntersection = getKeyValueConfiguration().getValue<double>(
   //   "global.intlat");
   // std::cout << "testTimeToIntersection" << testTimeToIntersection << '\n';
-  double const latitudeIntersection = getKeyValueConfiguration().getValue<double>(
-      "logic-legacy-locationonpath.intersection-latitude");
-  double const longitudeIntersection = getKeyValueConfiguration().getValue<double>(
-      "logic-legacy-locationonpath.intersection-longitude");
-  auto wgs84IntersectionPosition = opendlv::data::environment::WGS84Coordinate(latitudeIntersection,longitudeIntersection);
+ // double const latitudeIntersection = 
+//getKeyValueConfiguration().getValue<double>(
+//      "logic-legacy-locationonpath.intersection-latitude");
+ // double const longitudeIntersection = 
+//getKeyValueConfiguration().getValue<double>(
+//      "logic-legacy-locationonpath.intersection-longitude");
+  auto wgs84IntersectionPosition = 
+opendlv::data::environment::WGS84Coordinate(57.708474,11.946842);
   m_intersectionPosition = m_wgs84Reference.transform(wgs84IntersectionPosition);
   std::cout << "m_intersectionPosition" << m_intersectionPosition.getX() << ", " << m_intersectionPosition.getY() << '\n';
 
@@ -148,6 +152,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LocationOnPath::body()
       locationOnPath.setCurrentLocation(currentLocation);
       odcore::data::Container initC(locationOnPath);
       getConference().send(initC);
+
+      opendlv::proxy::ActuationRequest ar;
+      ar.setAcceleration(-2.0);
+      ar.setSteering(1);
+      ar.setIsValid(true);
+      odcore::data::Container car(ar);
+      getConference().send(car);
     }
 
 

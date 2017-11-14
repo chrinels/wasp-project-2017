@@ -128,3 +128,15 @@ logic-legacy-velocitytuner.max-velocity = 13.89 #m/s
 # Revera lab Anders Carlssons gata intersection
 logic-legacy-locationonpath.intersection-latitude = 57.708474
 logic-legacy-locationonpath.intersection-longitude = 11.946842
+
+#
+# CONFIGURATION FOR proxy-xc90
+#
+proxy-xc90.devicenode = can0        # Socket CAN device.
+proxy-xc90.debug = 0                # Enable debug output to console.
+proxy-xc90.record_gcm = 0           # 1 = Dump generic CAN messages.
+proxy-xc90.record_mapped_data = 0   # 1 = Record mapped containers.
+proxy-xc90.record_asc = 0           # 1 = Dump ASC data from CAN.
+proxy-xc90.read-only = 0            # 1 = read-only , 0 = read/write
+
+
