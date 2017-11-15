@@ -89,8 +89,8 @@ void LocationOnPath::nextContainer(odcore::data::Container &a_container)
   if (a_container.getDataType() == opendlv::logic::legacy::StateEstimate::ID()) {
     odcore::base::Lock l(m_referenceMutex);
     auto stateEstimate = a_container.getData<opendlv::logic::legacy::StateEstimate>();
-    m_position.setX(stateEstimate.getPositionX);
-    m_position.setY(stateEstimate.getPositionY);
+    m_position.setX(stateEstimate.getPositionX());
+    m_position.setY(stateEstimate.getPositionY());
   }
   // if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
   //   odcore::base::Lock l(m_referenceMutex);
