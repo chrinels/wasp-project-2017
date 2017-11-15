@@ -251,6 +251,11 @@ message opendlv.logic.legacy.StateEstimate [id = 204] {
   double yawRate [id = 6];
 }
 
+message opendlv.logic.legacy.VelocityRequest [id = 205] {
+  list<double> velocity [id = 1];
+  list<odcore::data::TimeStamp> timeStamp [id = 2];
+}
+
 message opendlv.logic.legacy.VelocityTunerState [id = 206] {
   double t1 [id = 1];
   double t2 [id = 2];
