@@ -34,23 +34,18 @@ services:
           - odsupercomponent
       command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=10"
 
-    logic-legacy-velocitytuner:
-      image: ${IMAGE}
-      network_mode: "host"
-      depends_on:
-          - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-velocitytuner --cid=${CID} --verbose=1 --freq=1"
+#    logic-legacy-velocitytuner:
+#      image: ${IMAGE}
+#      network_mode: "host"
+#      depends_on:
+#          - odsupercomponent
+#      command: "/opt/opendlv/bin/opendlv-logic-legacy-velocitytuner --cid=${CID} --verbose=1 --freq=1"
 
-    logic-legacy-lowlevelcontrol:
-      image: ${IMAGE}
-      network_mode: "host"
-      depends_on:
-          - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=10"
+#    logic-legacy-lowlevelcontrol:
+#      image: ${IMAGE}
+#      network_mode: "host"
+#      depends_on:
+#          - odsupercomponent
+#      command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=100"
 
-    sim-vehiclesim:
-      image: ${IMAGE}
-      network_mode: "host"
-      depends_on:
-          - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=10"
+   

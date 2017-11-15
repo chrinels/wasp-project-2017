@@ -84,8 +84,9 @@ global.session.expectedModules = knowledge-scene,perception-detectlane,core-tool
 #global.reference.WGS84.longitude = 12.773900
 
 # AstaZero City Area:
-global.reference.WGS84.latitude = 57.772840
-global.reference.WGS84.longitude = 12.769964
+global.reference.WGS84.latitude = 57.77338154493465
+global.reference.WGS84.longitude = 12.76686512235394
+
 
 # AstaZero Rural Road:
 #global.reference.WGS84.latitude = 57.77145065 
@@ -157,4 +158,7 @@ odrecorderh264.portbaseforchildprocesses = 29000;
 #
 proxy-applanix.ip = 10.42.42.40    # Change to Applanix IP.
 proxy-applanix.port = 5602
+
+logic-legacy-locationonpath.intersection-latitude = 57.77311000919249
+logic-legacy-locationonpath.intersection-longitude = 12.76892092885846
 

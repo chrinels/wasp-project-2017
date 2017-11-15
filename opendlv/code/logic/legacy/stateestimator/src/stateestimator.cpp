@@ -44,7 +44,7 @@ namespace logic {
 namespace legacy {
 
 StateEstimator::StateEstimator(int32_t const &a_argc, char **a_argv)
-  : TimeTriggeredConferenceClientModule(a_argc, a_argv, 
+  : TimeTriggeredConferenceClientModule(a_argc, a_argv,
       "logic-legacy-stateestimator"),
   m_stateMutex(),
   m_position(0,0,0),
@@ -81,8 +81,8 @@ void StateEstimator::setUp()
 void StateEstimator::tearDown()
 {
 }
-    
-void StateEstimator::nextContainer(odcore::data::Container &a_container) 
+
+void StateEstimator::nextContainer(odcore::data::Container &a_container)
 {
   if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
     odcore::base::Lock l(m_stateMutex);
@@ -104,7 +104,7 @@ void StateEstimator::nextContainer(odcore::data::Container &a_container)
     auto vx_i = groundSpeedReading.getGroundSpeed();
     auto vx = m_velocity.getX();
     odcore::data::TimeStamp currentTime;
-    
+
     auto dt = (currentTime - m_groundSpeedReadingTimeStamp).toMicroseconds()*1.0/1000000L;
     auto smoothing_factor = fmin(dt/m_velocitySmoothing,1.0);
     vx += smoothing_factor*(vx_i-vx);
@@ -115,7 +115,7 @@ void StateEstimator::nextContainer(odcore::data::Container &a_container)
   } else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
 
   } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
-    
+
   }
 
   // Read path
@@ -131,7 +131,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode StateEstimator::body()
 
       // Print current state
       std::cout << "position: (" << std::to_string(m_position.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;
-      std::cout << "velocity: (" << std::to_string(m_velocity.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;
+      std::cout << "velocity: (" << std::to_string(m_velocity.getX()) << ", " << std::to_string(m_velocity.getY()) << ")" << std::endl;
       std::cout << "orientation: " << std::to_string(m_orientation) << std::endl;
       std::cout << "yaw rate: " << std::to_string(m_yawRate) << std::endl;
 
