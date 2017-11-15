@@ -27,13 +27,13 @@ global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
 
 # The following key describes the list of modules expected to participate in this --cid session.
-global.session.expectedModules = knowledge-scene,perception-detectlane,core-tool-camera-replay
+#global.session.expectedModules = knowledge-scene,core-tool-camera-replay
 
 
 ###############################################################################
 ###############################################################################
 #
-# NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS. 
+# NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS.
 #
 ###############################################################################
 ###############################################################################
@@ -56,7 +56,7 @@ global.session.expectedModules = knowledge-scene,perception-detectlane,core-tool
 # to deliver their respective containers, this yielding time is used to sleep
 # before supercomponent sends the pulse messages the next module in this execution
 # cycle. This value needs to be adjusted for networked simulations to ensure
-# deterministic execution. 
+# deterministic execution.
 #odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
 
 # List of modules (without blanks) that will not get a pulse message from odsupercomponent.
@@ -65,7 +65,7 @@ global.session.expectedModules = knowledge-scene,perception-detectlane,core-tool
 ###############################################################################
 ###############################################################################
 #
-# NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS. 
+# NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS.
 #
 
 ###############################################################################
@@ -89,7 +89,7 @@ global.reference.WGS84.latitude = 57.772840
 global.reference.WGS84.longitude = 12.769964
 
 # AstaZero Rural Road:
-#global.reference.WGS84.latitude = 57.77145065 
+#global.reference.WGS84.latitude = 57.77145065
 #global.reference.WGS84.longitude = 12.77508563
 
 # Revere lab:
@@ -115,3 +115,6 @@ logic-legacy-lowlevelcontrol.longitudinal-gain = 0.5
 logic-legacy-lowlevelcontrol.longitudinal-max-acceleration = 3
 logic-legacy-lowlevelcontrol.longitudinal-min-acceleration = -3
 logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum = 1
+
+logic-coordination-intersection.slot_duration = 5
+logic-coordination-intersection.nrof_slots = 20
