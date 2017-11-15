@@ -86,19 +86,25 @@ void LocationOnPath::tearDown()
 
 void LocationOnPath::nextContainer(odcore::data::Container &a_container)
 {
-  if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
+  if (a_container.getDataType() == opendlv::logic::legacy::StateEstimate::ID()) {
     odcore::base::Lock l(m_referenceMutex);
-    auto currentPosition = a_container.getData<opendlv::data::environment::WGS84Coordinate>();
-    m_position = m_wgs84Reference.transform(currentPosition);
-    cout << "LOP: Recieved WGS84Coordinate (X, Y): " << m_position.getX() << ", " << m_position.getY() << endl;
-
-  } else if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
-
-  } else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
-
-  } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
-
+    auto stateEstimate = a_container.getData<opendlv::logic::legacy::StateEstimate>();
+    m_position.setX(stateEstimate.getPositionX);
+    m_position.setY(stateEstimate.getPositionY);
   }
+  // if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
+  //   odcore::base::Lock l(m_referenceMutex);
+  //   auto currentPosition = a_container.getData<opendlv::data::environment::WGS84Coordinate>();
+  //   m_position = m_wgs84Reference.transform(currentPosition);
+  //   cout << "LOP: Recieved WGS84Coordinate (X, Y): " << m_position.getX() << ", " << m_position.getY() << endl;
+
+  // } else if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
+
+  // } else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
+
+  // } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
+
+  // }
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LocationOnPath::body()
