@@ -47,7 +47,8 @@ namespace coordination {
 
 Intersection::Intersection(int32_t const &a_argc, char **a_argv)
   : DataTriggeredConferenceClientModule(a_argc, a_argv,
-      "logic-coordination-intersection")
+      "logic-coordination-intersection"),
+    m_initialised(False)
 {
 }
 
@@ -57,6 +58,16 @@ Intersection::~Intersection()
 
 void Intersection::setUp()
 {
+    // Extract parameter values
+    odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+    m_slot_duration = kv.getValue<float>(
+        "logic-coordination-intersection.slot_duration");
+    m_nrof_slots = kv.getValue<float>(
+        "logic-coordination-intersection.nrof_slots");
+
+    setUpCompatibleTrajectories();
+
+    m_initialised = true;
 }
 
 void Intersection::tearDown()
@@ -73,6 +84,83 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
   }
 }
 
+void setUpCompatibleTrajectories()
+{
+    // Define the compatible trajectories
+    // Coming from West
+    std::vector<VALID_TRAJECTORY> ws_compatible = { VALID_TRAJECTORY::ER,
+                                 		    VALID_TRAJECTORY::NR,
+		                                    VALID_TRAJECTORY::ES };
+    std::vector<VALID_TRAJECTORY> wr_compatible = { VALID_TRAJECTORY::ER,
+                                 		    VALID_TRAJECTORY::NR,
+		                                    VALID_TRAJECTORY::ES,
+                                                    VALID_TRAJECTORY::SL,
+                                                    VALID_TRAJECTORY::SS,
+                                                    VALID_TRAJECTORY::NL,
+                                                    VALID_TRAJECTORY::SR};
+    std::vector<VALID_TRAJECTORY> wl_compatible = { VALID_TRAJECTORY::NR,
+                                 		    VALID_TRAJECTORY::SR,
+		                                    VALID_TRAJECTORY::EL };
+
+    // Coming from South
+    std::vector<VALID_TRAJECTORY> ss_compatible = { VALID_TRAJECTORY::NR,
+                                 		    VALID_TRAJECTORY::WR,
+		                                    VALID_TRAJECTORY::NS };
+    std::vector<VALID_TRAJECTORY> sr_compatible = { VALID_TRAJECTORY::NR,
+                                 		    VALID_TRAJECTORY::WR,
+		                                    VALID_TRAJECTORY::NS,
+                                                    VALID_TRAJECTORY::EL,
+                                                    VALID_TRAJECTORY::ES,
+                                                    VALID_TRAJECTORY::WL,
+                                                    VALID_TRAJECTORY::ER};
+    std::vector<VALID_TRAJECTORY> sl_compatible = { VALID_TRAJECTORY::WR,
+                                 		    VALID_TRAJECTORY::ER,
+		                                    VALID_TRAJECTORY::NL };
+
+    // Coming from East
+    std::vector<VALID_TRAJECTORY> es_compatible = { VALID_TRAJECTORY::WR,
+                                 		    VALID_TRAJECTORY::SR,
+		                                    VALID_TRAJECTORY::WS };
+    std::vector<VALID_TRAJECTORY> er_compatible = { VALID_TRAJECTORY::WR,
+                                 		    VALID_TRAJECTORY::SR,
+		                                    VALID_TRAJECTORY::WS,
+                                                    VALID_TRAJECTORY::NL,
+                                                    VALID_TRAJECTORY::NS,
+                                                    VALID_TRAJECTORY::SL,
+                                                    VALID_TRAJECTORY::NR};
+    std::vector<VALID_TRAJECTORY> el_compatible = { VALID_TRAJECTORY::SR,
+                                 		    VALID_TRAJECTORY::NR,
+		                                    VALID_TRAJECTORY::WL };
+
+    // Coming from North
+    std::vector<VALID_TRAJECTORY> ns_compatible = { VALID_TRAJECTORY::SR,
+                                 		    VALID_TRAJECTORY::ER,
+		                                    VALID_TRAJECTORY::SS };
+    std::vector<VALID_TRAJECTORY> nr_compatible = { VALID_TRAJECTORY::SR,
+                                 		    VALID_TRAJECTORY::ER,
+		                                    VALID_TRAJECTORY::SS,
+                                                    VALID_TRAJECTORY::WL,
+                                                    VALID_TRAJECTORY::WS,
+                                                    VALID_TRAJECTORY::EL,
+                                                    VALID_TRAJECTORY::WR};
+    std::vector<VALID_TRAJECTORY> nl_compatible = { VALID_TRAJECTORY::ER,
+                                 		    VALID_TRAJECTORY::WR,
+		                                    VALID_TRAJECTORY::SL };
+
+    m_compatible_trajectories[VALID_TRAJECTORIES::WS] = ws_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORIES::WR] = ws_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORIES::WL] = ws_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORIES::SS] = ss_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORIES::SR] = ss_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORIES::SL] = ss_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORIES::ES] = es_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORIES::ER] = es_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORIES::EL] = es_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORIES::NS] = ns_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORIES::NR] = ns_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORIES::NL] = ns_compatible;
+
+}
 
 } // coordination
 } // logic

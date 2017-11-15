@@ -40,8 +40,22 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   virtual void nextContainer(odcore::data::Container &c);
 
  private:
-  virtual void setUp();
-  virtual void tearDown();
+  void setUp();
+  void setUpCompatibleTrajectories();
+  void tearDown();
+
+  // Valid trajectories definition
+  // [W]est/[S]outh/[N]orth/[E]ast - direction of approach
+  // [S]traight/[L]eft/[R]ight - Path plan
+  enum VALID_TRAJECTORY = {WS, WR, WL,
+                           SS, SR, SL,
+                           NS, NR, NL,
+                           ES, ER, EL};
+
+  bool m_initialised;
+  std::map<VALID_TRAJECTORY, std::vector<VALID_TRAJECTORY>> m_compatibile_trajectories;
+  float m_slot_duration;	// [seconds]
+  float m_nrof_slots;		// Slots scheduled by the scheduler
 
 };
 
