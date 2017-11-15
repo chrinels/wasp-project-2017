@@ -18,12 +18,15 @@
 
 #include <cmath>
 #include <cstdio>
+#include <ctype.h>
+#include <cstring>
 
 #include <iostream>
 
-#include <opendavinci/odcore/base/Thread.h>
-#include <opendavinci/odcore/base/Lock.h>
+
 #include <opendavinci/odcore/data/Container.h>
+#include "opendavinci/odcore/data/TimeStamp.h"
+
 #include <opendavinci/odcore/io/conference/ContainerConference.h>
 
 #include <opendlv/data/environment/Line.h>
@@ -34,7 +37,6 @@
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
 #include <odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h>
-#include <odvdvehicle/generated/opendlv/proxy/ActuationRequest.h>
 #include <odvdimu/GeneratedHeaders_ODVDIMU.h>
 
 #include "intersection.hpp"
@@ -63,11 +65,15 @@ void Intersection::tearDown()
 
 void Intersection::nextContainer(odcore::data::Container &a_container)
 {
-  if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
+  cout << "Message has dataType ID = " << opendlv::knowledge::Message::ID() << endl;
+  cout << " - Received dataType ID = " << a_container.getDataType() << endl;
+  if(a_container.getDataType() != opendlv::knowledge::Message::ID()){
+    cout << "Not a message! Returning!" << endl;
+    return;
   }
 }
 
 
-}
-}
-}
+} // coordination
+} // logic
+} // opendlv
