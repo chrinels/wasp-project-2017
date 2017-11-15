@@ -97,27 +97,18 @@ void VelocityTuner::tearDown()
 
 void VelocityTuner::nextContainer(odcore::data::Container &a_container)
 {
-  if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
-
-  } else if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
+  if (a_container.getDataType() == opendlv::logic::legacy::StateEstimate::ID()) {
     odcore::base::Lock l(m_stateMutex);
-    auto groundSpeedReading = a_container.getData<opendlv::proxy::GroundSpeedReading>();
-    m_velocity.setX(groundSpeedReading.getGroundSpeed());
-    cout << "Recieved GroundSpeedReading: " << groundSpeedReading.getGroundSpeed() << endl;
+    auto stateEstimate = a_container.getData<opendlv::logic::legacy::StateEstimate>();
+    m_velocity.setX(stateEstimate.getVelocityX);
 
-  } else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
-
-  } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
-
-  }
-  else if (a_container.getDataType() == opendlv::logic::legacy::TimeSlot::ID()) {
+  } else if (a_container.getDataType() == opendlv::logic::legacy::TimeSlot::ID()) {
     odcore::base::Lock l(m_referenceMutex);
     auto timeSlot = a_container.getData<opendlv::logic::legacy::TimeSlot>();
     m_timeSlotStart = timeSlot.getEntryTime();
     cout << "Recieved TimeSlot, SlotStart: " << m_timeSlotStart << endl;
 
-  }
-  else if (a_container.getDataType() == opendlv::logic::legacy::LocationOnPathToIntersection::ID()) {
+  } else if (a_container.getDataType() == opendlv::logic::legacy::LocationOnPathToIntersection::ID()) {
     odcore::base::Lock l(m_stateMutex);
     auto locationOnPathToIntersection = a_container.getData<opendlv::logic::legacy::LocationOnPathToIntersection>();
     m_distanceToIntersection = locationOnPathToIntersection.getIntersectionLocation() - locationOnPathToIntersection.getCurrentLocation();
