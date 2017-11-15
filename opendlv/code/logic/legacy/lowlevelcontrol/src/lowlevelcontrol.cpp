@@ -43,7 +43,7 @@ namespace logic {
 namespace legacy {
 
 LowLevelControl::LowLevelControl(int32_t const &a_argc, char **a_argv)
-  : TimeTriggeredConferenceClientModule(a_argc, a_argv, 
+  : TimeTriggeredConferenceClientModule(a_argc, a_argv,
       "logic-legacy-lowlevelcontrol"),
   m_stateMutex(),
   m_position(0,0,0),
@@ -92,8 +92,8 @@ void LowLevelControl::setUp()
 void LowLevelControl::tearDown()
 {
 }
-    
-void LowLevelControl::nextContainer(odcore::data::Container &a_container) 
+
+void LowLevelControl::nextContainer(odcore::data::Container &a_container)
 {
   if (a_container.getDataType() == opendlv::logic::legacy::StateEstimate::ID()) {
     odcore::base::Lock l(m_stateMutex);
@@ -130,27 +130,27 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
   getConference().send(initC);
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-    odcore::base::Lock l(m_stateMutex);
-    odcore::base::Lock l(m_referenceMutex);
+    odcore::base::Lock ls(m_stateMutex);
+    odcore::base::Lock lr(m_referenceMutex);
 
     double velocityReference = 0.0;
     double accelerationReference = 0.0;
 
   	if (m_velocityHorizonIsValid) {
     	odcore::data::TimeStamp currentTime;
-  		auto t = m_velocityHorizon.getTimeStamp();
-  		auto v = m_velocityHorizon.getVelocity();
-  		auto it = t.begin();
-  		auto iv = v.begin();
+      auto tpair = m_velocityHorizon.iteratorPair_ListOfTimeStamp();
+      auto vpair = m_velocityHorizon.iteratorPair_ListOfVelocity();
+  		auto it = tpair.first;
+  		auto iv = vpair.first;
     	odcore::data::TimeStamp t0;
     	odcore::data::TimeStamp t1;
     	double v0 = 0.0;
     	double v1 = 0.0;
     	bool hast0 = false;
     	bool hast1 = false;
-  		for(; i != its.end() && iv != iv.end(); ++it, ++iv) {
+  		for(; it != tpair.second && iv != vpair.second; ++it, ++iv) {
 		    if (*it < currentTime) {
-		    	v0 = *uv;
+		    	v0 = *iv;
 		    	t0 = *it;
 		    	hast0 = true;
 		    } else {
@@ -159,15 +159,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
 		    	hast1 = true;
 		    	break;
 		    }
-		}
-		if (hast0 && hast1) {
-			auto tdiff = (t1 - t0).toMicroseconds()*1.0/1000000L;
-			accelerationReference = (v1-v0)/tdiff;
-			velocityReference = accelerationReference*(currentTime-t0).toMicroseconds()*1.0/1000000L;
-		} else {
-  			vvelocityReference = v.back();
-			accelerationReference = 0;
-		}
+  		}
+  		if (hast0 && hast1) {
+  			auto tdiff = (t1 - t0).toMicroseconds()*1.0/1000000L;
+  			accelerationReference = (v1-v0)/tdiff;
+  			velocityReference = accelerationReference*(currentTime-t0).toMicroseconds()*1.0/1000000L;
+  		} else {
+    		velocityReference = *(vpair.second-1);
+  			accelerationReference = 0;
+  		}
 
     } else {
   		velocityReference = m_velocityReference;

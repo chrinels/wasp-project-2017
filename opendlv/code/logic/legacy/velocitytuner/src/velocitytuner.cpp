@@ -36,6 +36,7 @@
 #include <odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h>
 #include <odvdimu/GeneratedHeaders_ODVDIMU.h>
 
+#include <list>
 //#include <opendavinci/odcore/data/TimeStamp.h>
 
 #include "velocitytuner.hpp"
@@ -60,7 +61,13 @@ VelocityTuner::VelocityTuner(int32_t const &a_argc, char **a_argv)
 	m_timeSlotStart(),
   m_timeToIntersection(0),
 	m_targetVelocity(0),
-	m_distanceToIntersection(0)
+	m_distanceToIntersection(0),
+  m_start_velocity(0),
+  m_up_velocity(0),
+  m_down_velocity(0),
+  m_end_velocity(0),
+  m_start_point(0),
+  m_time_segment_seconds(0)
 {
 }
 
@@ -88,6 +95,18 @@ void VelocityTuner::setUp()
   double testTimeToIntersection = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-velocitytuner.test-time-to-intersection");
   m_timeSlotStart = currentTime + odcore::data::TimeStamp(testTimeToIntersection,0);
+  m_start_velocity = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-velocitytuner.start_velocitykmh")/3.6;
+  m_up_velocity = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-velocitytuner.up_velocitykmh")/3.6;
+  m_down_velocity = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-velocitytuner.down_velocitykmh")/3.6;
+  m_end_velocity = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-velocitytuner.end_velocitykmh")/3.6;
+  m_start_point = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-velocitytuner.start_point");
+  m_time_segment_seconds = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-velocitytuner.time_segment_seconds");
 
 }
 
@@ -119,10 +138,42 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
 {
   double const Tint = 1.0/static_cast<double>(getFrequency());
   std::cout << "Tint: " << Tint << '\n';
+  bool flag = false;
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     //debug message
     opendlv::logic::legacy::VelocityTunerState velocityTunerState;
+    if (m_distanceToIntersection < m_start_point) {
+      opendlv::logic::legacy::VelocityRequest velocityRequest;
+      velocityRequest.setVelocity(m_start_velocity);
+      odcore::data::Container initC(velocityRequest);
+      getConference().send(initC);
+      std::cout << "Sending constant velocityRequest: " << m_start_velocity*3.6 << '\n';
+    } else {
+      if (flag == false) {
+        flag = true;
+        odcore::data::TimeStamp currentTime;
+        opendlv::logic::legacy::VelocityHorizon velocityHorizon;
+        // std::list<double> velocity;
+        velocityHorizon.addTo_ListOfTimeStamp(currentTime);
+        velocityHorizon.addTo_ListOfVelocity(m_start_velocity);
+
+        velocityHorizon.addTo_ListOfTimeStamp(currentTime+odcore::data::TimeStamp(m_time_segment_seconds,0));
+        velocityHorizon.addTo_ListOfVelocity(m_up_velocity);
+        velocityHorizon.addTo_ListOfTimeStamp(currentTime+odcore::data::TimeStamp(2*m_time_segment_seconds,0));
+        velocityHorizon.addTo_ListOfVelocity(m_up_velocity);
+        velocityHorizon.addTo_ListOfTimeStamp(currentTime+odcore::data::TimeStamp(3*m_time_segment_seconds,0));
+        velocityHorizon.addTo_ListOfVelocity(m_down_velocity);
+        velocityHorizon.addTo_ListOfTimeStamp(currentTime+odcore::data::TimeStamp(4*m_time_segment_seconds,0));
+        velocityHorizon.addTo_ListOfVelocity(m_end_velocity);
+        velocityHorizon.addTo_ListOfTimeStamp(currentTime+odcore::data::TimeStamp(5*m_time_segment_seconds,0));
+        velocityHorizon.addTo_ListOfVelocity(m_end_velocity);
+
+        odcore::data::Container initC(velocityHorizon);
+        getConference().send(initC);
+      }
+    }
+
 
     // Calculate what velocity to set
     if (m_distanceToIntersection > 0) {
@@ -312,10 +363,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
       // }
       // cout << "commandV: " << commandV << endl;
       // Set velocity
-      opendlv::logic::legacy::VelocityRequest velocityRequest;
-      velocityRequest.setVelocity(commandV);
-      odcore::data::Container initC(velocityRequest);
-      getConference().send(initC);
+      // opendlv::logic::legacy::VelocityRequest velocityRequest;
+      // velocityRequest.setVelocity(commandV);
+      // odcore::data::Container initC(velocityRequest);
+      // getConference().send(initC);
 
       odcore::data::Container initC2(velocityTunerState);
       getConference().send(initC2);

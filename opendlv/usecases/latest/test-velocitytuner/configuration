@@ -85,16 +85,16 @@ global.session.expectedModules = knowledge-scene,perception-detectlane,core-tool
 #global.reference.WGS84.longitude = 12.773900
 
 # AstaZero City Area:
-#global.reference.WGS84.latitude = 57.772840
-#global.reference.WGS84.longitude = 12.769964
+global.reference.WGS84.latitude = 57.77338154493465
+global.reference.WGS84.longitude = 12.76686512235394
 
 # AstaZero Rural Road:
 #global.reference.WGS84.latitude = 57.77145065
 #global.reference.WGS84.longitude = 12.77508563
 
 # Revere lab:
-global.reference.WGS84.latitude = 57.709134
-global.reference.WGS84.longitude = 11.947603
+#global.reference.WGS84.latitude = 57.709134
+#global.reference.WGS84.longitude = 11.947603
 
 # Umea:
 #global.reference.WGS84.latitude = 63.792379
@@ -122,9 +122,48 @@ logic-legacy-velocitytuner.acceleration-planning-factor = 0.8
 logic-legacy-velocitytuner.test-time-to-intersection = 12 #s
 logic-legacy-velocitytuner.target-velocity-at-intersection = 10 #m/s
 logic-legacy-velocitytuner.max-velocity = 13.89 #m/s
+logic-legacy-velocitytuner.start_point = 20 
+logic-legacy-velocitytuner.start_velocitykmh = 20
+logic-legacy-velocitytuner.up_velocitykmh = 30
+logic-legacy-velocitytuner.end_velocitykmh = 0
 
-#global.intlat = 57.708474
-#global.intlong = 11.946842
-# Revera lab Anders Carlssons gata intersection
-logic-legacy-locationonpath.intersection-latitude = 57.708474
-logic-legacy-locationonpath.intersection-longitude = 11.946842
+logic-legacy-velocitytuner.time_segment_seconds = 5
+
+#
+# CONFIGURATION FOR state estimator
+#
+logic-legacy-stateestimator.position.smoothing = 0.1;
+logic-legacy-stateestimator.velocity.smoothing = 0.1;
+
+
+#
+# CONFIGURATION FOR proxy-xc90
+#
+proxy-xc90.devicenode = can0        # Socket CAN device.
+proxy-xc90.debug = 0                # Enable debug output to console.
+proxy-xc90.record_gcm = 0           # 1 = Dump generic CAN messages.
+proxy-xc90.record_mapped_data = 0   # 1 = Record mapped containers.
+proxy-xc90.record_asc = 0           # 1 = Dump ASC data from CAN.
+proxy-xc90.read-only = 0            # 1 = read-only , 0 = read/write
+
+
+
+#
+# CONFIGURATION FOR ODRECORDERH264
+#
+#odrecorderh264.output = file://recorder.rec # 
+odrecorderh264.remoteControl = 0;
+odrecorderh264.dumpSharedData = 0;
+odrecorderh264.lossless = 1;
+odrecorderh264.portbaseforchildprocesses = 29000;
+
+###############################################################################
+#
+# CONFIGURATION FOR proxy-applanix
+#
+proxy-applanix.ip = 10.42.42.40    # Change to Applanix IP.
+proxy-applanix.port = 5602
+
+logic-legacy-locationonpath.intersection-latitude = 57.77311000919249
+logic-legacy-locationonpath.intersection-longitude = 12.76892092885846
+

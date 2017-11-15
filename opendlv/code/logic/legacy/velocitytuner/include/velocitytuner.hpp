@@ -62,6 +62,12 @@ class VelocityTuner : public odcore::base::module::TimeTriggeredConferenceClient
   double m_timeToIntersection;
   double m_targetVelocity;
   double m_distanceToIntersection;
+  double m_start_velocity;
+  double m_up_velocity;
+  double m_down_velocity;
+  double m_end_velocity;
+  double m_start_point;
+  double m_time_segment_seconds;
 };
 
 }
