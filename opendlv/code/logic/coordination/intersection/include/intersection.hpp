@@ -21,7 +21,7 @@
 
 #include <memory>
 
-#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include <opendavinci/odcore/base/Mutex.h>
 #include <opendlv/data/environment/Point3.h>
 #include <opendlv/data/environment/WGS84Coordinate.h>
@@ -30,7 +30,7 @@ namespace opendlv {
 namespace logic {
 namespace coordination {
 
-class Intersection : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class Intersection : public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
   Intersection(int32_t const &, char **);
   Intersection(Intersection const &) = delete;

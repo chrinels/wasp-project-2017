@@ -44,7 +44,7 @@ namespace logic {
 namespace coordination {
 
 Intersection::Intersection(int32_t const &a_argc, char **a_argv)
-  : TimeTriggeredConferenceClientModule(a_argc, a_argv,
+  : DataTriggeredConferenceClientModule(a_argc, a_argv,
       "logic-coordination-intersection")
 {
 }
