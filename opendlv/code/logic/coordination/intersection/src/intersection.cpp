@@ -107,10 +107,9 @@ bool Intersection::scheduleTrajectory(float intersectionAccessTime, Trajectory p
 
         // Find the intersection with compatible trajectories
         std::vector<Trajectory> newValidTrajectories();
-        for(i = 0; i < m_allTrajectories.size(); ++i) {
-          if(contains(validTrajectories, m_allTrajectories[i] &&
-             contains(compatibleTrajectories, m_allTrajectories[i]))) {
-              newValidTrajectories.push_back(m_allTrajectories[i]);
+        for(i = 0; i < validTrajectories.size(); ++i) {
+          if(contains(compatibleTrajectories, validTrajectories[i])) {
+              newValidTrajectories.push_back(validTrajectories[i]);
           }
         }
         // Update the valid trajectories
@@ -127,6 +126,12 @@ bool Intersection::scheduleTrajectory(float intersectionAccessTime, Trajectory p
   }
 
   return schedulingSuccessful;
+}
+
+// Shift the scheduled trajectories table at every slot transition
+void Intersection::updateScheduledTrajectorySlots()
+{
+  // rotate(m_scheduledTrajectories.begin() + 1, m_scheduledTrajectories.end(), m_scheduledTrajectories.begin())
 }
 
 // Check if a vector of integers contains a given integer value

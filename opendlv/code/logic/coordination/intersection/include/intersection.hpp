@@ -54,6 +54,7 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   int determineFirstAccessibleSlot(float);
   void addTrajectoryToSlot(int, Trajectory, SchedulingInfo);
   bool contains(std::Vector<int>, int);
+  void updateScheduledTrajectorySlots();
 
   // Valid trajectories definition
   // [W]est/[S]outh/[N]orth/[E]ast - direction of approach
