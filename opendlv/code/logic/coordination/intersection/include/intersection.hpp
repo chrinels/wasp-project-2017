@@ -47,13 +47,13 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   // Valid trajectories definition
   // [W]est/[S]outh/[N]orth/[E]ast - direction of approach
   // [S]traight/[L]eft/[R]ight - Path plan
-  enum VALID_TRAJECTORY = {WS, WR, WL,
+  enum VALID_TRAJECTORY {WS, WR, WL,
                            SS, SR, SL,
                            NS, NR, NL,
                            ES, ER, EL};
 
   bool m_initialised;
-  std::map<VALID_TRAJECTORY, std::vector<VALID_TRAJECTORY>> m_compatibile_trajectories;
+  std::map<VALID_TRAJECTORY, std::vector<VALID_TRAJECTORY>> m_compatible_trajectories;
   float m_slot_duration;	// [seconds]
   float m_nrof_slots;		// Slots scheduled by the scheduler
 

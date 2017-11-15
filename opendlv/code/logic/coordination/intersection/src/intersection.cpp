@@ -48,7 +48,10 @@ namespace coordination {
 Intersection::Intersection(int32_t const &a_argc, char **a_argv)
   : DataTriggeredConferenceClientModule(a_argc, a_argv,
       "logic-coordination-intersection"),
-    m_initialised(False)
+    m_initialised(false),
+    m_compatible_trajectories(),
+    m_slot_duration(5.0),
+    m_nrof_slots(20)
 {
 }
 
@@ -84,7 +87,7 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
   }
 }
 
-void setUpCompatibleTrajectories()
+void Intersection::setUpCompatibleTrajectories()
 {
     // Define the compatible trajectories
     // Coming from West
@@ -147,18 +150,18 @@ void setUpCompatibleTrajectories()
                                  		    VALID_TRAJECTORY::WR,
 		                                    VALID_TRAJECTORY::SL };
 
-    m_compatible_trajectories[VALID_TRAJECTORIES::WS] = ws_compatible;
-    m_compatible_trajectories[VALID_TRAJECTORIES::WR] = ws_compatible;
-    m_compatible_trajectories[VALID_TRAJECTORIES::WL] = ws_compatible;
-    m_compatible_trajectories[VALID_TRAJECTORIES::SS] = ss_compatible;
-    m_compatible_trajectories[VALID_TRAJECTORIES::SR] = ss_compatible;
-    m_compatible_trajectories[VALID_TRAJECTORIES::SL] = ss_compatible;
-    m_compatible_trajectories[VALID_TRAJECTORIES::ES] = es_compatible;
-    m_compatible_trajectories[VALID_TRAJECTORIES::ER] = es_compatible;
-    m_compatible_trajectories[VALID_TRAJECTORIES::EL] = es_compatible;
-    m_compatible_trajectories[VALID_TRAJECTORIES::NS] = ns_compatible;
-    m_compatible_trajectories[VALID_TRAJECTORIES::NR] = ns_compatible;
-    m_compatible_trajectories[VALID_TRAJECTORIES::NL] = ns_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORY::WS] = ws_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORY::WR] = ws_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORY::WL] = ws_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORY::SS] = ss_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORY::SR] = ss_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORY::SL] = ss_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORY::ES] = es_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORY::ER] = es_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORY::EL] = es_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORY::NS] = ns_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORY::NR] = ns_compatible;
+    m_compatible_trajectories[VALID_TRAJECTORY::NL] = ns_compatible;
 
 }
 
