@@ -32,7 +32,6 @@
 #include <opendlv/data/environment/WGS84Coordinate.h>
 
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
-#include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
 #include <odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h>
 #include <odvdvehicle/generated/opendlv/proxy/ActuationRequest.h>
 #include <odvdimu/GeneratedHeaders_ODVDIMU.h>
@@ -61,7 +60,9 @@ LowLevelControl::LowLevelControl(int32_t const &a_argc, char **a_argv)
   m_longitudinalGain(0),
   m_maxAccelerationLimit(0),
   m_minAccelerationLimit(0),
-  m_velocitySumLimit(0)
+  m_velocitySumLimit(0),
+  m_velocityHorizon(),
+  m_velocityHorizonIsValid(false)
 {
 }
 
@@ -94,27 +95,25 @@ void LowLevelControl::tearDown()
     
 void LowLevelControl::nextContainer(odcore::data::Container &a_container) 
 {
-  // if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
-      
-  // } else if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
-  //   odcore::base::Lock l(m_stateMutex);
-  //   auto groundSpeedReading = a_container.getData<opendlv::proxy::GroundSpeedReading>();
-  //   m_velocity.setX(groundSpeedReading.getGroundSpeed());
-  //   cout << "Recieved GroundSpeedReading: " << groundSpeedReading.getGroundSpeed() << endl;
-
-  // } else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
-
-  // } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
   if (a_container.getDataType() == opendlv::logic::legacy::StateEstimate::ID()) {
     odcore::base::Lock l(m_stateMutex);
     auto stateEstimate = a_container.getData<opendlv::logic::legacy::StateEstimate>();
     m_velocity.setX(stateEstimate.getVelocityX());
     cout << "Recieved velocity: " << m_velocity.getX() << endl;
+
   } else if (a_container.getDataType() == opendlv::logic::legacy::VelocityRequest::ID()) {
     odcore::base::Lock l(m_referenceMutex);
     auto velocityRequest = a_container.getData<opendlv::logic::legacy::VelocityRequest>();
     m_velocityReference = velocityRequest.getVelocity();
+    m_velocityHorizonIsValid = false;
     cout << "Recieved VelocityReference: " << m_velocityReference << endl;
+
+  } else if (a_container.getDataType() == opendlv::logic::legacy::VelocityHorizon::ID()) {
+    odcore::base::Lock l(m_referenceMutex);
+    m_velocityHorizon = a_container.getData<opendlv::logic::legacy::VelocityHorizon>();
+    m_velocityHorizonIsValid = true;
+    cout << "Recieved VelocityHorizon." << endl;
+
   }
 
   // Read path
@@ -131,41 +130,85 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
   getConference().send(initC);
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+    odcore::base::Lock l(m_stateMutex);
+    odcore::base::Lock l(m_referenceMutex);
 
-      double const dt = 1.0 / static_cast<double>(getFrequency());
+    double velocityReference = 0.0;
+    double accelerationReference = 0.0;
 
-      // PI velocity control
-      {
-        double const kp = m_longitudinalGain;
-        double const ki = kp/4;
+  	if (m_velocityHorizonIsValid) {
+    	odcore::data::TimeStamp currentTime;
+  		auto t = m_velocityHorizon.getTimeStamp();
+  		auto v = m_velocityHorizon.getVelocity();
+  		auto it = t.begin();
+  		auto iv = v.begin();
+    	odcore::data::TimeStamp t0;
+    	odcore::data::TimeStamp t1;
+    	double v0 = 0.0;
+    	double v1 = 0.0;
+    	bool hast0 = false;
+    	bool hast1 = false;
+  		for(; i != its.end() && iv != iv.end(); ++it, ++iv) {
+		    if (*it < currentTime) {
+		    	v0 = *uv;
+		    	t0 = *it;
+		    	hast0 = true;
+		    } else {
+		    	v1 = *iv;
+		    	t1 = *it;
+		    	hast1 = true;
+		    	break;
+		    }
+		}
+		if (hast0 && hast1) {
+			auto tdiff = (t1 - t0).toMicroseconds()*1.0/1000000L;
+			accelerationReference = (v1-v0)/tdiff;
+			velocityReference = accelerationReference*(currentTime-t0).toMicroseconds()*1.0/1000000L;
+		} else {
+  			vvelocityReference = v.back();
+			accelerationReference = 0;
+		}
 
-        auto dv = m_velocity.getX() - m_velocityReference;
-        m_inputAcceleration = -kp*dv - ki*m_velocitySumReference;
+    } else {
+  		velocityReference = m_velocityReference;
+  		accelerationReference = 0;
+  	}
 
-        // Anti windup (clamp)
-        if (m_inputAcceleration < m_maxAccelerationLimit && m_inputAcceleration > m_minAccelerationLimit) {
-          m_inputAcceleration += dt*dv;
-          m_velocitySumReference += dt*dv;
-          m_velocitySumReference = fmin(m_velocitySumReference,m_velocitySumLimit);
-          m_velocitySumReference = fmax(m_velocitySumReference,-m_velocitySumLimit);
-        }
-        m_inputAcceleration = fmin(m_inputAcceleration,m_maxAccelerationLimit);
-        m_inputAcceleration = fmax(m_inputAcceleration,m_minAccelerationLimit);
+    double const dt = 1.0 / static_cast<double>(getFrequency());
+
+    // PI velocity control
+    {
+      double const kp = m_longitudinalGain;
+      double const ki = kp/4;
+
+      auto dv = m_velocity.getX() - velocityReference;
+      m_inputAcceleration = -kp*dv - ki*m_velocitySumReference + accelerationReference;
+
+      // Anti windup (clamp)
+      if (m_inputAcceleration < m_maxAccelerationLimit && m_inputAcceleration > m_minAccelerationLimit) {
+        m_inputAcceleration += ki*dt*dv;
+        m_velocitySumReference += dt*dv;
+        m_velocitySumReference = fmin(m_velocitySumReference,m_velocitySumLimit);
+        m_velocitySumReference = fmax(m_velocitySumReference,-m_velocitySumLimit);
       }
+      m_inputAcceleration = fmin(m_inputAcceleration,m_maxAccelerationLimit);
+      m_inputAcceleration = fmax(m_inputAcceleration,m_minAccelerationLimit);
+    }
+
+    cout << "Send velocityReference: " << velocityReference << endl;
+    cout << "Send accelerationReference: " << accelerationReference << endl;
 
 
+    cout << "Send AccelerationRequest: " << m_inputAcceleration << endl;
+    cout << "Send SteeringRequest: " << m_inputSteeringWheelAngle << endl;
 
-
-      cout << "Send AccelerationRequest: " << m_inputAcceleration << endl;
-      cout << "Send SteringRequest: " << m_inputSteeringWheelAngle << endl;
-
-      // Send ActuationRequest
-      opendlv::proxy::ActuationRequest ar;
-      ar.setAcceleration(static_cast<float>(m_inputAcceleration));
-      ar.setSteering(static_cast<float>(m_inputSteeringWheelAngle));
-      ar.setIsValid(true);
-      odcore::data::Container c = odcore::data::Container(ar);
-      getConference().send(c);
+    // Send ActuationRequest
+    opendlv::proxy::ActuationRequest ar;
+    ar.setAcceleration(static_cast<float>(m_inputAcceleration));
+    ar.setSteering(static_cast<float>(m_inputSteeringWheelAngle));
+    ar.setIsValid(true);
+    odcore::data::Container c = odcore::data::Container(ar);
+    getConference().send(c);
 
   }
 
