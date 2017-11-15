@@ -100,7 +100,7 @@ void VelocityTuner::nextContainer(odcore::data::Container &a_container)
   if (a_container.getDataType() == opendlv::logic::legacy::StateEstimate::ID()) {
     odcore::base::Lock l(m_stateMutex);
     auto stateEstimate = a_container.getData<opendlv::logic::legacy::StateEstimate>();
-    m_velocity.setX(stateEstimate.getVelocityX);
+    m_velocity.setX(stateEstimate.getVelocityX());
 
   } else if (a_container.getDataType() == opendlv::logic::legacy::TimeSlot::ID()) {
     odcore::base::Lock l(m_referenceMutex);
