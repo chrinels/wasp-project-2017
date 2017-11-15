@@ -1,0 +1,6 @@
+#!/bin/sh
+
+FILE="$1"
+mkdir csv_tmp 
+
+docker run --rm -ti -v "$FILE":/opt/input.rec -v csv_tmp:shared --cap-add SYS_ADMIN --cap-add MKNOD --security-opt apparmor:unconfined --device=/dev/fuse -u `id -u $USER` seresearch/opendlv-on-opendlv-core-on-opendavinci-on-base-dev:latest /opt/od4/bin/odrec2fuse /opt/input.rec -f /opt/output
