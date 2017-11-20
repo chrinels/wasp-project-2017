@@ -51,6 +51,7 @@ Intersection::Intersection(int32_t const &a_argc, char **a_argv)
   : DataTriggeredConferenceClientModule(a_argc, a_argv,
       "logic-coordination-intersection"),
     m_initialised(false),
+    m_timeRefreshMutex(false),
     m_slotDuration(5.0),
     m_nrofSlots(20),
     m_allTrajectories(),
@@ -104,6 +105,12 @@ bool Intersection::scheduleVehicle(int vehicleID, float intersectionAccessTime, 
 {
   bool schedulingSuccessful = false;
 
+  // Lock mutex to avoid accidental slot updates
+  if(!m_timeRefreshMutex)
+    m_timeRefreshMutex = true;
+  else
+    return false;
+
   // Determine the first slot after the vehicle's access time
   int startSlot = determineFirstAccessibleSlot(intersectionAccessTime);
 
@@ -140,12 +147,20 @@ bool Intersection::scheduleVehicle(int vehicleID, float intersectionAccessTime, 
     }
   }
 
+  // Release the mutex
+  m_timeRefreshMutex = false;
+
   return schedulingSuccessful;
 }
 
 //-----------------------------------------------------------------------------
-void Intersection::timeRefreshSlotsTable()
+bool Intersection::timeRefreshSlotsTable()
 {
+  if(!m_timeRefreshMutex)
+    m_timeRefreshMutex = true;
+  else 
+    return false;
+
   // Shift all slots to the left
   std::rotate(m_scheduledSlotsTable.begin(), 
               m_scheduledSlotsTable.begin() + 1, 
@@ -153,6 +168,11 @@ void Intersection::timeRefreshSlotsTable()
 
   // Assign a new empty map to the last slot
   m_scheduledSlotsTable[m_nrofSlots - 1] = std::vector<SchedulingInfo>();
+
+  // Release the mutex
+  m_timeRefreshMutex = false;
+
+  return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -60,14 +60,15 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   void tearDown();
 
   bool scheduleVehicle(int, float, Trajectory);
-  int determineFirstAccessibleSlot(float);
+  int  determineFirstAccessibleSlot(float);
 
   void addScheduledVehicleToSlot(int, int, SchedulingInfo);
   bool contains(const std::vector<Trajectory> &, Trajectory);
-  void timeRefreshSlotsTable();
+  bool timeRefreshSlotsTable();
 
   //! Member variables
   bool  m_initialised;
+  bool  m_timeRefreshMutex; // TODO: odcore::base::mutex?
   float m_slotDuration;	// [seconds]
   float m_nrofSlots;	// Number of schedulable slots
 
