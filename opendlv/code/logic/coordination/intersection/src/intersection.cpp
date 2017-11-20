@@ -91,29 +91,30 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
 
 bool Intersection::scheduleTrajectory(float intersectionAccessTime, Trajectory plannedTrajectory)
 {
-  schedulingSuccessful = false;
+  bool schedulingSuccessful = false;
 
-  startSlot = determineFirstAccessibleSlot(intersectionAccessTime);
+  int startSlot = determineFirstAccessibleSlot(intersectionAccessTime);
 
   if(startSlot >= 0 && startSlot < m_nrofSlots){
     // Try to find the earliest slot with no incompatible trajectories
     for(int slot = startSlot; slot < m_nrofSlots; ++slot) {
       // Determine the valid trajectories in this slot
-      validTrajectories = m_allTrajectories;
-      nrofSlotTrajectories = m_scheduledTrajectories[slot].size();
-      for(trajIndex = 0; trajIndex < nrofSlotTrajectories; ++trajIndex) {
-        trajectory = m_scheduledTrajectories[slot][trajIndex];
-        compatibleTrajectories = m_compatibleTrajectories[trajectory];
+      std::vector<Trajectory> validTrajectories = m_allTrajectories;
+      std::map<Trajectory, SchedulingInfo> slotTrajectories = m_scheduledTrajectories[slot];
+      for(std::map<Trajectory, SchedulingInfo>::iterator it = slotTrajectories.begin(); 
+          it != slotTrajectories.end(); ++it) {
+        Trajectory trajectory = it->first; //m_scheduledTrajectories[slot][trajIndex];
+        std::vector<Trajectory> compatibleTrajectories = m_compatibleTrajectories[trajectory];
 
         // Find the intersection with compatible trajectories
         std::vector<Trajectory> newValidTrajectories();
-        for(i = 0; i < validTrajectories.size(); ++i) {
+        for(unsigned int i = 0; i < validTrajectories.size(); ++i) {
           if(contains(compatibleTrajectories, validTrajectories[i])) {
-              newValidTrajectories.push_back(validTrajectories[i]);
+              // newValidTrajectories.push_back(validTrajectories[i]);
           }
         }
         // Update the valid trajectories
-        validTrajectories = newValidTrajectories;
+         //validTrajectories = newValidTrajectories;
       }
       // Check if the planned trajectory is valid and add it to this slot
       if(contains(validTrajectories, plannedTrajectory)) {
@@ -135,20 +136,24 @@ void Intersection::updateScheduledTrajectorySlots()
 }
 
 // Check if a vector of integers contains a given integer value
-bool Intersection::contains(const std::vector<int> &v, int val)
+bool Intersection::contains(const std::vector<Trajectory> &v, Trajectory val)
 {
-  return !v.empty() && (std::find(v.begin(), v.end(), val) != v.end());
+  std::cout << val << std::endl;
+  return !v.empty();//&& (std::find(v.begin(), v.end(), val) != v.end());
 }
 
 int Intersection::determineFirstAccessibleSlot(float intersectionAccessTime)
 {
   // TODO: Get updated currentTime
-  firstAcessibleSlot = ceil((intersectionAccessTime - currentTime) / m_slotDuration) + 1;
+  float currentTime = 0.0;
+  int firstAccessibleSlot = ceil((intersectionAccessTime - currentTime) / m_slotDuration) + 1;
+
+  return firstAccessibleSlot;
 }
 
 void Intersection::addTrajectoryToSlot(int slot, Trajectory trajectory, SchedulingInfo info)
 {
-  m_scheduledTrajectories[slot][trajectory] = info
+  m_scheduledTrajectories[slot][trajectory] = info;
 }
 
 void Intersection::setUpTrajectories()
