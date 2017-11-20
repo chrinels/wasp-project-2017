@@ -54,6 +54,7 @@ Intersection::Intersection(int32_t const &a_argc, char **a_argv)
     m_timeRefreshMutex(false),
     m_slotDuration(5.0),
     m_nrofSlots(20),
+    m_intersectionPosition(),
     m_allTrajectories(),
     m_compatibleTrajectories(),
     m_scheduledSlotsTable()    
@@ -92,16 +93,21 @@ void Intersection::tearDown()
 //-----------------------------------------------------------------------------
 void Intersection::nextContainer(odcore::data::Container &a_container)
 {
-  cout << "Message has dataType ID = " << opendlv::knowledge::Message::ID() << endl;
-  cout << " - Received dataType ID = " << a_container.getDataType() << endl;
-  if(a_container.getDataType() != opendlv::knowledge::Message::ID()){
-    cout << "Not a message! Returning!" << endl;
+  if(!m_initialised)
     return;
-  }
+
+  cout << " - Received dataType ID = " << a_container.getDataType() << endl;
+// TODO: Add message type in ODCORE and fix following lines
+//  if(a_container.getDataType() == opendlv::collaboration::Message::ID()) {
+//    odcore::data::collaboration::IntersectionAccessRequest req = 
+//        a_container.get_getData<odcore::data::collaboration::IntersectionAccessRequest>();
+  scheduleVehicle(IntersectionAccessRequest());
+    
+//  }
 }
 
 //-----------------------------------------------------------------------------
-bool Intersection::scheduleVehicle(int vehicleID, float intersectionAccessTime, Trajectory plannedTrajectory)
+bool Intersection::scheduleVehicle(const IntersectionAccessRequest &accessReq)
 {
   bool schedulingSuccessful = false;
 
@@ -110,6 +116,11 @@ bool Intersection::scheduleVehicle(int vehicleID, float intersectionAccessTime, 
     m_timeRefreshMutex = true;
   else
     return false;
+
+  int vehicleID = accessReq.vehicleID;
+  Trajectory plannedTrajectory = accessReq.plannedTrajectory;
+  float intersectionAccessTime = estimateIntersectionAccessTime(accessReq.currentPosition,
+                                                                accessReq.currentSpeed);
 
   // Determine the first slot after the vehicle's access time
   int startSlot = determineFirstAccessibleSlot(intersectionAccessTime);
@@ -151,6 +162,14 @@ bool Intersection::scheduleVehicle(int vehicleID, float intersectionAccessTime, 
   m_timeRefreshMutex = false;
 
   return schedulingSuccessful;
+}
+
+//-----------------------------------------------------------------------------
+float Intersection::estimateIntersectionAccessTime(const GPSCoord &currentPosition, 
+                                                   float currentSpeed)
+{
+  // TODO: Logic for determining intersection access time
+  return (m_intersectionPosition.x - currentPosition.x) / (double)currentSpeed;
 }
 
 //-----------------------------------------------------------------------------

@@ -48,6 +48,23 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
                     NS, NR, NL,
                     ES, ER, EL };
 
+  // TODO: Reuse some existing structure?
+  struct GPSCoord
+  {
+    double x;
+    double y;
+    double z;
+  };
+ 
+  // TODO: Move to opendlv::collaboration::message?
+  struct IntersectionAccessRequest
+  {
+    int vehicleID;
+    Trajectory plannedTrajectory;
+    GPSCoord currentPosition;
+    float currentSpeed;
+  };
+
   struct SchedulingInfo
   {
     int vehicleID;
@@ -59,8 +76,9 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   void setUpTrajectories();
   void tearDown();
 
-  bool scheduleVehicle(int, float, Trajectory);
-  int  determineFirstAccessibleSlot(float);
+  bool  scheduleVehicle(const IntersectionAccessRequest &);
+  float estimateIntersectionAccessTime(const GPSCoord &, float);
+  int   determineFirstAccessibleSlot(float);
 
   void addScheduledVehicleToSlot(int, int, SchedulingInfo);
   bool contains(const std::vector<Trajectory> &, Trajectory);
@@ -71,6 +89,8 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   bool  m_timeRefreshMutex; // TODO: odcore::base::mutex?
   float m_slotDuration;	// [seconds]
   float m_nrofSlots;	// Number of schedulable slots
+
+  GPSCoord m_intersectionPosition; // Location of the center of the intersection
 
   std::vector<Trajectory>                       m_allTrajectories;
   std::map<Trajectory, std::vector<Trajectory>> m_compatibleTrajectories;
