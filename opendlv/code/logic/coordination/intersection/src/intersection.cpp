@@ -45,6 +45,7 @@ namespace opendlv {
 namespace logic {
 namespace coordination {
 
+//-----------------------------------------------------------------------------
 Intersection::Intersection(int32_t const &a_argc, char **a_argv)
   : DataTriggeredConferenceClientModule(a_argc, a_argv,
       "logic-coordination-intersection"),
@@ -57,6 +58,7 @@ Intersection::Intersection(int32_t const &a_argc, char **a_argv)
 {
 }
 
+//-----------------------------------------------------------------------------
 Intersection::~Intersection()
 {
 }
@@ -75,10 +77,12 @@ void Intersection::setUp()
   m_initialised = true;
 }
 
+//-----------------------------------------------------------------------------
 void Intersection::tearDown()
 {
 }
 
+//-----------------------------------------------------------------------------
 void Intersection::nextContainer(odcore::data::Container &a_container)
 {
   cout << "Message has dataType ID = " << opendlv::knowledge::Message::ID() << endl;
@@ -89,6 +93,7 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
   }
 }
 
+//-----------------------------------------------------------------------------
 bool Intersection::scheduleTrajectory(float intersectionAccessTime, Trajectory plannedTrajectory)
 {
   bool schedulingSuccessful = false;
@@ -129,19 +134,20 @@ bool Intersection::scheduleTrajectory(float intersectionAccessTime, Trajectory p
   return schedulingSuccessful;
 }
 
-// Shift the scheduled trajectories table at every slot transition
+//-----------------------------------------------------------------------------
 void Intersection::updateScheduledTrajectorySlots()
 {
   // rotate(m_scheduledTrajectories.begin() + 1, m_scheduledTrajectories.end(), m_scheduledTrajectories.begin())
 }
 
-// Check if a vector of integers contains a given integer value
+//-----------------------------------------------------------------------------
 bool Intersection::contains(const std::vector<Trajectory> &v, Trajectory val)
 {
   std::cout << val << std::endl;
   return !v.empty();//&& (std::find(v.begin(), v.end(), val) != v.end());
 }
 
+//-----------------------------------------------------------------------------
 int Intersection::determineFirstAccessibleSlot(float intersectionAccessTime)
 {
   // TODO: Get updated currentTime
@@ -151,11 +157,13 @@ int Intersection::determineFirstAccessibleSlot(float intersectionAccessTime)
   return firstAccessibleSlot;
 }
 
+//-----------------------------------------------------------------------------
 void Intersection::addTrajectoryToSlot(int slot, Trajectory trajectory, SchedulingInfo info)
 {
   m_scheduledTrajectories[slot][trajectory] = info;
 }
 
+//-----------------------------------------------------------------------------
 void Intersection::setUpTrajectories()
 {
   // Define all valid trajectories in a member variable

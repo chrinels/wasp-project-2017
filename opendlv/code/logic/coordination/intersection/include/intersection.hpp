@@ -46,13 +46,13 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   virtual void nextContainer(odcore::data::Container &c);
 
  private:
-  // Valid trajectories definition
-  // [W]est/[S]outh/[N]orth/[E]ast - direction of approach
-  // [S]traight/[L]eft/[R]ight - Path plan
-  enum Trajectory {WS, WR, WL,
-                   SS, SR, SL,
-                   NS, NR, NL,
-                   ES, ER, EL};
+  //! Enumeration of valid trajectories
+  //! [W]est/[S]outh/[N]orth/[E]ast - direction of approach
+  //! [S]traight/[L]eft/[R]ight - Path plan
+  enum Trajectory { WS, WR, WL,
+                    SS, SR, SL,
+                    NS, NR, NL,
+                    ES, ER, EL };
 
   void setUp();
   void setUpTrajectories();
@@ -60,10 +60,12 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
 
   bool scheduleTrajectory(float, Trajectory);
   int determineFirstAccessibleSlot(float);
+
   void addTrajectoryToSlot(int, Trajectory, SchedulingInfo);
   bool contains(const std::vector<Trajectory> &, Trajectory);
   void updateScheduledTrajectorySlots();
 
+  //! Member variables
   bool  m_initialised;
   float m_slotDuration;	// [seconds]
   float m_nrofSlots;	// Number of schedulable slots
