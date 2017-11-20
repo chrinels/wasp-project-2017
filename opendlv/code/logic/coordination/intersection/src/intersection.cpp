@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <ctype.h>
 #include <cstring>
+#include <algorithm>
 
 #include <iostream>
 
@@ -54,7 +55,7 @@ Intersection::Intersection(int32_t const &a_argc, char **a_argv)
     m_nrofSlots(20),
     m_allTrajectories(),
     m_compatibleTrajectories(),
-    m_scheduledTrajectories()    
+    m_scheduledSlotsTable()    
 {
 }
 
@@ -73,6 +74,11 @@ void Intersection::setUp()
       "logic-coordination-intersection.nrof_slots");
 
   setUpTrajectories();
+
+  // Create empty maps to store trajectory information for each slot
+  for(int slot = 0; slot < m_nrofSlots; ++slot) {
+    m_scheduledSlotsTable.push_back(std::vector<SchedulingInfo>());
+  }
 
   m_initialised = true;
 }
@@ -94,37 +100,40 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
 }
 
 //-----------------------------------------------------------------------------
-bool Intersection::scheduleTrajectory(float intersectionAccessTime, Trajectory plannedTrajectory)
+bool Intersection::scheduleVehicle(int vehicleID, float intersectionAccessTime, Trajectory plannedTrajectory)
 {
   bool schedulingSuccessful = false;
 
+  // Determine the first slot after the vehicle's access time
   int startSlot = determineFirstAccessibleSlot(intersectionAccessTime);
 
-  if(startSlot >= 0 && startSlot < m_nrofSlots){
-    // Try to find the earliest slot with no incompatible trajectories
+  // Find the first slot that does not contain any incompatible trajectories
+  if(startSlot >= 0 && startSlot < m_nrofSlots) {
     for(int slot = startSlot; slot < m_nrofSlots; ++slot) {
-      // Determine the valid trajectories in this slot
+      // Find compatible trajectories for this slot
       std::vector<Trajectory> validTrajectories = m_allTrajectories;
-      std::map<Trajectory, SchedulingInfo> slotTrajectories = m_scheduledTrajectories[slot];
-      for(std::map<Trajectory, SchedulingInfo>::iterator it = slotTrajectories.begin(); 
-          it != slotTrajectories.end(); ++it) {
-        Trajectory trajectory = it->first; //m_scheduledTrajectories[slot][trajIndex];
-        std::vector<Trajectory> compatibleTrajectories = m_compatibleTrajectories[trajectory];
+      for(SchedulingInfo slotSchedulingInfo : m_scheduledSlotsTable[slot]) {
+        Trajectory scheduledTrajectory = slotSchedulingInfo.trajectory;
+        std::vector<Trajectory> compatibleTrajectories = m_compatibleTrajectories[scheduledTrajectory];
 
-        // Find the intersection with compatible trajectories
-        std::vector<Trajectory> newValidTrajectories();
+        // Update the compatible trajectories
+        std::vector<Trajectory> newValidTrajectories;
         for(unsigned int i = 0; i < validTrajectories.size(); ++i) {
           if(contains(compatibleTrajectories, validTrajectories[i])) {
-              // newValidTrajectories.push_back(validTrajectories[i]);
+            newValidTrajectories.push_back(validTrajectories[i]);
           }
         }
         // Update the valid trajectories
-         //validTrajectories = newValidTrajectories;
+        validTrajectories = newValidTrajectories;
       }
       // Check if the planned trajectory is valid and add it to this slot
       if(contains(validTrajectories, plannedTrajectory)) {
-        // TODO: Generate the SchedulingInfo properly
-        addTrajectoryToSlot(slot, plannedTrajectory, SchedulingInfo());
+        // Generate the scheduling info
+        SchedulingInfo schedInfo;
+        schedInfo.intersectionAccessTime = intersectionAccessTime;
+        schedInfo.trajectory = plannedTrajectory;
+
+        addScheduledVehicleToSlot(slot, vehicleID, schedInfo);
         schedulingSuccessful = true;
         break;
       }
@@ -135,16 +144,22 @@ bool Intersection::scheduleTrajectory(float intersectionAccessTime, Trajectory p
 }
 
 //-----------------------------------------------------------------------------
-void Intersection::updateScheduledTrajectorySlots()
+void Intersection::timeRefreshSlotsTable()
 {
-  // rotate(m_scheduledTrajectories.begin() + 1, m_scheduledTrajectories.end(), m_scheduledTrajectories.begin())
+  // Shift all slots to the left
+  std::rotate(m_scheduledSlotsTable.begin(), 
+              m_scheduledSlotsTable.begin() + 1, 
+              m_scheduledSlotsTable.end());
+
+  // Assign a new empty map to the last slot
+  m_scheduledSlotsTable[m_nrofSlots - 1] = std::vector<SchedulingInfo>();
 }
 
 //-----------------------------------------------------------------------------
 bool Intersection::contains(const std::vector<Trajectory> &v, Trajectory val)
 {
   std::cout << val << std::endl;
-  return !v.empty();//&& (std::find(v.begin(), v.end(), val) != v.end());
+  return !v.empty() && (std::find(v.begin(), v.end(), val) != v.end());
 }
 
 //-----------------------------------------------------------------------------
@@ -158,9 +173,9 @@ int Intersection::determineFirstAccessibleSlot(float intersectionAccessTime)
 }
 
 //-----------------------------------------------------------------------------
-void Intersection::addTrajectoryToSlot(int slot, Trajectory trajectory, SchedulingInfo info)
+void Intersection::addScheduledVehicleToSlot(int slot, int vehicleID, SchedulingInfo info)
 {
-  m_scheduledTrajectories[slot][trajectory] = info;
+  m_scheduledSlotsTable[slot][vehicleID] = info;
 }
 
 //-----------------------------------------------------------------------------

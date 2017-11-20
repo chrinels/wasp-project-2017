@@ -30,12 +30,6 @@ namespace opendlv {
 namespace logic {
 namespace coordination {
 
-struct SchedulingInfo
-{
-  int vehicleId;
-  float intersectionAccessTime;
-};
-
 class Intersection : public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
   Intersection(int32_t const &, char **);
@@ -54,25 +48,32 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
                     NS, NR, NL,
                     ES, ER, EL };
 
+  struct SchedulingInfo
+  {
+    int vehicleID;
+    float intersectionAccessTime;
+    Trajectory trajectory;
+  };
+
   void setUp();
   void setUpTrajectories();
   void tearDown();
 
-  bool scheduleTrajectory(float, Trajectory);
+  bool scheduleVehicle(int, float, Trajectory);
   int determineFirstAccessibleSlot(float);
 
-  void addTrajectoryToSlot(int, Trajectory, SchedulingInfo);
+  void addScheduledVehicleToSlot(int, int, SchedulingInfo);
   bool contains(const std::vector<Trajectory> &, Trajectory);
-  void updateScheduledTrajectorySlots();
+  void timeRefreshSlotsTable();
 
   //! Member variables
   bool  m_initialised;
   float m_slotDuration;	// [seconds]
   float m_nrofSlots;	// Number of schedulable slots
 
-  std::vector<Trajectory> m_allTrajectories;
+  std::vector<Trajectory>                       m_allTrajectories;
   std::map<Trajectory, std::vector<Trajectory>> m_compatibleTrajectories;
-  std::vector<std::map<Trajectory, SchedulingInfo>> m_scheduledTrajectories;
+  std::vector<std::vector<SchedulingInfo>>      m_scheduledSlotsTable; // [slot [schedInfo]]
 };
 
 }
