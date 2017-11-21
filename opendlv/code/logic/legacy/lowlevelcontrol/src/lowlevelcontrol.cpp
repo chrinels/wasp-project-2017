@@ -154,7 +154,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
 
         if (i >= size-1) {
             velocityReference = vvec.back();
-            accelerationReference = 0;
+            accelerationReference = 0.0;
         } else {
             double tdiff = (tvec[i+1] - tvec[i]).toMicroseconds()*1.0/1000000L;
             accelerationReference = (vvec[i+1]-vvec[i])/tdiff;
@@ -162,8 +162,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
             
             // Linear interpolation of next accelerationReference and current
             auto tcurrentdiff = (tvec[i+1] - currentTime).toMicroseconds()*1.0/1000000L;
-            if (m_accelerationSmoothing > 0 && tcurrentdiff < m_accelerationSmoothing) {
-                auto anext = i >= size-2 ? 0.0 : vvec[i+2];
+            if (m_accelerationSmoothing > 0.0 && tcurrentdiff < m_accelerationSmoothing) {
+                auto anext = i >= size-2 ? 0.0 : (vvec[i+2]-vvec[i+1])/((tvec[i+2] - tvec[i+1]).toMicroseconds()*1.0/1000000L);
                 auto proportion = (m_accelerationSmoothing-tcurrentdiff)/m_accelerationSmoothing;
                 accelerationReference = accelerationReference*proportion+anext*(1.0-proportion);
             }
