@@ -119,7 +119,8 @@ void LowLevelControl::nextContainer(odcore::data::Container &a_container)
     } else {
         m_velocityHorizonIsValid = true;
     }
-    cout << "Recieved VelocityHorizon." << endl;
+    cout << "Size of Velocity " << m_velocityHorizon.getSize_ListOfVelocity() << endl;
+    cout << "Size of TimeStamp " << m_velocityHorizon.getSize_ListOfTimeStamp() << endl;
 
   }
 
@@ -159,7 +160,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
             double tdiff = (tvec[i+1] - tvec[i]).toMicroseconds()*1.0/1000000L;
             accelerationReference = (vvec[i+1]-vvec[i])/tdiff;
             velocityReference = accelerationReference*(currentTime-tvec[i]).toMicroseconds()*1.0/1000000L;
-            
+
             // Linear interpolation of next accelerationReference and current
             auto tcurrentdiff = (tvec[i+1] - currentTime).toMicroseconds()*1.0/1000000L;
             if (m_accelerationSmoothing > 0.0 && tcurrentdiff < m_accelerationSmoothing) {
@@ -167,7 +168,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
                 auto proportion = (m_accelerationSmoothing-tcurrentdiff)/m_accelerationSmoothing;
                 accelerationReference = accelerationReference*proportion+anext*(1.0-proportion);
             }
-        } 
+        }
 
     } else {
         velocityReference = m_velocityReference;

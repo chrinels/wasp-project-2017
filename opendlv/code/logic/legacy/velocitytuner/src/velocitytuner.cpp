@@ -154,7 +154,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
         flag = true;
         odcore::data::TimeStamp currentTime;
         opendlv::logic::legacy::VelocityHorizon velocityHorizon;
-        // std::list<double> velocity;
+        // std::vector<double> velocity;
+        // std::vector<odcore::data::TimeStamp> timeStamp;
+        // velocity.push_back(m_up_velocity);
+        // timeStamp.push_back(currentTime);
+        // opendlv::logic::legacy::VelocityHorizon velocityHorizon(velocity,timeStamp);
         velocityHorizon.addTo_ListOfTimeStamp(currentTime);
         velocityHorizon.addTo_ListOfVelocity(m_start_velocity);
 
@@ -169,8 +173,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
         velocityHorizon.addTo_ListOfTimeStamp(currentTime+odcore::data::TimeStamp(5*m_time_segment_seconds,0));
         velocityHorizon.addTo_ListOfVelocity(m_end_velocity);
 
-        odcore::data::Container initC(velocityHorizon);
-        getConference().send(initC);
+        odcore::data::Container initC3(velocityHorizon);
+        getConference().send(initC3);
       }
     }
 

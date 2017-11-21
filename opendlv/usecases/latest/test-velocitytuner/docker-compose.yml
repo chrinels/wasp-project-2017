@@ -75,7 +75,7 @@ services:
       network_mode: "host"
       depends_on:
           - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=100"
+      command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=10"
 
 
     logic-legacy-velocitytuner:
@@ -90,4 +90,4 @@ services:
       network_mode: "host"
       depends_on:
           - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=100"
+      command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=10"

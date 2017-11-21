@@ -122,9 +122,10 @@ logic-legacy-velocitytuner.acceleration-planning-factor = 0.8
 logic-legacy-velocitytuner.test-time-to-intersection = 12 #s
 logic-legacy-velocitytuner.target-velocity-at-intersection = 10 #m/s
 logic-legacy-velocitytuner.max-velocity = 13.89 #m/s
-logic-legacy-velocitytuner.start_point = 20 
+logic-legacy-velocitytuner.start_point = 20
 logic-legacy-velocitytuner.start_velocitykmh = 20
 logic-legacy-velocitytuner.up_velocitykmh = 30
+logic-legacy-velocitytuner.down_velocitykmh = 10
 logic-legacy-velocitytuner.end_velocitykmh = 0
 
 logic-legacy-velocitytuner.time_segment_seconds = 5
@@ -151,7 +152,7 @@ proxy-xc90.read-only = 0            # 1 = read-only , 0 = read/write
 #
 # CONFIGURATION FOR ODRECORDERH264
 #
-#odrecorderh264.output = file://recorder.rec # 
+#odrecorderh264.output = file://recorder.rec #
 odrecorderh264.remoteControl = 0;
 odrecorderh264.dumpSharedData = 0;
 odrecorderh264.lossless = 1;
@@ -166,4 +167,3 @@ proxy-applanix.port = 5602
 
 logic-legacy-locationonpath.intersection-latitude = 57.77311000919249
 logic-legacy-locationonpath.intersection-longitude = 12.76892092885846
-
