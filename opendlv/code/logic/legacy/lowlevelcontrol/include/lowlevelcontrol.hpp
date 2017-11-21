@@ -65,6 +65,7 @@ class LowLevelControl : public odcore::base::module::TimeTriggeredConferenceClie
   double m_maxAccelerationLimit;
   double m_minAccelerationLimit;
   double m_velocitySumLimit;
+  double m_accelerationSmoothing;
 
   opendlv::logic::legacy::VelocityHorizon m_velocityHorizon;
   bool m_velocityHorizonIsValid;

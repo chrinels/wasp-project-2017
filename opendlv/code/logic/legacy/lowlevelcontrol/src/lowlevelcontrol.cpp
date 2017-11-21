@@ -61,6 +61,7 @@ LowLevelControl::LowLevelControl(int32_t const &a_argc, char **a_argv)
   m_maxAccelerationLimit(0),
   m_minAccelerationLimit(0),
   m_velocitySumLimit(0),
+  m_accelerationSmoothing(0),
   m_velocityHorizon(),
   m_velocityHorizonIsValid(false)
 {
@@ -86,6 +87,7 @@ void LowLevelControl::setUp()
     "logic-legacy-lowlevelcontrol.longitudinal-min-acceleration");
   m_velocitySumLimit = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum");
+  m_accelerationSmoothing = 1.0;
 
 }
 
@@ -111,7 +113,12 @@ void LowLevelControl::nextContainer(odcore::data::Container &a_container)
   } else if (a_container.getDataType() == opendlv::logic::legacy::VelocityHorizon::ID()) {
     odcore::base::Lock l(m_referenceMutex);
     m_velocityHorizon = a_container.getData<opendlv::logic::legacy::VelocityHorizon>();
-    m_velocityHorizonIsValid = true;
+    if (m_velocityHorizon.isEmpty_ListOfTimeStamp() || m_velocityHorizon.isEmpty_ListOfVelocity()) {
+        m_velocityHorizonIsValid = false;
+        cout << "WARNING: Bad VelocityHorizon." << endl;
+    } else {
+        m_velocityHorizonIsValid = true;
+    }
     cout << "Recieved VelocityHorizon." << endl;
 
   }
@@ -136,43 +143,36 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
     double velocityReference = 0.0;
     double accelerationReference = 0.0;
 
-  	if (m_velocityHorizonIsValid) {
-    	odcore::data::TimeStamp currentTime;
-      auto tpair = m_velocityHorizon.iteratorPair_ListOfTimeStamp();
-      auto vpair = m_velocityHorizon.iteratorPair_ListOfVelocity();
-  		auto it = tpair.first;
-  		auto iv = vpair.first;
-    	odcore::data::TimeStamp t0;
-    	odcore::data::TimeStamp t1;
-    	double v0 = 0.0;
-    	double v1 = 0.0;
-    	bool hast0 = false;
-    	bool hast1 = false;
-  		for(; it != tpair.second && iv != vpair.second; ++it, ++iv) {
-		    if (*it < currentTime) {
-		    	v0 = *iv;
-		    	t0 = *it;
-		    	hast0 = true;
-		    } else {
-		    	v1 = *iv;
-		    	t1 = *it;
-		    	hast1 = true;
-		    	break;
-		    }
-  		}
-  		if (hast0 && hast1) {
-  			auto tdiff = (t1 - t0).toMicroseconds()*1.0/1000000L;
-  			accelerationReference = (v1-v0)/tdiff;
-  			velocityReference = accelerationReference*(currentTime-t0).toMicroseconds()*1.0/1000000L;
-  		} else {
-    		velocityReference = *(vpair.second-1);
-  			accelerationReference = 0;
-  		}
+    if (m_velocityHorizonIsValid) {
+        odcore::data::TimeStamp currentTime;
+        auto tvec = m_velocityHorizon.getListOfTimeStamp();
+        auto vvec = m_velocityHorizon.getListOfVelocity();
+
+        auto size = std::min(tvec.size(),vvec.size());
+        uint32_t i=0;
+        for (; i < size &&  tvec[i] <= currentTime; ++i);
+
+        if (i >= size-1) {
+            velocityReference = vvec.back();
+            accelerationReference = 0;
+        } else {
+            double tdiff = (tvec[i+1] - tvec[i]).toMicroseconds()*1.0/1000000L;
+            accelerationReference = (vvec[i+1]-vvec[i])/tdiff;
+            velocityReference = accelerationReference*(currentTime-tvec[i]).toMicroseconds()*1.0/1000000L;
+            
+            // Linear interpolation of next accelerationReference and current
+            auto tcurrentdiff = (tvec[i+1] - currentTime).toMicroseconds()*1.0/1000000L;
+            if (m_accelerationSmoothing > 0 && tcurrentdiff < m_accelerationSmoothing) {
+                auto anext = i >= size-2 ? 0.0 : vvec[i+2];
+                auto proportion = (m_accelerationSmoothing-tcurrentdiff)/m_accelerationSmoothing;
+                accelerationReference = accelerationReference*proportion+anext*(1.0-proportion);
+            }
+        } 
 
     } else {
-  		velocityReference = m_velocityReference;
-  		accelerationReference = 0;
-  	}
+        velocityReference = m_velocityReference;
+        accelerationReference = 0;
+    }
 
     double const dt = 1.0 / static_cast<double>(getFrequency());
 
