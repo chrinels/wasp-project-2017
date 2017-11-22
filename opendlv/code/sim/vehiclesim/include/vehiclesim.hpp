@@ -49,6 +49,7 @@ class VehicleSim : public odcore::base::module::TimeTriggeredConferenceClientMod
   double m_orientation;
   opendlv::data::environment::Point3 m_velocity;
   double m_yawrate;
+  double m_acceleration;
 
   odcore::base::Mutex m_inputMutex;
   double m_inputAcceleration;
