@@ -79,7 +79,7 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
 #add_subdirectory(action/keepobjectsize)
 #add_subdirectory(action/setgroundspeed)
 #add_subdirectory(action/setopticalrotation)
-#add_subdirectory(knowledge/identity)
+add_subdirectory(knowledge/identity)
 #add_subdirectory(knowledge/scene)
 #add_subdirectory(knowledge/v2vcam)
 #add_subdirectory(knowledge/v2vdenm)
