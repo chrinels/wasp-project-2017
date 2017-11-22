@@ -111,10 +111,20 @@ global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
 # The following key describes the list of modules expected to participate in this --cid session.
 global.session.expectedModules = example
 
+# lowlevelcontrol
 logic-legacy-lowlevelcontrol.longitudinal-gain = 0.5
 logic-legacy-lowlevelcontrol.longitudinal-max-acceleration = 3
 logic-legacy-lowlevelcontrol.longitudinal-min-acceleration = -3
 logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum = 1
 
+# intersection scheduler
 logic-coordination-intersection.slot_duration = 5
 logic-coordination-intersection.nrof_slots = 20
+
+# knowledge-identity
+logic-knowledge-identity.stationId = 110
+logic-knowledge-identity.stationType = 8 #heavy truck
+logic-knowledge-identity.vehicleLength = 7.3
+logic-knowledge-identity.vehicleWidth = 2.55
+logic-knowledge-identity.vehicleRole = 0
+logic-knowledge-identity.rearAxleLocation = 5.0
