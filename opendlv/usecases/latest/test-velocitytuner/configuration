@@ -115,6 +115,7 @@ logic-legacy-lowlevelcontrol.longitudinal-gain = 0.5
 logic-legacy-lowlevelcontrol.longitudinal-max-acceleration = 3
 logic-legacy-lowlevelcontrol.longitudinal-min-acceleration = -3
 logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum = 1
+logic-legacy-lowlevelcontrol.longitudinal-acceleration-smoothing = 1
 
 #logic-legacy-velocitytuner.max-acceleration = 1.25
 logic-legacy-velocitytuner.max-acceleration = 2.5
@@ -123,7 +124,7 @@ logic-legacy-velocitytuner.test-time-to-intersection = 12 #s
 logic-legacy-velocitytuner.target-velocity-at-intersection = 10 #m/s
 logic-legacy-velocitytuner.max-velocity = 13.89 #m/s
 logic-legacy-velocitytuner.start_point = 20 #m
-logic-legacy-velocitytuner.start_time = 5 #s
+logic-legacy-velocitytuner.start_time = 10 #s
 logic-legacy-velocitytuner.start_velocitykmh = 20
 logic-legacy-velocitytuner.up_velocitykmh = 30
 logic-legacy-velocitytuner.down_velocitykmh = 10

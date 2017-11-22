@@ -87,7 +87,8 @@ void LowLevelControl::setUp()
     "logic-legacy-lowlevelcontrol.longitudinal-min-acceleration");
   m_velocitySumLimit = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum");
-  m_accelerationSmoothing = 1.0;
+  m_accelerationSmoothing = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-lowlevelcontrol.longitudinal-acceleration-smoothing");
 
 }
 
@@ -150,25 +151,61 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
         auto vvec = m_velocityHorizon.getListOfVelocity();
 
         auto size = std::min(tvec.size(),vvec.size());
-        uint32_t i=0;
+
+        size_t i=0;
         for (; i < size &&  tvec[i] <= currentTime; ++i);
 
-        if (i >= size-1) {
-            velocityReference = vvec.back();
-            accelerationReference = 0.0;
-        } else {
-            double tdiff = (tvec[i+1] - tvec[i]).toMicroseconds()*1.0/1000000L;
-            accelerationReference = (vvec[i+1]-vvec[i])/tdiff;
-            velocityReference = accelerationReference*(currentTime-tvec[i]).toMicroseconds()*1.0/1000000L;
+        
+        if (i > size-1) { // Keep the last specified velocity
+          velocityReference = vvec.back();
+          accelerationReference = 0.0;
 
-            // Linear interpolation of next accelerationReference and current
-            auto tcurrentdiff = (tvec[i+1] - currentTime).toMicroseconds()*1.0/1000000L;
-            if (m_accelerationSmoothing > 0.0 && tcurrentdiff < m_accelerationSmoothing) {
-                auto anext = i >= size-2 ? 0.0 : (vvec[i+2]-vvec[i+1])/((tvec[i+2] - tvec[i+1]).toMicroseconds()*1.0/1000000L);
-                auto proportion = (m_accelerationSmoothing-tcurrentdiff)/m_accelerationSmoothing;
-                accelerationReference = accelerationReference*proportion+anext*(1.0-proportion);
+        } else {
+          // Feed forward acceleration
+          double timeToNextSegment = (tvec[i]-currentTime).toMicroseconds()*1.0/1000000L;
+          accelerationReference = (vvec[i]-m_velocity.getX())/timeToNextSegment;
+
+          if (i == 0) { // yet to reach the first specified velocity
+            velocityReference = vvec.front();
+          } else {
+            auto segmentdt = (tvec[i]-tvec[i-1]).toMicroseconds()*1.0/1000000L;
+            auto segmentSlope = (vvec[i]-vvec[i-1])/segmentdt;
+            auto timeSinceLastSegment = (currentTime - tvec[i-1]).toMicroseconds()*1.0/1000000L;
+            velocityReference = vvec[i-1] + segmentSlope*timeSinceLastSegment;
+          }
+
+          // Linear interpolation of next accelerationReference and current
+          if (m_accelerationSmoothing > 0.0 && timeToNextSegment < m_accelerationSmoothing) {
+            double nextSegmentSlope = 0.0;
+            if (i < size-1) {
+              nextSegmentSlope = (vvec[i+1]-vvec[i])/((tvec[i+1]-tvec[i]).toMicroseconds()*1.0/1000000L);
             }
+            auto proportion = (m_accelerationSmoothing-timeToNextSegment)/m_accelerationSmoothing;
+            accelerationReference = accelerationReference*(1.0-proportion)+nextSegmentSlope*proportion;
+          }
+
+
         }
+
+        // uint32_t i=0;
+        // for (; i < size &&  tvec[i] <= currentTime; ++i);
+
+        // if (i >= size-1) {
+        //     velocityReference = vvec.back();
+        //     accelerationReference = 0.0;
+        // } else {
+        //     double tdiff = (tvec[i+1] - tvec[i]).toMicroseconds()*1.0/1000000L;
+        //     accelerationReference = (vvec[i+1]-vvec[i])/tdiff;
+        //     velocityReference = accelerationReference*(currentTime-tvec[i]).toMicroseconds()*1.0/1000000L;
+
+        //     // Linear interpolation of next accelerationReference and current
+        //     auto tcurrentdiff = (tvec[i+1] - currentTime).toMicroseconds()*1.0/1000000L;
+        //     if (m_accelerationSmoothing > 0.0 && tcurrentdiff < m_accelerationSmoothing) {
+        //         auto anext = i >= size-2 ? 0.0 : (vvec[i+2]-vvec[i+1])/((tvec[i+2] - tvec[i+1]).toMicroseconds()*1.0/1000000L);
+        //         auto proportion = (m_accelerationSmoothing-tcurrentdiff)/m_accelerationSmoothing;
+        //         accelerationReference = accelerationReference*proportion+anext*(1.0-proportion);
+        //     }
+        // }
 
     } else {
         velocityReference = m_velocityReference;
@@ -196,8 +233,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
       m_inputAcceleration = fmax(m_inputAcceleration,m_minAccelerationLimit);
     }
 
-    cout << "Send velocityReference: " << velocityReference << endl;
-    cout << "Send accelerationReference: " << accelerationReference << endl;
+    cout << "VelocityReference: " << velocityReference << endl;
+    cout << "AccelerationReference: " << accelerationReference << endl;
 
 
     cout << "Send AccelerationRequest: " << m_inputAcceleration << endl;
