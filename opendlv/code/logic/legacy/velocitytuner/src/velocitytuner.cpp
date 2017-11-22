@@ -36,7 +36,7 @@
 #include <odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h>
 #include <odvdimu/GeneratedHeaders_ODVDIMU.h>
 
-#include <list>
+#include <vector>
 //#include <opendavinci/odcore/data/TimeStamp.h>
 
 #include "velocitytuner.hpp"
@@ -139,11 +139,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
   double const Tint = 1.0/static_cast<double>(getFrequency());
   std::cout << "Tint: " << Tint << '\n';
   bool flag = false;
-
+  odcore::data::TimeStamp startTime;
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     //debug message
+    odcore::data::TimeStamp currentTime;
     opendlv::logic::legacy::VelocityTunerState velocityTunerState;
-    if (m_distanceToIntersection < m_start_point) {
+    if (currentTime < startTime + odcore::data::TimeStamp(m_time_segment_seconds,0)) {
       opendlv::logic::legacy::VelocityRequest velocityRequest;
       velocityRequest.setVelocity(m_start_velocity);
       odcore::data::Container initC(velocityRequest);
@@ -152,7 +153,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
     } else {
       if (flag == false) {
         flag = true;
-        odcore::data::TimeStamp currentTime;
+
         opendlv::logic::legacy::VelocityHorizon velocityHorizon;
         // std::vector<double> velocity;
         // std::vector<odcore::data::TimeStamp> timeStamp;
@@ -178,13 +179,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
       }
     }
 
-
+    // odcore::data::TimeStamp currentTime;
     // Calculate what velocity to set
-    if (m_distanceToIntersection > 0) {
+    if (m_distanceToIntersection > 0 && currentTime < m_timeSlotStart) {
       double s = m_distanceToIntersection;
       velocityTunerState.setS(s);
       std::cout << "s: " << s << '\n';
-      odcore::data::TimeStamp currentTime;
+
       auto T = (m_timeSlotStart - currentTime).toMicroseconds()*1.0/1000000L;
       velocityTunerState.setT(T);
       std::cout << "T: " << T << '\n';
@@ -209,6 +210,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
       double v2,v3,v4;
       double t1,t2,t3;
       double commandAcc, commandV;
+      t1 = T; t2 = T; t3 = T;
+      v2 = vout; v3 = vout; v4 = vout;
 
       if (mindistance > maxdistance)
         cout << "acceleration over limit is required" << endl;
@@ -219,21 +222,21 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
           if (s < averagedistance){ // __/
             t1 = (s-T/2*(v1+vout))/0.5/(v1-vout);
             v2 = v1;
-            v3 = vout;
+            // v3 = vout;
             // disp('__/')
             // mm(i) = 1;
             velocityTunerState.setMm(1);
           } else if (s > averagedistance) {
             t1 = (vout*T-s)/0.5/(vout-v1);
-            v2 = vout;
-            v3 = vout;
+            // v2 = vout;
+            // v3 = vout;
             // disp('/--')
             // mm(i) = 2;
             velocityTunerState.setMm(2);
           } else {
             t1 = T;
-            v2 = vout;
-            v3 = vout;
+            // v2 = vout;
+            // v3 = vout;
             // mm(i) = 3;
             velocityTunerState.setMm(3);
           }
@@ -241,7 +244,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
           if (s > averagedistance) {
             t1 = (s-T/2*(v1+vout))/0.5/(v1-vout);
             v2 = v1;
-            v3 = vout;
+            // v3 = vout;
             // disp('--\')
             // mm(i) = 4;
             velocityTunerState.setMm(4);
@@ -254,8 +257,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
             velocityTunerState.setMm(5);
           } else {
             t1 = T;
-            v2 = vout;
-            v3 = vout;
+            // v2 = vout;
+            // v3 = vout;
             // mm(i) = 6;
             velocityTunerState.setMm(6);
           }
