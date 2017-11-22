@@ -114,7 +114,7 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
 }
 
 //-----------------------------------------------------------------------------
-bool Intersection::scheduleVehicle(const IntersectionAccessRequest &accessReq)
+bool Intersection::scheduleVehicle(const IntersectionAccessRequest &a_accessReq)
 {
   bool schedulingSuccessful = false;
 
@@ -124,10 +124,10 @@ bool Intersection::scheduleVehicle(const IntersectionAccessRequest &accessReq)
   else
     return false;
 
-  int vehicleID = accessReq.vehicleID;
-  Trajectory plannedTrajectory = accessReq.plannedTrajectory;
-  float intersectionAccessTime = estimateIntersectionAccessTime(accessReq.currentPosition,
-                                                                accessReq.currentSpeed);
+  int vehicleID = a_accessReq.vehicleID;
+  Trajectory plannedTrajectory = a_accessReq.plannedTrajectory;
+  float intersectionAccessTime = estimateIntersectionAccessTime(a_accessReq.currentPosition,
+                                                                a_accessReq.currentSpeed);
 
   // Determine the first slot after the vehicle's access time
   int startSlot = determineFirstAccessibleSlot(intersectionAccessTime);
@@ -172,11 +172,11 @@ bool Intersection::scheduleVehicle(const IntersectionAccessRequest &accessReq)
 }
 
 //-----------------------------------------------------------------------------
-float Intersection::estimateIntersectionAccessTime(const GPSCoord &currentPosition,
-                                                   float currentSpeed)
+float Intersection::estimateIntersectionAccessTime(const GPSCoord &a_currentPosition,
+                                                   float a_currentSpeed)
 {
   // TODO: Logic for determining intersection access time
-  return (m_intersectionPosition.x - currentPosition.x) / (double)currentSpeed;
+  return (m_intersectionPosition.x - a_currentPosition.x) / (double) a_currentSpeed;
 }
 
 //-----------------------------------------------------------------------------
@@ -202,26 +202,26 @@ bool Intersection::timeRefreshSlotsTable()
 }
 
 //-----------------------------------------------------------------------------
-bool Intersection::contains(const std::vector<Trajectory> &v, Trajectory val)
+bool Intersection::contains(const std::vector<Trajectory> &a_v, Trajectory a_val)
 {
-  std::cout << val << std::endl;
-  return !v.empty() && (std::find(v.begin(), v.end(), val) != v.end());
+  std::cout << a_val << std::endl;
+  return !a_v.empty() && (std::find(a_v.begin(), a_v.end(), a_val) != a_v.end());
 }
 
 //-----------------------------------------------------------------------------
-int Intersection::determineFirstAccessibleSlot(float intersectionAccessTime)
+int Intersection::determineFirstAccessibleSlot(float a_intersectionAccessTime)
 {
   // TODO: Get updated currentTime
   float currentTime = 0.0;
-  int firstAccessibleSlot = ceil((intersectionAccessTime - currentTime) / m_slotDuration) + 1;
+  int firstAccessibleSlot = ceil((a_intersectionAccessTime - currentTime) / m_slotDuration) + 1;
 
   return firstAccessibleSlot;
 }
 
 //-----------------------------------------------------------------------------
-void Intersection::addScheduledVehicleToSlot(int slot, int vehicleID, SchedulingInfo info)
+void Intersection::addScheduledVehicleToSlot(int a_slot, int a_vehicleID, SchedulingInfo a_info)
 {
-  m_scheduledSlotsTable[slot][vehicleID] = info;
+  m_scheduledSlotsTable[a_slot][a_vehicleID] = a_info;
 }
 
 //-----------------------------------------------------------------------------
