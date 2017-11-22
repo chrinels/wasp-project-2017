@@ -46,14 +46,12 @@ namespace opendlv {
 namespace logic {
 namespace coordination {
 
-//-----------------------------------------------------------------------------
 V2IBeacon::V2IBeacon(int32_t const &a_argc, char **a_argv)
   : DataTriggeredConferenceClientModule(a_argc, a_argv,
       "logic-coordination-v2ibeacon")
 {
 }
 
-//-----------------------------------------------------------------------------
 V2IBeacon::~V2IBeacon()
 {
 }
@@ -62,16 +60,16 @@ void V2IBeacon::setUp()
 {
 }
 
-//-----------------------------------------------------------------------------
 void V2IBeacon::tearDown()
 {
 }
 
-//-----------------------------------------------------------------------------
 void V2IBeacon::nextContainer(odcore::data::Container &a_container)
 {
 
 }
+
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
 } // V2IBeacon
 } // logic

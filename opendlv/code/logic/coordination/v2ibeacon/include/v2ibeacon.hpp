@@ -21,7 +21,7 @@
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include <opendavinci/odcore/base/Mutex.h>
 #include <opendlv/data/environment/Point3.h>
 #include <opendlv/data/environment/WGS84Coordinate.h>
@@ -30,7 +30,7 @@ namespace opendlv {
 namespace logic {
 namespace coordination {
 
-class V2IBeacon : public odcore::base::module::DataTriggeredConferenceClientModule {
+class V2IBeacon : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   V2IBeacon(int32_t const &, char **);
   V2IBeacon(V2IBeacon const &) = delete;
@@ -38,11 +38,13 @@ class V2IBeacon : public odcore::base::module::DataTriggeredConferenceClientModu
   virtual ~V2IBeacon();
 
   virtual void nextContainer(odcore::data::Container &c);
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
   void setUp();
   void tearDown();
-  
+
+  bool m_initialized;
 };
 
 }
