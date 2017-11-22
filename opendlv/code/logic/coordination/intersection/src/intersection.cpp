@@ -28,6 +28,8 @@
 #include <opendavinci/odcore/data/Container.h>
 #include "opendavinci/odcore/data/TimeStamp.h"
 
+#include <opendavinci/odcore/base/Lock.h>
+
 #include <opendavinci/odcore/io/conference/ContainerConference.h>
 
 #include <opendlv/data/environment/Line.h>
@@ -50,8 +52,8 @@ namespace coordination {
 Intersection::Intersection(int32_t const &a_argc, char **a_argv)
   : DataTriggeredConferenceClientModule(a_argc, a_argv,
       "logic-coordination-intersection"),
-    m_initialised(false),
     m_timeRefreshMutex(),
+    m_initialised(false),
     m_slotDuration(5.0),
     m_nrofSlots(20),
     m_intersectionPosition(),

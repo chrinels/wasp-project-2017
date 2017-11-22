@@ -86,8 +86,8 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   bool timeRefreshSlotsTable();
 
   //! Member variables
+  odcore::base::Mutex m_timeRefreshMutex;
   bool  m_initialised;
-  odcore::base::mutex  m_timeRefreshMutex; // TODO: odcore::base::mutex?
   float m_slotDuration;	// [seconds]
   float m_nrofSlots;	// Number of schedulable slots
 
