@@ -47,8 +47,9 @@ namespace logic {
 namespace coordination {
 
 V2IBeacon::V2IBeacon(int32_t const &a_argc, char **a_argv)
-  : DataTriggeredConferenceClientModule(a_argc, a_argv,
-      "logic-coordination-v2ibeacon")
+  : TimeTriggeredConferenceClientModule(a_argc, a_argv,
+      "logic-coordination-v2ibeacon"),
+      m_initialized(false)
 {
 }
 
@@ -66,10 +67,16 @@ void V2IBeacon::tearDown()
 
 void V2IBeacon::nextContainer(odcore::data::Container &a_container)
 {
-
+  if(!m_initialized) {
+    return;
+  }
+  cout << " Received dataType ID = " << a_container.getDataType() << endl;
 }
 
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2IBeacon::body()
+{
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+}
 
 } // V2IBeacon
 } // logic
