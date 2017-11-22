@@ -115,3 +115,6 @@ logic-legacy-lowlevelcontrol.longitudinal-gain = 0.5
 logic-legacy-lowlevelcontrol.longitudinal-max-acceleration = 3
 logic-legacy-lowlevelcontrol.longitudinal-min-acceleration = -3
 logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum = 1
+
+logic-legacy-stateestimator.position.smoothing = 0.1;
+logic-legacy-stateestimator.velocity.smoothing = 0.1;

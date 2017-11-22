@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Example usage:
+# 
+# . odrec2csv 2017-11-15_095956_15kmh/CID-114-odrecorderh264_2017-11-15_095956_15kmhtestprofile.rec
+#
+
+FILE="$1"
+DIR=$(dirname "${VAR}")
+mkdir csv_tmp 
+
+docker run --rm -ti -v "$PWD"/"$FILE":/opt/input.rec -v "$PWD"/csv_tmp:/opt/output:shared --cap-add SYS_ADMIN --cap-add MKNOD --security-opt apparmor:unconfined --device=/dev/fuse -u `id -u $USER` seresearch/opendlv-on-opendlv-core-on-opendavinci-on-base-dev:latest /opt/od4/bin/odrec2fuse /opt/input.rec -f /opt/output

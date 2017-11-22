@@ -229,12 +229,57 @@ message opendlv.system.diagnostics.HealthStatus [id = 200] {
 }
 
 message opendlv.logic.legacy.TimeSlot [id = 201] {
-
+	odcore::data::TimeStamp entryTime [id = 1];
+	odcore::data::TimeStamp exitTime [id = 2];
 }
 
 message opendlv.logic.legacy.VelocityRequest [id = 202] {
   double velocity [id = 1];
 }
+
+message opendlv.logic.legacy.LocationOnPathToIntersection [id = 203]{
+	double currentLocation [id = 1];
+	double intersectionLocation [id = 2];
+}
+
+message opendlv.logic.legacy.StateEstimate [id = 204] {
+  double positionX [id = 1];
+  double positionY [id = 2];
+  double velocityX [id = 3];
+  double velocityY [id = 4];
+  double orientation [id = 5];
+  double yawRate [id = 6];
+}
+
+message opendlv.logic.legacy.VelocityHorizon [id = 205] {
+  list<double> velocity [id = 1];
+  list<odcore::data::TimeStamp> timeStamp [id = 2];
+}
+
+message opendlv.logic.legacy.VelocityTunerState [id = 206] {
+  double t1 [id = 1];
+  double t2 [id = 2];
+  double t3 [id = 3];
+  double t4 [id = 4];
+  double v1 [id = 5];
+  double v2 [id = 6];
+  double v3 [id = 7];
+  double v4 [id = 8];
+  double t [id = 9];
+  double s [id = 10];
+  double scal [id = 11];
+  double commandAcc [id = 12];
+  double commandAcc2 [id = 13];
+  double commandV [id = 14];
+  double commandV2 [id = 15];
+  double acctime [id = 16];
+  double mindistance [id = 17];
+  double maxdistance [id = 18];
+  double averagedistance [id = 19];
+  double desireda [id = 20];
+  double mm [id = 21];
+}
+
 
 message opendlv.logic.coordination.IntersectionAccessRequest [id = 203] {
   uint32 vehicleID [id = 1];

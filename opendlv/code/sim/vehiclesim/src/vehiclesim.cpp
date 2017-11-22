@@ -47,9 +47,10 @@ VehicleSim::VehicleSim(int32_t const &a_argc, char **a_argv)
       "sim-vehiclesim"),
   m_stateMutex(),
   m_position(0,0,0),
-  m_orientation(0),
-  m_velocity(1,0,0),
+  m_orientation(4.05),
+  m_velocity(5,0,0),
   m_yawrate(0),
+  m_acceleration(0),
   m_inputMutex(),
   m_inputAcceleration(),
   m_inputSteeringWheelAngle(),
@@ -99,6 +100,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       double const dt = 1.0 / static_cast<double>(getFrequency());
 
       double const g = 9.82;
+      double const pi = 3.1415926;
       
       // XC90 chassis parameters
       // chassis params
@@ -124,6 +126,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       double const Fzf = lr/(lf+lr)*m*g;
       double const Fzr = lf/(lf+lr)*m*g;
 
+      // Acceleration constant
+      double const gamma = 0.1;
+
       // Tire slip
       auto delta = k*m_inputSteeringWheelAngle;
       auto vx = m_velocity.getX();
@@ -136,8 +141,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       auto alphaf = abs(vxf) > 0.00001 ? 0 : -atan(vyf/vxf);
       auto alphar = abs(vxr) > 0.00001 ? 0 : -atan(vyr/vxr);
 
+      // Acceleration and brake dynamics
+      auto dax = (m_inputAcceleration - m_acceleration)/gamma;
+
       // Longitudinal tire Force
-      auto Fxf = vx > 0 || m_inputAcceleration > 0 ? m*m_inputAcceleration : 0;
+      auto Fxf = vx > 0 || m_acceleration > 0 ? m*m_acceleration : 0;
       double const Fxr = 0;
 
       // Lateral tire Force
@@ -165,8 +173,16 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       m_orientation += dt*dpsi;
       m_velocity += opendlv::data::environment::Point3(dvx,dvy,0)*dt;
       m_yawrate += dt*dr;
+      m_acceleration += dt*dax;
 
-      // Send GPS coordinate
+      // Correct forward velocity (no reversing)
+      m_velocity.setX(fmax(m_velocity.getX(),0.0));
+
+      // Correct orientation -pi to pi
+      while (m_orientation < -pi) m_orientation += 2*pi;
+      while (m_orientation > pi) m_orientation -= 2*pi;
+
+      // Send GPS coordinate (not accurate at all)
       auto wgs84Coordinate = m_wgs84Reference.transform(m_position);
       odcore::data::Container c_coordinate(wgs84Coordinate);
       getConference().send(c_coordinate);
@@ -177,9 +193,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       odcore::data::Container c_velocity(groundSpeed);
       getConference().send(c_velocity);
 
+      auto pos = m_wgs84Reference.transform(wgs84Coordinate);
       std::cout << "position: (" << std::to_string(m_position.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;
-      std::cout << "orientation: " << std::to_string(m_orientation) << std::endl;
       std::cout << "velocity: (" << std::to_string(m_velocity.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;
+      std::cout << "orientation: " << std::to_string(m_orientation) << std::endl;
       std::cout << "yaw rate: " << std::to_string(m_yawrate) << std::endl;
     }
 

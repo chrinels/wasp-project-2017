@@ -1,0 +1,2 @@
+docker run --rm -ti -v /home/fs-meas/Documents/tests/CID-114-odrecorderh264_2017-11-15_095956_15kmhtestprofile.rec:/opt/input.rec -v /home/fs-meas/Documents/csv:/opt/output:shared --cap-add SYS_ADMIN --cap-add MKNOD --security-opt apparmor:unconfined --device=/dev/fuse -u `id -u $USER` seresearch/opendlv-on-opendlv-core-on-opendavinci-on-base-dev:latest /opt/od4/bin/odrec2fuse /opt/input.rec -f /opt/output
+

@@ -25,6 +25,7 @@
 #include <opendavinci/odcore/base/Mutex.h>
 #include <opendlv/data/environment/Point3.h>
 #include <opendlv/data/environment/WGS84Coordinate.h>
+#include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
 
 namespace opendlv {
 namespace logic {
@@ -64,6 +65,10 @@ class LowLevelControl : public odcore::base::module::TimeTriggeredConferenceClie
   double m_maxAccelerationLimit;
   double m_minAccelerationLimit;
   double m_velocitySumLimit;
+  double m_accelerationSmoothing;
+
+  opendlv::logic::legacy::VelocityHorizon m_velocityHorizon;
+  bool m_velocityHorizonIsValid;
 };
 
 }
