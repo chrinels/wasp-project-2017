@@ -100,6 +100,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       double const dt = 1.0 / static_cast<double>(getFrequency());
 
       double const g = 9.82;
+      double const pi = 3.1415926;
       
       // XC90 chassis parameters
       // chassis params
@@ -176,6 +177,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
 
       // Correct forward velocity (no reversing)
       m_velocity.setX(fmax(m_velocity.getX(),0.0));
+
+      // Correct orientation -pi to pi
+      while (m_orientation < -pi) m_orientation += 2*pi;
+      while (m_orientation > pi) m_orientation -= 2*pi;
 
       // Send GPS coordinate (not accurate at all)
       auto wgs84Coordinate = m_wgs84Reference.transform(m_position);
