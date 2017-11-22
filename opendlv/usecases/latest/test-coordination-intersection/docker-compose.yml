@@ -37,6 +37,13 @@ services:
           - odsupercomponent
       command: "/opt/opendlv/bin/opendlv-logic-knowledge-identity --cid=${CID} --freq=10"
 
+    logic-coordination-v2ibeacon:
+      image: ${IMAGE}
+      network_mode: "host"
+      depends_on:
+        - odsupercomponent
+      command: "/opt/opendlv/bin/opendlv-logic-coordination-v2ibeacon --cid=${CID} --verbose=1 --freq=10"
+
     logic-legacy-lowlevelcontrol:
       image: ${IMAGE}
       network_mode: "host"
