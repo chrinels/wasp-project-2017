@@ -55,13 +55,14 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
     double y;
     double z;
   };
- 
+
   // TODO: Move to opendlv::collaboration::message?
   struct IntersectionAccessRequest
   {
     int vehicleID;
     Trajectory plannedTrajectory;
     GPSCoord currentPosition;
+    // opendlv::data::environment::WGS84Coordinate m_wgs84CurrentPosition;
     float currentSpeed;
   };
 
@@ -91,10 +92,12 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   float m_nrofSlots;	// Number of schedulable slots
 
   GPSCoord m_intersectionPosition; // Location of the center of the intersection
+  // opendlv::data::environment::WGS84Coordinate m_wgs84IntersectionPosition;
 
   std::vector<Trajectory>                       m_allTrajectories;
   std::map<Trajectory, std::vector<Trajectory>> m_compatibleTrajectories;
   std::vector<std::vector<SchedulingInfo>>      m_scheduledSlotsTable; // [slot [schedInfo]]
+  opendlv::data::environment::WGS84Coordinate   m_wgs84Reference;
 };
 
 }

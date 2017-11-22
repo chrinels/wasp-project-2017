@@ -57,7 +57,8 @@ Intersection::Intersection(int32_t const &a_argc, char **a_argv)
     m_intersectionPosition(),
     m_allTrajectories(),
     m_compatibleTrajectories(),
-    m_scheduledSlotsTable()
+    m_scheduledSlotsTable(),
+    m_wgs84Reference()
 {
 }
 
@@ -74,6 +75,12 @@ void Intersection::setUp()
       "logic-coordination-intersection.slot_duration");
   m_nrofSlots = kv.getValue<float>(
       "logic-coordination-intersection.nrof_slots");
+
+  double const latitude = getKeyValueConfiguration().getValue<double>(
+      "global.reference.WGS84.latitude");
+  double const longitude = getKeyValueConfiguration().getValue<double>(
+      "global.reference.WGS84.longitude");
+  m_wgs84Reference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
 
   setUpTrajectories();
 
