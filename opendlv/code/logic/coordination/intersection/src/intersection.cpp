@@ -57,7 +57,7 @@ Intersection::Intersection(int32_t const &a_argc, char **a_argv)
     m_intersectionPosition(),
     m_allTrajectories(),
     m_compatibleTrajectories(),
-    m_scheduledSlotsTable()    
+    m_scheduledSlotsTable()
 {
 }
 
@@ -99,10 +99,10 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
   cout << " - Received dataType ID = " << a_container.getDataType() << endl;
 // TODO: Add message type in ODCORE and fix following lines
 //  if(a_container.getDataType() == opendlv::collaboration::Message::ID()) {
-//    odcore::data::collaboration::IntersectionAccessRequest req = 
+//    odcore::data::collaboration::IntersectionAccessRequest req =
 //        a_container.get_getData<odcore::data::collaboration::IntersectionAccessRequest>();
   scheduleVehicle(IntersectionAccessRequest());
-    
+
 //  }
 }
 
@@ -165,7 +165,7 @@ bool Intersection::scheduleVehicle(const IntersectionAccessRequest &accessReq)
 }
 
 //-----------------------------------------------------------------------------
-float Intersection::estimateIntersectionAccessTime(const GPSCoord &currentPosition, 
+float Intersection::estimateIntersectionAccessTime(const GPSCoord &currentPosition,
                                                    float currentSpeed)
 {
   // TODO: Logic for determining intersection access time
@@ -177,12 +177,12 @@ bool Intersection::timeRefreshSlotsTable()
 {
   if(!m_timeRefreshMutex)
     m_timeRefreshMutex = true;
-  else 
+  else
     return false;
 
   // Shift all slots to the left
-  std::rotate(m_scheduledSlotsTable.begin(), 
-              m_scheduledSlotsTable.begin() + 1, 
+  std::rotate(m_scheduledSlotsTable.begin(),
+              m_scheduledSlotsTable.begin() + 1,
               m_scheduledSlotsTable.end());
 
   // Assign a new empty map to the last slot
@@ -221,7 +221,7 @@ void Intersection::addScheduledVehicleToSlot(int slot, int vehicleID, Scheduling
 void Intersection::setUpTrajectories()
 {
   // Define all valid trajectories in a member variable
-  m_allTrajectories = { Trajectory::WS, Trajectory::WR, Trajectory::WL, 
+  m_allTrajectories = { Trajectory::WS, Trajectory::WR, Trajectory::WL,
                         Trajectory::SS, Trajectory::SR, Trajectory::SL,
                         Trajectory::ES, Trajectory::ER, Trajectory::EL,
                         Trajectory::NS, Trajectory::NR, Trajectory::NL};
@@ -288,17 +288,17 @@ void Intersection::setUpTrajectories()
                                             Trajectory::SL };
 
   m_compatibleTrajectories[Trajectory::WS] = ws_compatible;
-  m_compatibleTrajectories[Trajectory::WR] = ws_compatible;
-  m_compatibleTrajectories[Trajectory::WL] = ws_compatible;
+  m_compatibleTrajectories[Trajectory::WR] = wr_compatible;
+  m_compatibleTrajectories[Trajectory::WL] = wl_compatible;
   m_compatibleTrajectories[Trajectory::SS] = ss_compatible;
-  m_compatibleTrajectories[Trajectory::SR] = ss_compatible;
-  m_compatibleTrajectories[Trajectory::SL] = ss_compatible;
+  m_compatibleTrajectories[Trajectory::SR] = sr_compatible;
+  m_compatibleTrajectories[Trajectory::SL] = sl_compatible;
   m_compatibleTrajectories[Trajectory::ES] = es_compatible;
-  m_compatibleTrajectories[Trajectory::ER] = es_compatible;
-  m_compatibleTrajectories[Trajectory::EL] = es_compatible;
+  m_compatibleTrajectories[Trajectory::ER] = er_compatible;
+  m_compatibleTrajectories[Trajectory::EL] = el_compatible;
   m_compatibleTrajectories[Trajectory::NS] = ns_compatible;
-  m_compatibleTrajectories[Trajectory::NR] = ns_compatible;
-  m_compatibleTrajectories[Trajectory::NL] = ns_compatible;
+  m_compatibleTrajectories[Trajectory::NR] = nr_compatible;
+  m_compatibleTrajectories[Trajectory::NL] = nl_compatible;
 
 }
 
