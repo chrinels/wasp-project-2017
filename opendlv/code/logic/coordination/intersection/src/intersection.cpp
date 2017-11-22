@@ -105,7 +105,13 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
   if(!m_initialised)
     return;
 
-  cout << " - Received dataType ID = " << a_container.getDataType() << endl;
+  odcore::data::TimeStamp now;
+  auto timeSent = a_container.getSentTimeStamp();
+  auto timeReceived = a_container.getReceivedTimeStamp();
+  
+  cout << " Received dataType ID = " << a_container.getDataType() << endl;
+  cout << " Sent at " << timeSent.getYYYYMMDD_HHMMSSms() << endl;
+  cout << " Received at " << timeReceived.getYYYYMMDD_HHMMSSms() << endl;
 // TODO: Add message type in ODCORE and fix following lines
 //  if(a_container.getDataType() == opendlv::collaboration::Message::ID()) {
 //    odcore::data::collaboration::IntersectionAccessRequest req =
@@ -200,8 +206,9 @@ bool Intersection::contains(const std::vector<Trajectory> &a_v, Trajectory a_val
 //-----------------------------------------------------------------------------
 int Intersection::determineFirstAccessibleSlot(float a_intersectionAccessTime)
 {
-  // TODO: Get updated currentTime
-  float currentTime = 0.0;
+  odcore::data::TimeStamp now;
+  float currentTime = now.toMicroseconds();
+  
   int firstAccessibleSlot = ceil((a_intersectionAccessTime - currentTime) / m_slotDuration) + 1;
 
   return firstAccessibleSlot;
