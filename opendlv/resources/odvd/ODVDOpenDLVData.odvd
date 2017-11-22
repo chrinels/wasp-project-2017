@@ -235,3 +235,12 @@ message opendlv.logic.legacy.TimeSlot [id = 201] {
 message opendlv.logic.legacy.VelocityRequest [id = 202] {
   double velocity [id = 1];
 }
+
+message opendlv.logic.coordination.IntersectionAccessRequest [id = 203] {
+  uint32 vehicleID [id = 1];
+  odcore::data::TimeStamp timeAtRequest [id = 2];
+  string plannedTrajectory [id = 3];
+  double velocity [id = 4];
+  double latitude [id = 5];
+  double longitude [id = 6];
+}
