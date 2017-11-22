@@ -51,7 +51,7 @@ Intersection::Intersection(int32_t const &a_argc, char **a_argv)
   : DataTriggeredConferenceClientModule(a_argc, a_argv,
       "logic-coordination-intersection"),
     m_initialised(false),
-    m_timeRefreshMutex(false),
+    m_timeRefreshMutex(),
     m_slotDuration(5.0),
     m_nrofSlots(20),
     m_intersectionPosition(),
@@ -118,11 +118,7 @@ bool Intersection::scheduleVehicle(const IntersectionAccessRequest &a_accessReq)
 {
   bool schedulingSuccessful = false;
 
-  // Lock mutex to avoid accidental slot updates
-  if(!m_timeRefreshMutex)
-    m_timeRefreshMutex = true;
-  else
-    return false;
+  odcore::base::Lock l(m_timeRefreshMutex);
 
   int vehicleID = a_accessReq.vehicleID;
   Trajectory plannedTrajectory = a_accessReq.plannedTrajectory;
@@ -165,9 +161,6 @@ bool Intersection::scheduleVehicle(const IntersectionAccessRequest &a_accessReq)
     }
   }
 
-  // Release the mutex
-  m_timeRefreshMutex = false;
-
   return schedulingSuccessful;
 }
 
@@ -182,10 +175,7 @@ float Intersection::estimateIntersectionAccessTime(const GPSCoord &a_currentPosi
 //-----------------------------------------------------------------------------
 bool Intersection::timeRefreshSlotsTable()
 {
-  if(!m_timeRefreshMutex)
-    m_timeRefreshMutex = true;
-  else
-    return false;
+  odcore::base::Lock l(m_timeRefreshMutex);
 
   // Shift all slots to the left
   std::rotate(m_scheduledSlotsTable.begin(),
@@ -194,9 +184,6 @@ bool Intersection::timeRefreshSlotsTable()
 
   // Assign a new empty map to the last slot
   m_scheduledSlotsTable[m_nrofSlots - 1] = std::vector<SchedulingInfo>();
-
-  // Release the mutex
-  m_timeRefreshMutex = false;
 
   return true;
 }
