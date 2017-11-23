@@ -217,7 +217,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
     // PI velocity control
     {
       double const kp = m_longitudinalGain;
-      double const ki = kp/4;
+      double const ki = m_velocityHorizonIsValid ? 0.0 : kp/4;
 
       auto dv = m_velocity.getX() - velocityReference;
       m_inputAcceleration = -kp*dv - ki*m_velocitySumReference + accelerationReference;
