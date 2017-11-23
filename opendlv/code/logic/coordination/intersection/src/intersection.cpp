@@ -109,16 +109,15 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
   auto timeSent = a_container.getSentTimeStamp();
   auto timeReceived = a_container.getReceivedTimeStamp();
   
+  /**
   cout << " Received dataType ID = " << a_container.getDataType() << endl;
   cout << " Sent at " << timeSent.getYYYYMMDD_HHMMSSms() << endl;
   cout << " Received at " << timeReceived.getYYYYMMDD_HHMMSSms() << endl;
-// TODO: Add message type in ODCORE and fix following lines
-//  if(a_container.getDataType() == opendlv::collaboration::Message::ID()) {
-//    odcore::data::collaboration::IntersectionAccessRequest req =
-//        a_container.get_getData<odcore::data::collaboration::IntersectionAccessRequest>();
+  */
+  if (a_container.getDataType() == opendlv::logic::coordination::IntersectionAccessRequest::ID()) {
+    cout << "Got an IntersectionAccessRequest!" << endl;
+  }
   scheduleVehicle(IntersectionAccessRequest());
-
-//  }
 }
 
 //-----------------------------------------------------------------------------

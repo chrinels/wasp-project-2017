@@ -19,6 +19,14 @@
 #ifndef LOGIC_LEGACY_COORDINATION_V2IBEACON_HPP
 #define LOGIC_LEGACY_COORDINATION_V2IBEACON_HPP
 
+#include <cmath>
+#include <cstdio>
+#include <ctype.h>
+#include <cstring>
+#include <algorithm>
+
+#include <iostream>
+
 #include <memory>
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
@@ -45,6 +53,10 @@ class V2IBeacon : public odcore::base::module::TimeTriggeredConferenceClientModu
   void tearDown();
 
   bool m_initialized;
+  opendlv::data::environment::WGS84Coordinate m_wgs84Reference;
+  double m_groundSpeed;
+  std::string m_plannedTrajectory;
+  uint32_t m_vehicleID;
 };
 
 }
