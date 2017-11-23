@@ -66,7 +66,7 @@ VelocityTuner::VelocityTuner(int32_t const &a_argc, char **a_argv)
   m_up_velocity(0),
   m_down_velocity(0),
   m_end_velocity(0),
-  m_start_point(0),
+  m_test_distance_to_intersection(0),
   m_start_time(),
   m_plan_mode(0),
   m_start_mode(0),
@@ -95,9 +95,9 @@ void VelocityTuner::setUp()
   m_acclerationPlanningFactor = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-velocitytuner.acceleration-planning-factor");
   odcore::data::TimeStamp currentTime;
-  double testTimeToIntersection = getKeyValueConfiguration().getValue<double>(
+  m_timeToIntersection = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-velocitytuner.test-time-to-intersection");
-  m_timeSlotStart = currentTime + odcore::data::TimeStamp(testTimeToIntersection,0);
+  m_timeSlotStart = currentTime + odcore::data::TimeStamp(m_timeToIntersection,0);
   m_start_velocity = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-velocitytuner.start_velocitykmh")/3.6;
   m_up_velocity = getKeyValueConfiguration().getValue<double>(
@@ -106,8 +106,8 @@ void VelocityTuner::setUp()
     "logic-legacy-velocitytuner.down_velocitykmh")/3.6;
   m_end_velocity = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-velocitytuner.end_velocitykmh")/3.6;
-  m_start_point = getKeyValueConfiguration().getValue<double>(
-    "logic-legacy-velocitytuner.start_point");
+  m_test_distance_to_intersection = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-velocitytuner.test_distance_to_intersection");
   double startTime = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-velocitytuner.start_time");
   m_start_time = currentTime + odcore::data::TimeStamp(startTime,0);
@@ -159,8 +159,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
       //true before start_time
       switchCondition = currentTime < m_start_time;
     } else if (m_start_mode == 2){//after start_point
-      //true before start_point
-      switchCondition = m_distanceToIntersection < m_start_point;
+      //true when distance is more than m_test_distance_to_intersection
+      switchCondition = m_distanceToIntersection > m_test_distance_to_intersection;
+      std::cout << "m_distanceToIntersection, m_test_distance_to_intersectiont, switchCondition " << m_distanceToIntersection << ','
+        << m_test_distance_to_intersection << ',' << switchCondition<< '\n';
     }
 
     if (m_plan_mode == 1) {//predefined profile
@@ -204,6 +206,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
         getConference().send(initC);
         std::cout << "PlanHorizon: Sending constant velocityRequest: " << m_start_velocity*3.6 << '\n';
       } else {
+        if (flagOnce == false) {
+          flagOnce = true;
+          // odcore::data::TimeStamp currentTime;
+          m_timeSlotStart = currentTime + odcore::data::TimeStamp(m_timeToIntersection,0);
+        }
         // Calculate what velocity to set
         if (m_distanceToIntersection > 0 && currentTime < m_timeSlotStart) {
           double s = m_distanceToIntersection;

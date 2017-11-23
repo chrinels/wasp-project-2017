@@ -66,7 +66,7 @@ class VelocityTuner : public odcore::base::module::TimeTriggeredConferenceClient
   double m_up_velocity;
   double m_down_velocity;
   double m_end_velocity;
-  double m_start_point;
+  double m_test_distance_to_intersection;
   odcore::data::TimeStamp m_start_time;
   int32_t m_plan_mode;
   int32_t m_start_mode;

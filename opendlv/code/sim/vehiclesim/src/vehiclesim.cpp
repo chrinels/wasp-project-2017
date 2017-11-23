@@ -43,11 +43,11 @@ namespace logic {
 namespace legacy {
 
 VehicleSim::VehicleSim(int32_t const &a_argc, char **a_argv)
-  : TimeTriggeredConferenceClientModule(a_argc, a_argv, 
+  : TimeTriggeredConferenceClientModule(a_argc, a_argv,
       "sim-vehiclesim"),
   m_stateMutex(),
   m_position(0,0,0),
-  m_orientation(4.05),
+  m_orientation(-0.2423),
   m_velocity(5,0,0),
   m_yawrate(0),
   m_acceleration(0),
@@ -75,8 +75,8 @@ void VehicleSim::setUp()
 void VehicleSim::tearDown()
 {
 }
-    
-void VehicleSim::nextContainer(odcore::data::Container &a_container) 
+
+void VehicleSim::nextContainer(odcore::data::Container &a_container)
 {
   if (a_container.getDataType() == opendlv::proxy::ActuationRequest::ID()) {
       auto actuationRequest = a_container.getData<opendlv::proxy::ActuationRequest>();
@@ -85,14 +85,14 @@ void VehicleSim::nextContainer(odcore::data::Container &a_container)
         m_inputAcceleration = actuationRequest.getAcceleration();
         m_inputSteeringWheelAngle = actuationRequest.getSteering();
       }
-    } 
+    }
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
 {
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-    
+
 
     {
       odcore::base::Lock li(m_inputMutex);
@@ -101,7 +101,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
 
       double const g = 9.82;
       double const pi = 3.1415926;
-      
+
       // XC90 chassis parameters
       // chassis params
       double const m = 2194;

@@ -42,14 +42,14 @@ services:
       depends_on:
           - odsupercomponent
           # - proxy-xc90
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-stateestimator --cid=${CID} --verbose=1 --freq=10"
+      command: "/opt/opendlv/bin/opendlv-logic-legacy-stateestimator --cid=${CID} --verbose=1 --freq=100"
 
     sim-vehiclesim:
       image: ${IMAGE}
       network_mode: "host"
       depends_on:
           - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=10"
+      command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=100"
 
     proxy-applanix:
       image: ${IMAGE}
@@ -75,7 +75,7 @@ services:
       network_mode: "host"
       depends_on:
           - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=10"
+      command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=100"
 
 
     logic-legacy-velocitytuner:
@@ -90,4 +90,4 @@ services:
       network_mode: "host"
       depends_on:
           - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=10"
+      command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=100"
