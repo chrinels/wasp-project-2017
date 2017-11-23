@@ -116,6 +116,7 @@ logic-legacy-lowlevelcontrol.longitudinal-gain = 0.5
 logic-legacy-lowlevelcontrol.longitudinal-max-acceleration = 3
 logic-legacy-lowlevelcontrol.longitudinal-min-acceleration = -3
 logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum = 1
+logic-legacy-lowlevelcontrol.longitudinal-acceleration-smoothing = 1
 
 # intersection scheduler
 logic-coordination-intersection.slot_duration = 5
