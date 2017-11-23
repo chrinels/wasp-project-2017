@@ -229,8 +229,9 @@ message opendlv.system.diagnostics.HealthStatus [id = 200] {
 }
 
 message opendlv.logic.legacy.TimeSlot [id = 201] {
-	odcore::data::TimeStamp entryTime [id = 1];
-	odcore::data::TimeStamp exitTime [id = 2];
+  uint32 vehicleID [id = 1];
+	odcore::data::TimeStamp entryTime [id = 2];
+	odcore::data::TimeStamp exitTime [id = 3];
 }
 
 message opendlv.logic.legacy.VelocityRequest [id = 202] {
