@@ -20,7 +20,6 @@
 #include <cstdio>
 #include <ctype.h>
 #include <cstring>
-#include <algorithm>
 
 #include <iostream>
 
@@ -29,15 +28,8 @@
 
 #include <opendavinci/odcore/io/conference/ContainerConference.h>
 
-#include <opendlv/data/environment/Line.h>
-#include <opendlv/data/environment/Obstacle.h>
-#include <opendlv/data/environment/Polygon.h>
-#include <opendlv/data/environment/WGS84Coordinate.h>
-
-#include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
 #include <odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h>
-#include <odvdimu/GeneratedHeaders_ODVDIMU.h>
 
 #include "v2ibeacon.hpp"
 
@@ -50,9 +42,12 @@ V2IBeacon::V2IBeacon(int32_t const &a_argc, char **a_argv)
       "logic-coordination-v2ibeacon"),
       m_initialized(false),
       m_wgs84Reference(),
+      m_wgs84Position(),
       m_groundSpeed(0),
       m_plannedTrajectory(),
-      m_vehicleID(0)
+      m_vehicleID(0),
+      m_positionX(0),
+      m_positionY(0)
 {
 }
 
@@ -67,6 +62,7 @@ void V2IBeacon::setUp()
   double const longitude = getKeyValueConfiguration().getValue<double>(
       "global.reference.WGS84.longitude");
   m_wgs84Reference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
+  m_plannedTrajectory = "ES"; // TODO: Read fom config?
   m_initialized = true;
 }
 
@@ -87,14 +83,30 @@ void V2IBeacon::nextContainer(odcore::data::Container &a_container)
     if(insightString.find("stationId") != std::string::npos) {
       std::size_t found = insightString.find_first_of("0123456789");
       m_vehicleID = std::stoi(insightString.substr(found));
-      cout << "ID = " << m_vehicleID << endl;
     } 
   }
+  if (dataType == opendlv::logic::legacy::StateEstimate::ID()) {
+    auto stateEstimate = a_container.getData<opendlv::logic::legacy::StateEstimate>();
+    double positionX = stateEstimate.getPositionX();
+    double positionY = stateEstimate.getPositionY();
+    double velocityX = stateEstimate.getVelocityX();
+    double velocityY = stateEstimate.getVelocityY();
+    
+    m_groundSpeed = sqrt(velocityX*velocityX + velocityY*velocityY);
+    m_positionX = positionX;
+    m_positionY = positionY;
+
+    opendlv::data::environment::Point3 position(positionX, positionY, 0.0);
+    m_wgs84Position = m_wgs84Reference.transform(position);
+    
+  }
+  /**
   if (dataType == opendlv::proxy::GroundSpeedReading::ID()) {
     auto groundSpeed = a_container.getData<opendlv::proxy::GroundSpeedReading>();
     m_groundSpeed = groundSpeed.getGroundSpeed();
     cout << "Ground speed = " << m_groundSpeed << endl;
-  } 
+  }
+  */
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2IBeacon::body()
@@ -107,10 +119,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2IBeacon::body()
     opendlv::logic::coordination::IntersectionAccessRequest iar;
     iar.setVehicleID(m_vehicleID);
     iar.setTimeAtRequest(now);
-    iar.setPlannedTrajectory("ES");
+    iar.setPlannedTrajectory(m_plannedTrajectory);
     iar.setVelocity(m_groundSpeed);
-    iar.setLatitude(55.234);
-    iar.setLongitude(27.1234);
+    iar.setPositionX(m_positionX);
+    iar.setPositionY(m_positionX);
     odcore::data::Container c_intersectionAccess(iar);
     getConference().send(c_intersectionAccess);
   }

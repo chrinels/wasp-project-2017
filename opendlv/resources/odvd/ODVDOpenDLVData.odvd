@@ -286,6 +286,6 @@ message opendlv.logic.coordination.IntersectionAccessRequest [id = 233] {
   odcore::data::TimeStamp timeAtRequest [id = 2];
   string plannedTrajectory [id = 3];
   double velocity [id = 4];
-  double latitude [id = 5];
-  double longitude [id = 6];
+  double positionX [id = 5];
+  double positionY [id = 6];
 }
