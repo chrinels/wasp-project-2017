@@ -23,8 +23,11 @@
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include <opendavinci/odcore/base/Mutex.h>
-#include <opendlv/data/environment/Point3.h>
+
 #include <opendlv/data/environment/WGS84Coordinate.h>
+#include <opendlv/data/environment/Point3.h>
+
+#include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
 
 namespace opendlv {
 namespace logic {
@@ -48,24 +51,6 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
                     NS, NR, NL,
                     ES, ER, EL };
 
-  // TODO: Reuse some existing structure?
-  struct GPSCoord
-  {
-    double x;
-    double y;
-    double z;
-  };
-
-  // TODO: Move to opendlv::collaboration::message?
-  struct IntersectionAccessRequest
-  {
-    int vehicleID;
-    Trajectory plannedTrajectory;
-    GPSCoord currentPosition;
-    // opendlv::data::environment::WGS84Coordinate m_wgs84CurrentPosition;
-    float currentSpeed;
-  };
-
   struct SchedulingInfo
   {
     int vehicleID;
@@ -77,8 +62,8 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   void setUpTrajectories();
   void tearDown();
 
-  bool  scheduleVehicle(const IntersectionAccessRequest &);
-  float estimateIntersectionAccessTime(const GPSCoord &, float);
+  bool  scheduleVehicle(const opendlv::logic::coordination::IntersectionAccessRequest &);
+  float estimateIntersectionAccessTime(double, double, double) const;
   int   determineFirstAccessibleSlot(float);
 
   void addScheduledVehicleToSlot(int, int, SchedulingInfo);
@@ -91,8 +76,8 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   float m_slotDuration;	// [seconds]
   float m_nrofSlots;	// Number of schedulable slots
 
-  GPSCoord m_intersectionPosition; // Location of the center of the intersection
-  // opendlv::data::environment::WGS84Coordinate m_wgs84IntersectionPosition;
+  opendlv::data::environment::WGS84Coordinate m_wgs84IntersectionPosition;
+  opendlv::data::environment::Point3 m_intersectionPosition;
 
   std::vector<Trajectory>                       m_allTrajectories;
   std::map<Trajectory, std::vector<Trajectory>> m_compatibleTrajectories;

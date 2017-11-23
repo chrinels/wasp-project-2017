@@ -32,15 +32,8 @@
 
 #include <opendavinci/odcore/io/conference/ContainerConference.h>
 
-#include <opendlv/data/environment/Line.h>
-#include <opendlv/data/environment/Obstacle.h>
-#include <opendlv/data/environment/Polygon.h>
-#include <opendlv/data/environment/WGS84Coordinate.h>
-
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
-#include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
 #include <odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h>
-#include <odvdimu/GeneratedHeaders_ODVDIMU.h>
 
 #include "intersection.hpp"
 
@@ -56,7 +49,8 @@ Intersection::Intersection(int32_t const &a_argc, char **a_argv)
     m_initialised(false),
     m_slotDuration(5.0),
     m_nrofSlots(20),
-    m_intersectionPosition(),
+    m_wgs84IntersectionPosition(),
+    m_intersectionPosition(0),
     m_allTrajectories(),
     m_compatibleTrajectories(),
     m_scheduledSlotsTable(),
@@ -83,6 +77,12 @@ void Intersection::setUp()
   double const longitude = getKeyValueConfiguration().getValue<double>(
       "global.reference.WGS84.longitude");
   m_wgs84Reference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
+
+  // TODO: Read from config!
+  m_wgs84IntersectionPosition = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
+
+  m_intersectionPosition = m_wgs84Reference.transform(m_wgs84IntersectionPosition);
+
 
   setUpTrajectories();
 
@@ -116,21 +116,28 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
   */
   if (a_container.getDataType() == opendlv::logic::coordination::IntersectionAccessRequest::ID()) {
     cout << "Got an IntersectionAccessRequest!" << endl;
+    auto accessRequest = a_container.getData<opendlv::logic::coordination::IntersectionAccessRequest>();
+    scheduleVehicle(accessRequest);
   }
-  scheduleVehicle(IntersectionAccessRequest());
+  
 }
 
 //-----------------------------------------------------------------------------
-bool Intersection::scheduleVehicle(const IntersectionAccessRequest &a_accessReq)
+bool Intersection::scheduleVehicle(const opendlv::logic::coordination::IntersectionAccessRequest &a_accessReq)
 {
   bool schedulingSuccessful = false;
 
   odcore::base::Lock l(m_timeRefreshMutex);
 
-  int vehicleID = a_accessReq.vehicleID;
-  Trajectory plannedTrajectory = a_accessReq.plannedTrajectory;
-  float intersectionAccessTime = estimateIntersectionAccessTime(a_accessReq.currentPosition,
-                                                                a_accessReq.currentSpeed);
+  int vehicleID = a_accessReq.getVehicleID();
+  Trajectory plannedTrajectory = a_accessReq.getPlannedTrajectory();
+
+  double currentVelocity = a_accessReq.getVelocity();
+  double currentPositionX = a_accessReq.getPositionX();
+  double currentPositionY = a_accessReq.getPositionY();
+
+  float intersectionAccessTime = estimateIntersectionAccessTime(currentPositionX, currentPositionY,
+                                                                currentVelocity);
 
   // Determine the first slot after the vehicle's access time
   int startSlot = determineFirstAccessibleSlot(intersectionAccessTime);
@@ -172,11 +179,13 @@ bool Intersection::scheduleVehicle(const IntersectionAccessRequest &a_accessReq)
 }
 
 //-----------------------------------------------------------------------------
-float Intersection::estimateIntersectionAccessTime(const GPSCoord &a_currentPosition,
-                                                   float a_currentSpeed)
+float Intersection::estimateIntersectionAccessTime(double a_positionX, double a_positionY,
+                                                   double a_currentSpeed) const
 {
   // TODO: Logic for determining intersection access time
-  return (m_intersectionPosition.x - a_currentPosition.x) / (double) a_currentSpeed;
+  double dx = m_intersectionPosition.getX() - a_positionX;
+  double dy = m_intersectionPosition.getY() - a_positionY;
+  return sqrt(dx*dx + dy*dy) / a_currentSpeed;
 }
 
 //-----------------------------------------------------------------------------
