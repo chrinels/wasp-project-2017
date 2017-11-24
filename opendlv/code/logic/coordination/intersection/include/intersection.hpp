@@ -20,6 +20,7 @@
 #define LOGIC_LEGACY_INTERSECTION_INTERSECTION_HPP
 
 #include <memory>
+#include <string>
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include <opendavinci/odcore/base/Mutex.h>
@@ -80,6 +81,7 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   opendlv::data::environment::Point3 m_intersectionPosition;
 
   std::vector<Trajectory>                       m_allTrajectories;
+  std::map<std::string, Trajectory>             m_trajectoryLookUp;
   std::map<Trajectory, std::vector<Trajectory>> m_compatibleTrajectories;
   std::vector<std::vector<SchedulingInfo>>      m_scheduledSlotsTable; // [slot [schedInfo]]
   opendlv::data::environment::WGS84Coordinate   m_wgs84Reference;

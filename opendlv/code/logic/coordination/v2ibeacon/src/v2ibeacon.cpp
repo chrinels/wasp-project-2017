@@ -123,6 +123,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2IBeacon::body()
     iar.setVelocity(m_groundSpeed);
     iar.setPositionX(m_positionX);
     iar.setPositionY(m_positionX);
+    cout << "Beaconing information" << endl;
     odcore::data::Container c_intersectionAccess(iar);
     getConference().send(c_intersectionAccess);
   }
