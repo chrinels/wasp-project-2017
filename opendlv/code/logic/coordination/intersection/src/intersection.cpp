@@ -117,7 +117,9 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
   if (a_container.getDataType() == opendlv::logic::coordination::IntersectionAccessRequest::ID()) {
     cout << "Got an IntersectionAccessRequest!" << endl;
     auto accessRequest = a_container.getData<opendlv::logic::coordination::IntersectionAccessRequest>();
-    scheduleVehicle(accessRequest);
+    if(scheduleVehicle(accessRequest)){
+      cout << "Succesfully scheduled vehicle " << accessRequest.getVehicleID() << endl;
+    }
   }
   
 }
@@ -142,9 +144,14 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
   // Determine the first slot after the vehicle's access time
   int startSlot = determineFirstAccessibleSlot(intersectionAccessTime);
 
+  cout << "Vehicle ID = " << vehicleID << "\t Velocity = " << currentVelocity << endl;
+  cout << "\t X = " << currentPositionX << "\t Y = " << currentPositionY << endl;
+  cout << "Accesstime = " << intersectionAccessTime << "\t Earliest slot = " << startSlot << endl; 
+
   // Find the first slot that does not contain any incompatible trajectories
   if(startSlot >= 0 && startSlot < m_nrofSlots) {
     for(int slot = startSlot; slot < m_nrofSlots; ++slot) {
+
       // Find compatible trajectories for this slot
       std::vector<Trajectory> validTrajectories = m_allTrajectories;
       for(SchedulingInfo slotSchedulingInfo : m_scheduledSlotsTable[slot]) {
@@ -158,9 +165,11 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
             newValidTrajectories.push_back(validTrajectories[i]);
           }
         }
+
         // Update the valid trajectories
         validTrajectories = newValidTrajectories;
       }
+
       // Check if the planned trajectory is valid and add it to this slot
       if(contains(validTrajectories, plannedTrajectory)) {
         // Generate the scheduling info
@@ -179,13 +188,14 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
 }
 
 //-----------------------------------------------------------------------------
-float Intersection::estimateIntersectionAccessTime(double a_positionX, double a_positionY,
+float Intersection::estimateIntersectionAccessTime(double a_positionX, 
+                                                   double a_positionY,
                                                    double a_currentSpeed) const
 {
   // TODO: Logic for determining intersection access time
   double dx = m_intersectionPosition.getX() - a_positionX;
   double dy = m_intersectionPosition.getY() - a_positionY;
-  return sqrt(dx*dx + dy*dy) / a_currentSpeed;
+  return sqrt(dx*dx + dy*dy)/a_currentSpeed; // Time in seconds to intersection
 }
 
 //-----------------------------------------------------------------------------
@@ -216,8 +226,10 @@ int Intersection::determineFirstAccessibleSlot(float a_intersectionAccessTime)
 {
   odcore::data::TimeStamp now;
   float currentTime = now.toMicroseconds();
+  // seconds -> microseconds
+  float intersectionAccessTime = a_intersectionAccessTime*1000*1000;
   
-  int firstAccessibleSlot = ceil((a_intersectionAccessTime - currentTime) / m_slotDuration) + 1;
+  int firstAccessibleSlot = ceil((intersectionAccessTime - currentTime) / m_slotDuration) + 1;
 
   return firstAccessibleSlot;
 }
