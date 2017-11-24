@@ -87,9 +87,9 @@ void VelocityTuner::setUp()
   m_wgs84Reference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
 
   m_maxVelocity = getKeyValueConfiguration().getValue<double>(
-    "logic-legacy-velocitytuner.max-velocity");
+    "logic-legacy-velocitytuner.max-velocitykmh")/3.6;
   m_targetVelocity = getKeyValueConfiguration().getValue<double>(
-    "logic-legacy-velocitytuner.target-velocity-at-intersection");
+    "logic-legacy-velocitytuner.target-velocity-at-intersectionkmh")/3.6;
   m_maxAccleleration = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-velocitytuner.max-acceleration");
   m_acclerationPlanningFactor = getKeyValueConfiguration().getValue<double>(
