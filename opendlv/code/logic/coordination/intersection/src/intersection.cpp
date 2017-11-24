@@ -50,7 +50,7 @@ Intersection::Intersection(int32_t const &a_argc, char **a_argv)
     m_slotDuration(5.0),
     m_nrofSlots(20),
     m_wgs84IntersectionPosition(),
-    m_intersectionPosition(0),
+    m_intersectionPosition(0,0,0),
     m_allTrajectories(),
     m_trajectoryLookUp(),
     m_compatibleTrajectories(),
@@ -121,7 +121,7 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
   odcore::data::TimeStamp now;
   auto timeSent = a_container.getSentTimeStamp();
   auto timeReceived = a_container.getReceivedTimeStamp();
-  
+
   /**
   cout << " Received dataType ID = " << a_container.getDataType() << endl;
   cout << " Sent at " << timeSent.getYYYYMMDD_HHMMSSms() << endl;
@@ -138,7 +138,7 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
     cout << "opendlv::logic::coordination::IntersectionAccessRequest::plannedTrajectory = " << accessRequest.getPlannedTrajectory() << endl;
     scheduleVehicle(accessRequest);
   }
-  
+
 }
 
 //-----------------------------------------------------------------------------
@@ -203,7 +203,7 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
 }
 
 //-----------------------------------------------------------------------------
-float Intersection::estimateIntersectionAccessTime(double a_positionX, 
+float Intersection::estimateIntersectionAccessTime(double a_positionX,
                                                    double a_positionY,
                                                    double a_currentSpeed) const
 {
@@ -243,7 +243,7 @@ int Intersection::determineFirstAccessibleSlot(float a_intersectionAccessTime)
   float currentTime = now.toMicroseconds();
   // seconds -> microseconds
   float intersectionAccessTime = a_intersectionAccessTime*1000*1000;
-  
+
   int firstAccessibleSlot = ceil((intersectionAccessTime - currentTime) / m_slotDuration) + 1;
 
   return firstAccessibleSlot;
