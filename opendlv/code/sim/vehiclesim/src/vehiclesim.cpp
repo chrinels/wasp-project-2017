@@ -35,6 +35,7 @@
 #include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
 #include <odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h>
 #include <odvdvehicle/generated/opendlv/proxy/ActuationRequest.h>
+#include <odvdimu/GeneratedHeaders_ODVDIMU.h>
 
 #include "vehiclesim.hpp"
 
@@ -192,6 +193,21 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       groundSpeed.setGroundSpeed(m_velocity.getX());
       odcore::data::Container c_velocity(groundSpeed);
       getConference().send(c_velocity);
+
+      // Send IMU data
+      auto acceleration = opendlv::proxy::AccelerometerReading();
+      acceleration.setAccelerationX(FX/m);
+      acceleration.setAccelerationY(FY/m);
+      acceleration.setAccelerationZ(-g);
+      odcore::data::Container c_acc(acceleration);
+      getConference().send(c_acc);
+
+      auto angularv = opendlv::proxy::GyroscopeReading();
+      angularv.setAngularVelocityX(0.0);
+      angularv.setAngularVelocityY(0.0);
+      angularv.setAngularVelocityZ(m_yawrate);
+      odcore::data::Container c_angv(angularv);
+      getConference().send(c_angv);
 
       auto pos = m_wgs84Reference.transform(wgs84Coordinate);
       std::cout << "position: (" << std::to_string(m_position.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;

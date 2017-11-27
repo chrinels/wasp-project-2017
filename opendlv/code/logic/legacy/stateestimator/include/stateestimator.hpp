@@ -32,6 +32,7 @@
 #include "SystemModel.hpp"
 #include "PositionMeasurementModel.hpp"
 #include "OrientationMeasurementModel.hpp"
+#include "YawRateMeasurementModel.hpp"
 
 typedef double T;
 
@@ -61,6 +62,7 @@ class StateEstimator : public odcore::base::module::TimeTriggeredConferenceClien
   SystemModel<T> m_systemModel;
   PositionMeasurementModel<T> m_positionModel;
   OrientationMeasurementModel<T> m_orientationModel;
+  YawRateMeasurementModel<T> m_yawRateModel;
 };
 
 }

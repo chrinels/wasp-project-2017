@@ -51,7 +51,8 @@ StateEstimator::StateEstimator(int32_t const &a_argc, char **a_argv)
   m_ekf(),
   m_systemModel(100.0,10.0,3.14,0.01),
   m_positionModel(0.1*0.1),
-  m_orientationModel(0.1)
+  m_orientationModel(0.1),
+  m_yawRateModel(0.1*0.1)
 {
 }
 
@@ -125,7 +126,15 @@ void StateEstimator::nextContainer(odcore::data::Container &a_container)
   } else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
 
   } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
+    odcore::base::Lock l(m_stateMutex);
+    auto yawrateReading = a_container.getData<opendlv::proxy::GyroscopeReading>();
 
+    YawRateMeasurement<T> y;
+    y.r() = yawrateReading.getAngularVelocityZ();
+    auto state = m_ekf.update(m_yawRateModel,y);
+
+    cout << "measured yaw rate: " << y.r() << endl;
+    cout << "estimated yaw rate: " << state.dpsi() << endl;
   }
 
   // Read path
