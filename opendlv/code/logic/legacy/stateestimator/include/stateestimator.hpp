@@ -28,6 +28,13 @@
 #include <opendlv/data/environment/WGS84Coordinate.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
 
+#include <kalman/ExtendedKalmanFilter.hpp>
+#include "SystemModel.hpp"
+#include "PositionMeasurementModel.hpp"
+#include "OrientationMeasurementModel.hpp"
+
+typedef double T;
+
 namespace opendlv {
 namespace logic {
 namespace legacy {
@@ -47,26 +54,13 @@ class StateEstimator : public odcore::base::module::TimeTriggeredConferenceClien
   virtual void tearDown();
 
   odcore::base::Mutex m_stateMutex;
-  opendlv::data::environment::Point3 m_position;
-  opendlv::data::environment::Point3 m_velocity;
-  double m_orientation;
-  double m_yawRate;
 
   opendlv::data::environment::WGS84Coordinate m_wgs84Reference;
 
-
-  odcore::data::TimeStamp m_gpsReadingTimeStamp;
-  double m_positionSmoothing;
-
-  odcore::data::TimeStamp m_groundSpeedReadingTimeStamp;
-  double m_velocitySmoothing;
-
-  odcore::data::TimeStamp m_orientationReadingTimeStamp;
-  double m_orientationSmoothing;
-  double m_orientationMinDistance;
-  double m_orientationMaxDistance;
-  size_t m_maxPositionSize;
-  std::queue<opendlv::data::environment::Point3> m_positions;
+  Kalman::ExtendedKalmanFilter<State<T>> m_ekf;
+  SystemModel<T> m_systemModel;
+  PositionMeasurementModel<T> m_positionModel;
+  OrientationMeasurementModel<T> m_orientationModel;
 };
 
 }

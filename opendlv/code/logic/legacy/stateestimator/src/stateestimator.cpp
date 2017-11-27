@@ -47,21 +47,11 @@ StateEstimator::StateEstimator(int32_t const &a_argc, char **a_argv)
   : TimeTriggeredConferenceClientModule(a_argc, a_argv,
       "logic-legacy-stateestimator"),
   m_stateMutex(),
-  m_position(0,0,0),
-  m_velocity(0,0,0),
-  m_orientation(0),
-  m_yawRate(0),
   m_wgs84Reference(),
-  m_gpsReadingTimeStamp(),
-  m_positionSmoothing(),
-  m_groundSpeedReadingTimeStamp(),
-  m_velocitySmoothing(),
-  m_orientationReadingTimeStamp(),
-  m_orientationSmoothing(),
-  m_orientationMinDistance(),
-  m_orientationMaxDistance(),
-  m_maxPositionSize(),
-  m_positions()
+  m_ekf(),
+  m_systemModel(100.0,10.0,3.14,0.01),
+  m_positionModel(0.1*0.1),
+  m_orientationModel(0.1)
 {
 }
 
@@ -77,16 +67,9 @@ void StateEstimator::setUp()
       "global.reference.WGS84.longitude");
   m_wgs84Reference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
 
-  m_positionSmoothing = getKeyValueConfiguration().getValue<double>(
-      "logic-legacy-stateestimator.position.smoothing");
-
-  m_velocitySmoothing = getKeyValueConfiguration().getValue<double>(
-      "logic-legacy-stateestimator.velocity.smoothing");
-
-  m_orientationSmoothing = 0.1;
-  m_orientationMinDistance = 0.1;
-  m_orientationMaxDistance = 0.15;
-  m_maxPositionSize = 20;
+  State<T> state;
+  state.setZero();
+  m_ekf.init(state);
 }
 
 void StateEstimator::tearDown()
@@ -99,65 +82,45 @@ void StateEstimator::nextContainer(odcore::data::Container &a_container)
     odcore::base::Lock l(m_stateMutex);
     auto gpsReading = a_container.getData<opendlv::data::environment::WGS84Coordinate>();
 
-    auto previousPosition = m_position;
     auto position_i = m_wgs84Reference.transform(gpsReading);
-    odcore::data::TimeStamp currentTime;
 
-    { // Position estimate
-      auto dt = (currentTime - m_gpsReadingTimeStamp).toMicroseconds()*1.0/1000000L;
-      auto smoothing_factor = fmin(dt/m_positionSmoothing,1.0);
+    {
+      PositionMeasurement<T> p;
+      p.x() = position_i.getX();
+      p.y() = position_i.getY();
+      auto state = m_ekf.update(m_positionModel,p);
 
-      m_position += (position_i - m_position)*smoothing_factor;
-      m_gpsReadingTimeStamp = currentTime;
+      cout << "measured position: (" << p.x() << "," << p.y() << ")" << endl;
+      cout << "estimated position: (" << state.px() << "," << state.py() << ")" << endl;
     }
 
     // Orientation estimate
-    m_positions.push(m_position);
-    while (m_positions.size() > m_maxPositionSize) {
-        m_positions.pop();
-    }
-    auto distanceTravelled = (m_positions.back()-m_positions.front());
-    if (distanceTravelled.lengthXY() > m_orientationMinDistance) {
-      m_positions.pop();
-      while (!m_positions.empty() && (m_positions.back()-m_positions.front()).lengthXY() > m_orientationMaxDistance) {
-        m_positions.pop();
+    {
+      OrientationMeasurement<T> o;
+      o.psi() = 0.0;
+      auto vx = m_ekf.getState().vx();
+      auto vy = m_ekf.getState().vy();
+      if (vx*vx+vy*vy > 1.0) { // drive faster than 3.6 km/h, otherwise assume constant orientation.
+        o.psi() = std::atan2(vy,vx);
       }
-      auto dt = (currentTime - m_orientationReadingTimeStamp).toMicroseconds()*1.0/1000000L;
-      auto smoothing_factor = fmin(dt/m_orientationSmoothing,1.0);
-      double orientation_i = distanceTravelled.getAngleXY();
-
-      cout << "received orientation: " << orientation_i << endl;
 
       double const pi = 3.1415926;
-      // Correct orientation_input
-      while (orientation_i < -pi+m_orientation) orientation_i += 2*pi;
-      while (orientation_i > pi+m_orientation) orientation_i -= 2*pi;
+      // Correct measurement to shortest angle
+      while (o.psi() < -pi+m_ekf.getState().psi()) o.psi() += 2*pi;
+      while (o.psi() >  pi+m_ekf.getState().psi()) o.psi() -= 2*pi;
 
-      m_orientation += (orientation_i - m_orientation)*smoothing_factor;
+      auto state = m_ekf.update(m_orientationModel,o);
 
       // Correct orientation
-      while (m_orientation < -pi) m_orientation += 2*pi;
-      while (m_orientation > pi) m_orientation -= 2*pi;
-      m_orientationReadingTimeStamp = currentTime;
+      while (state.psi() < -pi) state.psi() += 2*pi;
+      while (state.psi() > pi) state.psi() -= 2*pi;
 
-      cout << "new orienation: " << m_orientation << endl;
+      cout << "received orientation: " << o.psi() << endl;
+      cout << "estimated orientation: " << state.psi() << endl;
     }
 
 
   } else if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
-    odcore::base::Lock l(m_stateMutex);
-    auto groundSpeedReading = a_container.getData<opendlv::proxy::GroundSpeedReading>();
-
-    auto vx_i = groundSpeedReading.getGroundSpeed();
-    auto vx = m_velocity.getX();
-    odcore::data::TimeStamp currentTime;
-
-    auto dt = (currentTime - m_groundSpeedReadingTimeStamp).toMicroseconds()*1.0/1000000L;
-    auto smoothing_factor = fmin(dt/m_velocitySmoothing,1.0);
-    vx += smoothing_factor*(vx_i-vx);
-
-    m_velocity.setX(vx);
-    m_groundSpeedReadingTimeStamp = currentTime;
 
   } else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
 
@@ -171,27 +134,30 @@ void StateEstimator::nextContainer(odcore::data::Container &a_container)
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode StateEstimator::body()
 {
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-        odcore::base::Lock l(m_stateMutex);
+    odcore::base::Lock l(m_stateMutex);
 
-      // Predict
+    // Predict
+    Control<T> u;
+    auto state = m_ekf.predict(m_systemModel, u);
 
+    auto velocity = std::sqrt(state.vx()*state.vx()+state.vy()*state.vy());
 
-      // Print current state
-      std::cout << "position: (" << std::to_string(m_position.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;
-      std::cout << "velocity: (" << std::to_string(m_velocity.getX()) << ", " << std::to_string(m_velocity.getY()) << ")" << std::endl;
-      std::cout << "orientation: " << std::to_string(m_orientation) << std::endl;
-      std::cout << "yaw rate: " << std::to_string(m_yawRate) << std::endl;
+    // Print current state
+    std::cout << "position: (" << state.px() << ", " << state.py() << ")" << std::endl;
+    std::cout << "velocity: " << velocity << std::endl;
+    std::cout << "orientation: " << state.psi() << std::endl;
+    std::cout << "yaw rate: " << state.dpsi() << std::endl;
 
-      // Send StateEstimate
-      opendlv::logic::legacy::StateEstimate se;
-      se.setPositionX(m_position.getX());
-      se.setPositionY(m_position.getY());
-      se.setVelocityX(m_velocity.getX());
-      se.setVelocityY(m_velocity.getY());
-      se.setOrientation(m_orientation);
-      se.setYawRate(m_yawRate);
-      odcore::data::Container c = odcore::data::Container(se);
-      getConference().send(c);
+    // Send StateEstimate
+    opendlv::logic::legacy::StateEstimate se;
+    se.setPositionX(state.px());
+    se.setPositionY(state.py());
+    se.setVelocityX(velocity);
+    se.setVelocityY(0.0);
+    se.setOrientation(state.psi());
+    se.setYawRate(state.dpsi());
+    odcore::data::Container c = odcore::data::Container(se);
+    getConference().send(c);
   }
 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;

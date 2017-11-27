@@ -20,6 +20,8 @@ project(opendlv-logic-legacy-stateestimator)
 
 include_directories(include)
 
+include_directories(SYSTEM ${KALMAN_INCLUDE_DIR})
+
 set (CMAKE_MODULE_PATH "${ODVDOPENDLVSTANDARDMESSAGESET_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
 find_package (ODVDOpenDLVStandardMessageSet REQUIRED)
 include_directories(SYSTEM ${ODVDOPENDLVSTANDARDMESSAGESET_INCLUDE_DIRS})
