@@ -65,6 +65,7 @@ class StateEstimator : public odcore::base::module::TimeTriggeredConferenceClien
   double m_orientationSmoothing;
   double m_orientationMinDistance;
   double m_orientationMaxDistance;
+  size_t m_maxPositionSize;
   std::queue<opendlv::data::environment::Point3> m_positions;
 };
 
