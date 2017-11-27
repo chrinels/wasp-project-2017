@@ -46,8 +46,8 @@ VehicleSim::VehicleSim(int32_t const &a_argc, char **a_argv)
   : TimeTriggeredConferenceClientModule(a_argc, a_argv,
       "sim-vehiclesim"),
   m_stateMutex(),
-  m_position(0,0,0),
-  m_orientation(-0.2423),
+  m_position(1,1,0),
+  m_orientation(-0.2823),
   m_velocity(5,0,0),
   m_yawrate(0),
   m_acceleration(0),
@@ -192,6 +192,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       groundSpeed.setGroundSpeed(m_velocity.getX());
       odcore::data::Container c_velocity(groundSpeed);
       getConference().send(c_velocity);
+
+      // VehicleSimState
+      opendlv::logic::legacy::VehicleSimState vehicleSimState;
+      vehicleSimState.setPositionX(m_position.getX());
+      vehicleSimState.setPositionY(m_position.getY());
+      vehicleSimState.setVelocityX(m_velocity.getX());
+      vehicleSimState.setVelocityY(m_velocity.getY());
+      vehicleSimState.setOrientation(m_orientation);
+      vehicleSimState.setYawRate(m_yawrate);
+      odcore::data::Container c_state(vehicleSimState);
+      getConference().send(c_state);
 
       auto pos = m_wgs84Reference.transform(wgs84Coordinate);
       std::cout << "position: (" << std::to_string(m_position.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;
