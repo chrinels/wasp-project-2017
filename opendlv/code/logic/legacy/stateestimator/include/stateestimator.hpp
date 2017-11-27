@@ -20,6 +20,7 @@
 #define LOGIC_LEGACY_STATEESTIMATOR_STATEESTIMATOR_HPP
 
 #include <memory>
+#include <queue>
 
 #include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/base/Mutex.h>
@@ -59,6 +60,12 @@ class StateEstimator : public odcore::base::module::TimeTriggeredConferenceClien
 
   odcore::data::TimeStamp m_groundSpeedReadingTimeStamp;
   double m_velocitySmoothing;
+
+  odcore::data::TimeStamp m_orientationReadingTimeStamp;
+  double m_orientationSmoothing;
+  double m_orientationMinDistance;
+  double m_orientationMaxDistance;
+  std::queue<opendlv::data::environment::Point3> m_positions;
 };
 
 }
