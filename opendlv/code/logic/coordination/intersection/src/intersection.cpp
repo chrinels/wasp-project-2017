@@ -102,22 +102,13 @@ void Intersection::tearDown()
 //-----------------------------------------------------------------------------
 void Intersection::nextContainer(odcore::data::Container &a_container)
 {
-  if(!m_initialised)
-    return;
+  if(!m_initialised) return;
 
-  odcore::data::TimeStamp now;
   auto timeSent = a_container.getSentTimeStamp();
   auto timeReceived = a_container.getReceivedTimeStamp();
 
-  /**
-  cout << " Received dataType ID = " << a_container.getDataType() << endl;
-  cout << " Sent at " << timeSent.getYYYYMMDD_HHMMSSms() << endl;
-  cout << " Received at " << timeReceived.getYYYYMMDD_HHMMSSms() << endl;
-  */
   if (a_container.getDataType() == opendlv::logic::coordination::IntersectionAccessRequest::ID()) {
-    cout << "Got an IntersectionAccessRequest!" << endl;
     auto accessRequest = a_container.getData<opendlv::logic::coordination::IntersectionAccessRequest>();
-    toLogger(odcore::data::LogMessage::INFO, "Got an IntersectionAccessRequest!");
     cout << "opendlv::logic::coordination::IntersectionAccessRequest::ID = " << opendlv::logic::coordination::IntersectionAccessRequest::ID() << endl;
     cout << "opendlv::logic::coordination::IntersectionAccessRequest::vehicleID = " << accessRequest.getVehicleID() << endl;
     cout << "opendlv::logic::coordination::IntersectionAccessRequest::velocity = " << accessRequest.getVelocity() << endl;
@@ -297,7 +288,8 @@ void Intersection::addScheduledVehicleToSlot(int a_slot, SchedulingInfo a_info)
   m_scheduledSlotsTable[a_slot] = atslot;
 }
 
-void Intersection::printTimeSlotTable() const {
+void Intersection::printTimeSlotTable() const 
+{
   cout << setw(5) << "Slot" << setw(20) << "Scheduled" << endl;
 
   for(std::vector<std::vector<SchedulingInfo>>::size_type i = 0; i != m_scheduledSlotsTable.size(); i++) {
@@ -311,7 +303,11 @@ void Intersection::printTimeSlotTable() const {
 
     for(std::vector<SchedulingInfo>::size_type j = 0; j != scheduledAtSlot.size(); j++) {
       SchedulingInfo scheduledVehicle = scheduledAtSlot[j];
-      cout <<  setw(5) << i+1 << "," << j+1 << setw(20) << scheduledVehicle.vehicleID << endl;
+
+      int32_t accessSeconds = floor(scheduledVehicle.intersectionAccessTime/(1000*1000));
+      int32_t accessMicrosends = scheduledVehicle.intersectionAccessTime - accessSeconds*1000*1000;
+      odcore::data::TimeStamp accessTime(accessSeconds, accessMicrosends);
+      cout <<  setw(5) << i+1 << "," << j+1 << setw(20) << scheduledVehicle.vehicleID << "\tAccess Time: "<< accessTime.getYYYYMMDD_HHMMSS() << endl;
     }
   }
 }
