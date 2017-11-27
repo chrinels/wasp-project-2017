@@ -283,7 +283,7 @@ void Intersection::addScheduledVehicleToSlot(int a_slot, SchedulingInfo a_info)
 {
   std::vector<SchedulingInfo> atslot = m_scheduledSlotsTable[a_slot];
   atslot.push_back(a_info);
-  // m_scheduledSlotsTable[a_slot][a_vehicleID] = a_info;
+  m_scheduledSlotsTable[a_slot] = atslot;
 }
 
 void Intersection::printTimeSlotTable() const {
