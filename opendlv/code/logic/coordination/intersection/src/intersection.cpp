@@ -162,44 +162,24 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
   // Find the first slot that does not contain any incompatible trajectories
   for(int slot = startSlot; slot < m_nrofSlots; ++slot) {
 
+    if (schedulingSuccessful) break;
+
     // Find compatible trajectories for this slot
     std::vector<Trajectory> validTrajectories = m_allTrajectories;
     
     std::vector<SchedulingInfo> scheduledAtSlot = m_scheduledSlotsTable[slot];
-    if (!tmp.empty()) {
-      for(std::vector<SchedulingInfo>::size_type i = 0; i != scheduledAtSlot.size(); i++) {
-        
-        SchedulingInfo slotSchedulingInfo = scheduledAtSlot[i];
 
-        Trajectory scheduledTrajectory = slotSchedulingInfo.trajectory;
-        std::vector<Trajectory> compatibleTrajectories = m_compatibleTrajectories[scheduledTrajectory];
-
-        // Update the compatible trajectories
-        std::vector<Trajectory> newValidTrajectories;
-        for(std::vector<Trajectory>::size_type j = 0; j != validTrajectories.size(); j++) {
-          if(contains(compatibleTrajectories, validTrajectories[j])) {
-            newValidTrajectories.push_back(validTrajectories[j]);
-          }
-        }
-
-        // Update the valid trajectories
-        validTrajectories = newValidTrajectories;
-      }
-
-      // Check if the planned trajectory is valid and add it to this slot
-      if(contains(validTrajectories, plannedTrajectory)) {
-        // Generate the scheduling info
-        SchedulingInfo schedInfo;
-        schedInfo.intersectionAccessTime = intersectionAccessTime;
-        schedInfo.trajectory = plannedTrajectory;
-        schedInfo.vehicleID = vehicleID;
-
-        addScheduledVehicleToSlot(slot, schedInfo);
-        schedulingSuccessful = true;
-        break;
-      }
-    }
-    else {
+    /**
+     * At the current time slot, check if the vector of already scheduled
+     * vehicles is empty -> if true: just add the new vehicle.
+     * 
+     * If not, check if the planned trajectories of the already 
+     * scheduled vehicles is compatible with the desired trajectory.
+     * 
+     * If not, go to the next slot and try there instead.
+     * 
+     */
+    if (scheduledAtSlot.empty()) {
       // Generate the scheduling info
       SchedulingInfo schedInfo;
       schedInfo.intersectionAccessTime = intersectionAccessTime;
@@ -208,8 +188,37 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
 
       addScheduledVehicleToSlot(slot, schedInfo);
       schedulingSuccessful = true;
-      break;
+
+    } else {
+
+      bool slotIsCompatible = true;
+      for(std::vector<SchedulingInfo>::size_type i = 0; i != scheduledAtSlot.size(); i++) {
+        
+        SchedulingInfo slotSchedulingInfo = scheduledAtSlot[i];
+
+        // Is the vehicle already scheduled?!
+        if (vehicleID == slotSchedulingInfo.vehicleID) return false;
+
+        Trajectory scheduledTrajectory = slotSchedulingInfo.trajectory;
+        std::vector<Trajectory> compatibleTrajectories = m_compatibleTrajectories[scheduledTrajectory];
+
+        if (!contains(compatibleTrajectories, plannedTrajectory)) {
+          slotIsCompatible = false;
+          break;
+        }
+      }
+      if (slotIsCompatible) {
+        // Generate the scheduling info
+        SchedulingInfo schedInfo;
+        schedInfo.intersectionAccessTime = intersectionAccessTime;
+        schedInfo.trajectory = plannedTrajectory;
+        schedInfo.vehicleID = vehicleID;
+
+        addScheduledVehicleToSlot(slot, schedInfo);
+        schedulingSuccessful = true;
+      }
     }
+
   }
 
   return schedulingSuccessful;
