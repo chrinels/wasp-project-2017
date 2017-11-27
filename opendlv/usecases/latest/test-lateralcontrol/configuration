@@ -172,5 +172,12 @@ proxy-applanix.port = 5602
 
 logic-legacy-locationonpath.intersection-latitude = 57.77311000919249
 logic-legacy-locationonpath.intersection-longitude = 12.76892092885846
+logic-legacy-locationonpath.virtualPosition = 1 # 0 = position from StateEstimate, 1 = position from vehicleSimState
 logic-legacy-locationonpath.forward-distance = 10 #m
-logic-legacy-locationonpath.virtual-position = 1 #0 = position from StateEstimate, 1 = position from VehicleSimState
+
+#
+# CONFIGURATION FOR velocity profile
+#
+logic-legacy-velocityprofile.test-time-delay = 3;
+logic-legacy-velocityprofile.test-time-duration = 30;
+logic-legacy-velocityprofile.velocitykmh = 20;

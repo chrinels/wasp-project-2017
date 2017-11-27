@@ -60,6 +60,7 @@ StateEstimator::StateEstimator(int32_t const &a_argc, char **a_argv)
   m_orientationSmoothing(),
   m_orientationMinDistance(),
   m_orientationMaxDistance(),
+  m_maxPositionSize(),
   m_positions()
 {
 }
@@ -85,6 +86,7 @@ void StateEstimator::setUp()
   m_orientationSmoothing = 0.1;
   m_orientationMinDistance = 0.1;
   m_orientationMaxDistance = 0.15;
+  m_maxPositionSize = 20;
 }
 
 void StateEstimator::tearDown()
@@ -111,6 +113,9 @@ void StateEstimator::nextContainer(odcore::data::Container &a_container)
 
     // Orientation estimate
     m_positions.push(m_position);
+    while (m_positions.size() > m_maxPositionSize) {
+        m_positions.pop();
+    }
     auto distanceTravelled = (m_positions.back()-m_positions.front());
     if (distanceTravelled.lengthXY() > m_orientationMinDistance) {
       m_positions.pop();
@@ -121,30 +126,21 @@ void StateEstimator::nextContainer(odcore::data::Container &a_container)
       auto smoothing_factor = fmin(dt/m_orientationSmoothing,1.0);
       double orientation_i = distanceTravelled.getAngleXY();
 
-      cout << "pold: (" << previousPosition.getX() << "," << previousPosition.getY() << ")" << endl;
-      cout << "pnew: (" << m_position.getX() << "," << m_position.getY() << ")" << endl;
-
-      cout << "dist: " << distanceTravelled.lengthXY() << endl;
-
-      cout << "m_orientation: " << m_orientation << endl;
-      cout << "orientation_i: " << orientation_i << endl;
+      cout << "received orientation: " << orientation_i << endl;
 
       double const pi = 3.1415926;
       // Correct orientation_input
       while (orientation_i < -pi+m_orientation) orientation_i += 2*pi;
       while (orientation_i > pi+m_orientation) orientation_i -= 2*pi;
-      cout << "orientation_i2: " << orientation_i << endl;
 
       m_orientation += (orientation_i - m_orientation)*smoothing_factor;
-
-      cout << "m_orientation2: " << m_orientation << endl;
 
       // Correct orientation
       while (m_orientation < -pi) m_orientation += 2*pi;
       while (m_orientation > pi) m_orientation -= 2*pi;
       m_orientationReadingTimeStamp = currentTime;
 
-      cout << "m_orientation3: " << m_orientation << endl;
+      cout << "new orienation: " << m_orientation << endl;
     }
 
 
