@@ -165,10 +165,12 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
     // Find compatible trajectories for this slot
     std::vector<Trajectory> validTrajectories = m_allTrajectories;
     
-    std::vector<SchedulingInfo> tmp = m_scheduledSlotsTable[slot];
+    std::vector<SchedulingInfo> scheduledAtSlot = m_scheduledSlotsTable[slot];
     if (!tmp.empty()) {
-      for(std::vector<SchedulingInfo>::size_type i = 0; i != tmp.size(); i++) {
-        SchedulingInfo slotSchedulingInfo = tmp[i];
+      for(std::vector<SchedulingInfo>::size_type i = 0; i != scheduledAtSlot.size(); i++) {
+        
+        SchedulingInfo slotSchedulingInfo = scheduledAtSlot[i];
+
         Trajectory scheduledTrajectory = slotSchedulingInfo.trajectory;
         std::vector<Trajectory> compatibleTrajectories = m_compatibleTrajectories[scheduledTrajectory];
 
