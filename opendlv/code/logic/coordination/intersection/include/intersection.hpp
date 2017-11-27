@@ -67,9 +67,10 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   float estimateIntersectionAccessTime(double, double, double) const;
   int   determineFirstAccessibleSlot(float);
 
-  void addScheduledVehicleToSlot(int, int, SchedulingInfo);
+  void addScheduledVehicleToSlot(int, SchedulingInfo);
   bool contains(const std::vector<Trajectory> &, Trajectory);
   bool timeRefreshSlotsTable();
+  void printTimeSlotTable() const;
 
   //! Member variables
   odcore::base::Mutex m_timeRefreshMutex;

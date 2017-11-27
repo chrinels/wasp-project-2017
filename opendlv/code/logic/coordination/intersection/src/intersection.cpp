@@ -23,7 +23,7 @@
 #include <algorithm>
 
 #include <iostream>
-
+#include <iomanip>
 
 #include <opendavinci/odcore/data/Container.h>
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -66,7 +66,6 @@ Intersection::~Intersection()
 
 void Intersection::setUp()
 {
-  cout << "Intersection::setUp()" << endl;
   // Extract parameter values
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_slotDuration = kv.getValue<float>(
@@ -80,31 +79,19 @@ void Intersection::setUp()
       "global.reference.WGS84.longitude");
   m_wgs84Reference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
 
-  cout << "\t Read configuration file!" << endl;
 
   // TODO: Read from config!
   m_wgs84IntersectionPosition = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
-
   m_intersectionPosition = m_wgs84Reference.transform(m_wgs84IntersectionPosition);
-
-  cout << "\t Tranformed intersection WGS84 -> Local." << endl;
 
   setUpTrajectories();
 
-  cout << "\t setUpTrajectories() \t DONE!" << endl;
-
-
-  cout << "\t Initializing m_scheduledSlotsTable \t ..." << endl;
   // Create empty maps to store trajectory information for each slot
   for(int slot = 0; slot < m_nrofSlots; ++slot) {
     m_scheduledSlotsTable.push_back(std::vector<SchedulingInfo>());
   }
 
-  cout << "\t Initializing m_scheduledSlotsTable \t DONE!" << endl;
-
   m_initialised = true;
-
-  cout << "Intersection::setUp()\t DONE!" << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -130,6 +117,7 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
   if (a_container.getDataType() == opendlv::logic::coordination::IntersectionAccessRequest::ID()) {
     cout << "Got an IntersectionAccessRequest!" << endl;
     auto accessRequest = a_container.getData<opendlv::logic::coordination::IntersectionAccessRequest>();
+    toLogger(odcore::data::LogMessage::INFO, "Got an IntersectionAccessRequest!");
     cout << "opendlv::logic::coordination::IntersectionAccessRequest::ID = " << opendlv::logic::coordination::IntersectionAccessRequest::ID() << endl;
     cout << "opendlv::logic::coordination::IntersectionAccessRequest::vehicleID = " << accessRequest.getVehicleID() << endl;
     cout << "opendlv::logic::coordination::IntersectionAccessRequest::velocity = " << accessRequest.getVelocity() << endl;
@@ -137,6 +125,7 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
     cout << "opendlv::logic::coordination::IntersectionAccessRequest::positionY = " << accessRequest.getPositionY() << endl;
     cout << "opendlv::logic::coordination::IntersectionAccessRequest::plannedTrajectory = " << accessRequest.getPlannedTrajectory() << endl;
     scheduleVehicle(accessRequest);
+    printTimeSlotTable();  
   }
 
 }
@@ -149,35 +138,45 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
   odcore::base::Lock l(m_timeRefreshMutex);
 
   int vehicleID = a_accessReq.getVehicleID();
-
-  Trajectory plannedTrajectory = m_trajectoryLookUp[a_accessReq.getPlannedTrajectory()];
-
   double currentVelocity = a_accessReq.getVelocity();
   double currentPositionX = a_accessReq.getPositionX();
   double currentPositionY = a_accessReq.getPositionY();
 
+  Trajectory plannedTrajectory = m_trajectoryLookUp[a_accessReq.getPlannedTrajectory()];
+
+  if (currentVelocity <= 0) return false;
+
   float intersectionAccessTime = estimateIntersectionAccessTime(currentPositionX, currentPositionY,
                                                                 currentVelocity);
+
+  if (std::isnan(intersectionAccessTime) || intersectionAccessTime < 0) return false;
 
   // Determine the first slot after the vehicle's access time
   int startSlot = determineFirstAccessibleSlot(intersectionAccessTime);
 
 
-  // Find the first slot that does not contain any incompatible trajectories
-  if(startSlot >= 0 && startSlot < m_nrofSlots) {
-    for(int slot = startSlot; slot < m_nrofSlots; ++slot) {
+  if(startSlot < 0 || startSlot > m_nrofSlots) {
+    return schedulingSuccessful;
+  }
 
-      // Find compatible trajectories for this slot
-      std::vector<Trajectory> validTrajectories = m_allTrajectories;
-      for(SchedulingInfo slotSchedulingInfo : m_scheduledSlotsTable[slot]) {
+  // Find the first slot that does not contain any incompatible trajectories
+  for(int slot = startSlot; slot < m_nrofSlots; ++slot) {
+
+    // Find compatible trajectories for this slot
+    std::vector<Trajectory> validTrajectories = m_allTrajectories;
+    
+    std::vector<SchedulingInfo> tmp = m_scheduledSlotsTable[slot];
+    if (!tmp.empty()) {
+      for(std::vector<SchedulingInfo>::size_type i = 0; i != tmp.size(); i++) {
+        SchedulingInfo slotSchedulingInfo = tmp[i];
         Trajectory scheduledTrajectory = slotSchedulingInfo.trajectory;
         std::vector<Trajectory> compatibleTrajectories = m_compatibleTrajectories[scheduledTrajectory];
 
         // Update the compatible trajectories
         std::vector<Trajectory> newValidTrajectories;
-        for(unsigned int i = 0; i < validTrajectories.size(); ++i) {
-          if(contains(compatibleTrajectories, validTrajectories[i])) {
-            newValidTrajectories.push_back(validTrajectories[i]);
+        for(std::vector<Trajectory>::size_type j = 0; j != validTrajectories.size(); j++) {
+          if(contains(compatibleTrajectories, validTrajectories[j])) {
+            newValidTrajectories.push_back(validTrajectories[j]);
           }
         }
 
@@ -191,11 +190,23 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
         SchedulingInfo schedInfo;
         schedInfo.intersectionAccessTime = intersectionAccessTime;
         schedInfo.trajectory = plannedTrajectory;
+        schedInfo.vehicleID = vehicleID;
 
-        addScheduledVehicleToSlot(slot, vehicleID, schedInfo);
+        addScheduledVehicleToSlot(slot, schedInfo);
         schedulingSuccessful = true;
         break;
       }
+    }
+    else {
+      // Generate the scheduling info
+      SchedulingInfo schedInfo;
+      schedInfo.intersectionAccessTime = intersectionAccessTime;
+      schedInfo.trajectory = plannedTrajectory;
+      schedInfo.vehicleID = vehicleID;
+
+      addScheduledVehicleToSlot(slot, schedInfo);
+      schedulingSuccessful = true;
+      break;
     }
   }
 
@@ -210,7 +221,28 @@ float Intersection::estimateIntersectionAccessTime(double a_positionX,
   // TODO: Logic for determining intersection access time
   double dx = m_intersectionPosition.getX() - a_positionX;
   double dy = m_intersectionPosition.getY() - a_positionY;
-  return sqrt(dx*dx + dy*dy)/a_currentSpeed; // Time in seconds to intersection
+  cout << "Intersection::estimateIntersectionAccessTime(double a_positionX, double a_positionY, double a_currentSpeed) const" << endl;
+  cout << "\tdx = " << dx << endl;
+  cout << "\tdy = " << dy << endl;
+  cout << "\ta_currentSpeed = " << a_currentSpeed << endl;
+  
+  double estimatedAccessTime = sqrt(dx*dx + dy*dy)/a_currentSpeed; // Time in seconds to intersection
+
+  int32_t accessSeconds = floor(estimatedAccessTime);
+  int32_t accessmicroseconds = (estimatedAccessTime - accessSeconds)*1000*1000;
+
+  odcore::data::TimeStamp now;
+
+  odcore::data::TimeStamp accessTime(now.getSeconds() + accessSeconds, accessmicroseconds);
+
+  cout << "\tseconds = " << accessSeconds << endl;
+  cout << "\tmicroseconds = " << accessmicroseconds << endl;
+  cout << "\taccessTime = " << accessTime.getYYYYMMDD_HHMMSS() << endl;
+  cout << "\tnow = " << now.getYYYYMMDD_HHMMSS() << endl;
+
+  cout << "\testimatedAccessTime = " << accessTime.toMicroseconds() << endl;
+
+  return accessTime.toMicroseconds();
 }
 
 //-----------------------------------------------------------------------------
@@ -241,31 +273,46 @@ int Intersection::determineFirstAccessibleSlot(float a_intersectionAccessTime)
 {
   odcore::data::TimeStamp now;
   float currentTime = now.toMicroseconds();
-  // seconds -> microseconds
-  float intersectionAccessTime = a_intersectionAccessTime*1000*1000;
-
-  int firstAccessibleSlot = ceil((intersectionAccessTime - currentTime) / m_slotDuration) + 1;
+  int firstAccessibleSlot = ceil((a_intersectionAccessTime - currentTime) / (m_slotDuration*1000*1000)) + 1;
 
   return firstAccessibleSlot;
 }
 
 //-----------------------------------------------------------------------------
-void Intersection::addScheduledVehicleToSlot(int a_slot, int a_vehicleID, SchedulingInfo a_info)
+void Intersection::addScheduledVehicleToSlot(int a_slot, SchedulingInfo a_info)
 {
-  m_scheduledSlotsTable[a_slot][a_vehicleID] = a_info;
+  std::vector<SchedulingInfo> atslot = m_scheduledSlotsTable[a_slot];
+  atslot.push_back(a_info);
+  // m_scheduledSlotsTable[a_slot][a_vehicleID] = a_info;
+}
+
+void Intersection::printTimeSlotTable() const {
+  cout << setw(5) << "Slot" << setw(20) << "Scheduled" << endl;
+
+  for(std::vector<std::vector<SchedulingInfo>>::size_type i = 0; i != m_scheduledSlotsTable.size(); i++) {
+    
+    std::vector<SchedulingInfo> scheduledAtSlot = m_scheduledSlotsTable[i];
+
+    if(scheduledAtSlot.empty()) {
+      cout << setw(5) << i+1 << setw(20) << "-" << endl;
+      continue;
+    }
+
+    for(std::vector<SchedulingInfo>::size_type j = 0; j != scheduledAtSlot.size(); j++) {
+      SchedulingInfo scheduledVehicle = scheduledAtSlot[j];
+      cout <<  setw(5) << i+1 << "," << j+1 << setw(20) << scheduledVehicle.vehicleID << endl;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void Intersection::setUpTrajectories()
 {
-  cout << "Intersection::setUpTrajectories()" << endl;
   // Define all valid trajectories in a member variable
   m_allTrajectories = { Trajectory::WS, Trajectory::WR, Trajectory::WL,
                         Trajectory::SS, Trajectory::SR, Trajectory::SL,
                         Trajectory::ES, Trajectory::ER, Trajectory::EL,
                         Trajectory::NS, Trajectory::NR, Trajectory::NL};
-
-  cout << "\t m_allTrajectories \t DONE!" << endl;
 
   m_trajectoryLookUp["WS"] = Trajectory::WS;
   m_trajectoryLookUp["WR"] = Trajectory::WR;
@@ -283,8 +330,6 @@ void Intersection::setUpTrajectories()
   m_trajectoryLookUp["NR"] = Trajectory::NR;
   m_trajectoryLookUp["NL"] = Trajectory::NL;
 
-  cout << "\t m_trajectoryLookUp \t DONE!" << endl;
-
   // Define the compatible trajectories
   // Coming from West
   std::vector<Trajectory> ws_compatible = { Trajectory::ER,
@@ -300,8 +345,6 @@ void Intersection::setUpTrajectories()
   std::vector<Trajectory> wl_compatible = { Trajectory::NR,
                                             Trajectory::SR,
                                             Trajectory::EL };
-
-  cout << "\t ws_compatible, wr_compatible, wl_compatible \t DONE!" << endl;
 
   // Coming from South
   std::vector<Trajectory> ss_compatible = { Trajectory::NR,
@@ -360,8 +403,6 @@ void Intersection::setUpTrajectories()
   m_compatibleTrajectories[Trajectory::NS] = ns_compatible;
   m_compatibleTrajectories[Trajectory::NR] = nr_compatible;
   m_compatibleTrajectories[Trajectory::NL] = nl_compatible;
-
-  cout << "\t m_compatibleTrajectories \t DONE!" << endl;
 
 }
 

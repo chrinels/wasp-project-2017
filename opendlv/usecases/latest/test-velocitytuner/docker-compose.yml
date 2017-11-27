@@ -42,14 +42,14 @@ services:
       depends_on:
           - odsupercomponent
           # - proxy-xc90
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-stateestimator --cid=${CID} --verbose=1 --freq=100"
+      command: "/opt/opendlv/bin/opendlv-logic-legacy-stateestimator --cid=${CID} --verbose=1 --freq=1"
 
     sim-vehiclesim:
       image: ${IMAGE}
       network_mode: "host"
       depends_on:
           - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=100"
+      command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=1"
 
     proxy-applanix:
       image: ${IMAGE}
@@ -75,7 +75,7 @@ services:
       network_mode: "host"
       depends_on:
           - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=100"
+      command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=1"
 
 
     logic-legacy-velocitytuner:
@@ -90,4 +90,29 @@ services:
       network_mode: "host"
       depends_on:
           - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=100"
+      command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=1"
+
+    # microservice for knowledge-identity
+    knowledge-identity:
+      build: .
+      network_mode: "host"
+      working_dir: "/opt/opendlv/bin"
+      restart: always
+      depends_on:
+          - odsupercomponent
+      command: "/opt/opendlv/bin/opendlv-logic-knowledge-identity --cid=${CID} --freq=1"
+
+    logic-coordination-v2ibeacon:
+      image: ${IMAGE}
+      network_mode: "host"
+      depends_on:
+        - odsupercomponent
+      command: "/opt/opendlv/bin/opendlv-logic-coordination-v2ibeacon --cid=${CID} --verbose=1 --freq=1"
+
+    logic-coordination-intersection:
+      image: ${IMAGE}
+      network_mode: "host"
+      depends_on:
+        - odsupercomponent
+      command: "/opt/opendlv/bin/opendlv-logic-coordination-intersection --cid=${CID} --verbose=1 --freq=1"
+
