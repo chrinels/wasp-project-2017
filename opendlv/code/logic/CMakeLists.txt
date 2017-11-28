@@ -89,7 +89,7 @@ add_subdirectory(legacy/velocitytuner)
 add_subdirectory(legacy/stateestimator)
 add_subdirectory(legacy/velocityprofile)
 add_subdirectory(legacy/locationonpath)
-add_subdirectory(coordination/v2ibeacon)
+#add_subdirectory(coordination/v2ibeacon)
 add_subdirectory(coordination/intersection)
 
 ###########################################################################

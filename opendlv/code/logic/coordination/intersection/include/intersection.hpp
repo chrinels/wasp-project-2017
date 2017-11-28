@@ -27,6 +27,7 @@
 
 #include <opendlv/data/environment/WGS84Coordinate.h>
 #include <opendlv/data/environment/Point3.h>
+#include "opendavinci/odcore/data/TimeStamp.h"
 
 #include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
 
@@ -55,7 +56,7 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   struct SchedulingInfo
   {
     int vehicleID;
-    float intersectionAccessTime;
+    double intersectionAccessTime;
     Trajectory trajectory;
   };
 
@@ -63,29 +64,23 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   void setUpTrajectories();
   void tearDown();
 
-  bool  scheduleVehicle(const opendlv::logic::coordination::IntersectionAccessRequest &);
-  float estimateIntersectionAccessTime(double, double, double) const;
-  int   determineFirstAccessibleSlot(float);
+  bool scheduleVehicle(const opendlv::logic::coordination::IntersectionAccessRequest &);
 
   void addScheduledVehicleToSlot(int, SchedulingInfo);
-  bool contains(const std::vector<Trajectory> &, Trajectory);
+  bool contains(const std::vector<Trajectory> &, Trajectory) const;
   bool timeRefreshSlotsTable();
   void printTimeSlotTable() const;
 
   //! Member variables
   odcore::base::Mutex m_timeRefreshMutex;
-  bool  m_initialised;
-  float m_slotDuration;	// [seconds]
-  float m_nrofSlots;	// Number of schedulable slots
-
-  opendlv::data::environment::WGS84Coordinate m_wgs84IntersectionPosition;
-  opendlv::data::environment::Point3 m_intersectionPosition;
+  bool    m_initialised;
+  double  m_slotDuration;	  // [seconds]
+  double  m_nrofSlots;	    // Number of schedulable slots
 
   std::vector<Trajectory>                       m_allTrajectories;
   std::map<std::string, Trajectory>             m_trajectoryLookUp;
   std::map<Trajectory, std::vector<Trajectory>> m_compatibleTrajectories;
   std::vector<std::vector<SchedulingInfo>>      m_scheduledSlotsTable; // [slot [schedInfo]]
-  opendlv::data::environment::WGS84Coordinate   m_wgs84Reference;
 };
 
 }
