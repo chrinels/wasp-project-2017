@@ -53,7 +53,7 @@ LocationOnPath::LocationOnPath(int32_t const &a_argc, char **a_argv)
   m_wgs84Reference(),
   m_referenceMutex(),
   m_intersectionPosition(0,0,0),
-  m_virtualPosition(false),
+  // m_virtualPosition(false),
   m_vehicleSimState(),
   m_forwardDistance(0)
 {
@@ -80,10 +80,10 @@ void LocationOnPath::setUp()
   auto wgs84IntersectionPosition = opendlv::data::environment::WGS84Coordinate(latitudeIntersection,longitudeIntersection);
   m_intersectionPosition = m_wgs84Reference.transform(wgs84IntersectionPosition);
   std::cout << "m_intersectionPosition" << m_intersectionPosition.getX() << ", " << m_intersectionPosition.getY() << '\n';
-  int32_t virtual_position = getKeyValueConfiguration().getValue<int32_t>(
-      "logic-legacy-locationonpath.virtualPosition");
-  if (virtual_position == 1)
-    m_virtualPosition = true;
+  // int32_t virtual_position = getKeyValueConfiguration().getValue<int32_t>(
+  //     "logic-legacy-locationonpath.virtualPosition");
+  // if (virtual_position == 1)
+  //   m_virtualPosition = true;
   m_forwardDistance = getKeyValueConfiguration().getValue<double>(
       "logic-legacy-locationonpath.forward-distance");
 
@@ -140,16 +140,16 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LocationOnPath::body()
       // Calculate location on the path
       double x0 = 0, y0 = 0, h0 = 0;
       double d = m_forwardDistance;
-      if (m_virtualPosition) {
-        x0 = m_vehicleSimState.getPositionX();
-        y0 = m_vehicleSimState.getPositionY();
-        h0 = m_vehicleSimState.getOrientation();
-      }
-      else {
+      // if (m_virtualPosition) {
+      //   x0 = m_vehicleSimState.getPositionX();
+      //   y0 = m_vehicleSimState.getPositionY();
+      //   h0 = m_vehicleSimState.getOrientation();
+      // }
+      // else {
         x0 = m_position.getX();
         y0 = m_position.getY();
         h0 = m_orientation;
-      }
+      // }
 
 
       double x = (b*(b*x0-a*y0)-a*c)/(pow(a,2)+pow(b,2));
