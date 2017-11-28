@@ -138,8 +138,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       auto vyf = -sin(delta)*vx + cos(delta)*(vy+lf*m_yawrate);
       auto vxr = vx;
       auto vyr = vy-lr*m_yawrate;
-      auto alphaf = abs(vxf) > 0.00001 ? 0 : -atan(vyf/vxf);
-      auto alphar = abs(vxr) > 0.00001 ? 0 : -atan(vyr/vxr);
+      auto alphaf = abs(vxf) < 0.00001 ? 0 : -atan(vyf/vxf);
+      auto alphar = abs(vxr) < 0.00001 ? 0 : -atan(vyr/vxr);
 
       // Acceleration and brake dynamics
       auto dax = (m_inputAcceleration - m_acceleration)/gamma;
