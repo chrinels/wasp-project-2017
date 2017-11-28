@@ -49,7 +49,7 @@ services:
       network_mode: "host"
       depends_on:
           - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=1"
+      command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=100"
 
     proxy-applanix:
       image: ${IMAGE}
@@ -75,7 +75,7 @@ services:
       network_mode: "host"
       depends_on:
           - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=1"
+      command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=100"
 
 
     logic-legacy-velocitytuner:
@@ -90,7 +90,7 @@ services:
       network_mode: "host"
       depends_on:
           - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=1"
+      command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=100"
 
     # microservice for knowledge-identity
     knowledge-identity:
