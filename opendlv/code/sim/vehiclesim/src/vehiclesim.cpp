@@ -54,7 +54,8 @@ VehicleSim::VehicleSim(int32_t const &a_argc, char **a_argv)
   m_inputMutex(),
   m_inputAcceleration(),
   m_inputSteeringWheelAngle(),
-  m_wgs84Reference()
+  m_wgs84Reference(),
+  m_sendStateEstimate(true)
 {
 }
 
@@ -193,16 +194,29 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       odcore::data::Container c_velocity(groundSpeed);
       getConference().send(c_velocity);
 
-      // VehicleSimState
-      opendlv::logic::legacy::VehicleSimState vehicleSimState;
-      vehicleSimState.setPositionX(m_position.getX());
-      vehicleSimState.setPositionY(m_position.getY());
-      vehicleSimState.setVelocityX(m_velocity.getX());
-      vehicleSimState.setVelocityY(m_velocity.getY());
-      vehicleSimState.setOrientation(m_orientation);
-      vehicleSimState.setYawRate(m_yawrate);
-      odcore::data::Container c_state(vehicleSimState);
-      getConference().send(c_state);
+      // // VehicleSimState
+      // opendlv::logic::legacy::VehicleSimState vehicleSimState;
+      // vehicleSimState.setPositionX(m_position.getX());
+      // vehicleSimState.setPositionY(m_position.getY());
+      // vehicleSimState.setVelocityX(m_velocity.getX());
+      // vehicleSimState.setVelocityY(m_velocity.getY());
+      // vehicleSimState.setOrientation(m_orientation);
+      // vehicleSimState.setYawRate(m_yawrate);
+      // odcore::data::Container c_state(vehicleSimState);
+      // getConference().send(c_state);
+
+      if (m_sendStateEstimate) {
+        // Send StateEstimate
+        opendlv::logic::legacy::StateEstimate se;
+        se.setPositionX(m_position.getX());
+        se.setPositionY(m_position.getY());
+        se.setVelocityX(m_velocity.getX());
+        se.setVelocityY(m_velocity.getY());
+        se.setOrientation(m_orientation);
+        se.setYawRate(m_yawrate);
+        odcore::data::Container c = odcore::data::Container(se);
+        getConference().send(c);
+      }
 
       auto pos = m_wgs84Reference.transform(wgs84Coordinate);
       std::cout << "position: (" << std::to_string(m_position.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;

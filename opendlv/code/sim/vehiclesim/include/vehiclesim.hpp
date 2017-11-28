@@ -56,6 +56,8 @@ class VehicleSim : public odcore::base::module::TimeTriggeredConferenceClientMod
   double m_inputSteeringWheelAngle;
 
   opendlv::data::environment::WGS84Coordinate m_wgs84Reference;
+
+  bool m_sendStateEstimate;
 };
 
 }
