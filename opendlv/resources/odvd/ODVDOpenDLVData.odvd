@@ -297,6 +297,5 @@ message opendlv.logic.coordination.IntersectionAccessRequest [id = 363] {
   uint32 vehicleID [id = 1];
   string plannedTrajectory [id = 2];
   double velocity [id = 3];
-  double positionX [id = 4];
-  double positionY [id = 5];
+  double distanceToIntersection [id = 4];
 }
