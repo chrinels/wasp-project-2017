@@ -127,6 +127,8 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
   int startSlot = ceil(intersectionAccessTime/(m_slotDuration*1000*1000)) + 1;
   if(startSlot < 0 || startSlot > m_nrofSlots) return schedulingSuccessful;
 
+  SchedulingInfo schedInfo;
+
   // Find the first slot that does not contain any incompatible trajectories
   for(int slot = startSlot; slot < m_nrofSlots; ++slot) {
 
@@ -149,7 +151,6 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
      */
     if (scheduledAtSlot.empty()) {
       // Generate the scheduling info
-      SchedulingInfo schedInfo;
       schedInfo.intersectionAccessTime = intersectionAccessTime;
       schedInfo.trajectory = plannedTrajectory;
       schedInfo.vehicleID = vehicleID;
@@ -177,7 +178,6 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
       }
       if (slotIsCompatible) {
         // Generate the scheduling info
-        SchedulingInfo schedInfo;
         schedInfo.intersectionAccessTime = intersectionAccessTime;
         schedInfo.trajectory = plannedTrajectory;
         schedInfo.vehicleID = vehicleID;
@@ -187,6 +187,19 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
       }
     }
 
+  }
+
+  if (schedulingSuccessful) {
+    odcore::data::TimeStamp now;
+    odcore::data::TimeStamp entryTime = now + odcore::data::TimeStamp(ceil(schedInfo.intersectionAccessTime), 0);
+    odcore::data::TimeStamp exitTime = entryTime + odcore::data::TimeStamp(m_slotDuration, 0);
+    opendlv::logic::legacy::TimeSlot timeSlot;
+    timeSlot.setVehicleID(vehicleID);
+    timeSlot.setEntryTime(entryTime);
+    timeSlot.setExitTime(exitTime);
+    cout << "Beaconing information" << endl;
+    odcore::data::Container c_intersectionAccess(timeSlot);
+    getConference().send(c_intersectionAccess);
   }
 
   return schedulingSuccessful;
