@@ -36,13 +36,13 @@ services:
 #             - odsupercomponent
 #         command: "/opt/dlv.snowfox/bin/snowfox-proxy-xc90 --cid=${CID} --freq=100"
 
-    logic-legacy-stateestimator:
-      image: ${IMAGE}
-      network_mode: "host"
-      depends_on:
-          - odsupercomponent
-          # - proxy-xc90
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-stateestimator --cid=${CID} --verbose=1 --freq=1"
+#    logic-legacy-stateestimator:
+#      image: ${IMAGE}
+#      network_mode: "host"
+#      depends_on:
+#          - odsupercomponent
+#          # - proxy-xc90
+#      command: "/opt/opendlv/bin/opendlv-logic-legacy-stateestimator --cid=${CID} --verbose=1 --freq=100"
 
     sim-vehiclesim:
       image: ${IMAGE}
