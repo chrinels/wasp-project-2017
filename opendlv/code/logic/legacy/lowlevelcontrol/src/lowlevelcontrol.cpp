@@ -62,6 +62,10 @@ LowLevelControl::LowLevelControl(int32_t const &a_argc, char **a_argv)
   m_minAccelerationLimit(0),
   m_velocitySumLimit(0),
   m_accelerationSmoothing(0),
+  m_locationOnPath(),
+  m_aimPointGain(0),
+  m_steeringFilterCoefficient(0),
+  m_steeringWheelAngle(0),
   m_velocityHorizon(),
   m_velocityHorizonIsValid(false)
 {
@@ -89,6 +93,10 @@ void LowLevelControl::setUp()
     "logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum");
   m_accelerationSmoothing = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-lowlevelcontrol.longitudinal-acceleration-smoothing");
+  m_aimPointGain = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-lowlevelcontrol.aim_point_gain");
+  m_steeringFilterCoefficient = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-lowlevelcontrol.steering_filter_coefficient");
 
 }
 
@@ -110,6 +118,10 @@ void LowLevelControl::nextContainer(odcore::data::Container &a_container)
     m_velocityReference = velocityRequest.getVelocity();
     m_velocityHorizonIsValid = false;
     cout << "Recieved VelocityReference: " << m_velocityReference << endl;
+
+  } else if (a_container.getDataType() == opendlv::logic::legacy::LocationOnPathToIntersection::ID()) {
+      m_locationOnPath = a_container.getData<opendlv::logic::legacy::LocationOnPathToIntersection>();
+      std::cout << "Received LocationOnPath, errAngle: " << m_locationOnPath.getErrAngle() << std::endl;
 
   } else if (a_container.getDataType() == opendlv::logic::legacy::VelocityHorizon::ID()) {
     odcore::base::Lock l(m_referenceMutex);
@@ -155,7 +167,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
         size_t i=0;
         for (; i < size &&  tvec[i] <= currentTime; ++i);
 
-        
+
         if (i > size-1) { // Keep the last specified velocity
           velocityReference = vvec.back();
           accelerationReference = 0.0;
@@ -232,6 +244,23 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
       m_inputAcceleration = fmin(m_inputAcceleration,m_maxAccelerationLimit);
       m_inputAcceleration = fmax(m_inputAcceleration,m_minAccelerationLimit);
     }
+
+    // Steergin control
+    double aimPointAngle = m_locationOnPath.getErrAngle();
+    while (aimPointAngle < -cartesian::Constants::PI) {
+      aimPointAngle += 2.0 * cartesian::Constants::PI;
+    }
+    while (aimPointAngle > cartesian::Constants::PI) {
+      aimPointAngle -= 2.0 * cartesian::Constants::PI;
+    }
+    double const steeringWheelAngleUnfiltered = m_aimPointGain * aimPointAngle;
+    double const steeringWheelAngleRate = m_steeringFilterCoefficient *
+      (steeringWheelAngleUnfiltered - m_steeringWheelAngle);
+    m_steeringWheelAngle += steeringWheelAngleRate * dt;
+    m_steeringWheelAngle = (m_steeringWheelAngle > 3.0 * cartesian::Constants::PI) ? 9.3 : m_steeringWheelAngle;
+    m_steeringWheelAngle = (m_steeringWheelAngle < -3.0 * cartesian::Constants::PI) ? -9.3 : m_steeringWheelAngle;
+    std::cout << "m_steeringWheelAngle: " << m_steeringWheelAngle << std::endl;
+    m_inputSteeringWheelAngle = m_steeringWheelAngle;
 
     cout << "VelocityReference: " << velocityReference << endl;
     cout << "AccelerationReference: " << accelerationReference << endl;

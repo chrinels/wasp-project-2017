@@ -25,6 +25,7 @@
 #include <opendavinci/odcore/base/Mutex.h>
 #include <opendlv/data/environment/Point3.h>
 #include <opendlv/data/environment/WGS84Coordinate.h>
+#include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
 
 namespace opendlv {
 namespace logic {
@@ -54,6 +55,9 @@ class LocationOnPath : public odcore::base::module::TimeTriggeredConferenceClien
   odcore::base::Mutex m_referenceMutex;
 
   opendlv::data::environment::Point3 m_intersectionPosition;
+  // bool m_virtualPosition;
+  opendlv::logic::legacy::VehicleSimState m_vehicleSimState;
+  double m_forwardDistance;
 };
 
 }

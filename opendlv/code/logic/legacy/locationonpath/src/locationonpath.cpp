@@ -32,7 +32,7 @@
 #include <opendlv/data/environment/WGS84Coordinate.h>
 
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
-#include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
+// #include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
 #include <odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h>
 #include <odvdimu/GeneratedHeaders_ODVDIMU.h>
 
@@ -52,7 +52,10 @@ LocationOnPath::LocationOnPath(int32_t const &a_argc, char **a_argv)
   m_yawrate(0),
   m_wgs84Reference(),
   m_referenceMutex(),
-  m_intersectionPosition(0,0,0)
+  m_intersectionPosition(0,0,0),
+  // m_virtualPosition(false),
+  m_vehicleSimState(),
+  m_forwardDistance(0)
 {
 }
 
@@ -77,6 +80,12 @@ void LocationOnPath::setUp()
   auto wgs84IntersectionPosition = opendlv::data::environment::WGS84Coordinate(latitudeIntersection,longitudeIntersection);
   m_intersectionPosition = m_wgs84Reference.transform(wgs84IntersectionPosition);
   std::cout << "m_intersectionPosition" << m_intersectionPosition.getX() << ", " << m_intersectionPosition.getY() << '\n';
+  // int32_t virtual_position = getKeyValueConfiguration().getValue<int32_t>(
+  //     "logic-legacy-locationonpath.virtualPosition");
+  // if (virtual_position == 1)
+  //   m_virtualPosition = true;
+  m_forwardDistance = getKeyValueConfiguration().getValue<double>(
+      "logic-legacy-locationonpath.forward-distance");
 
 }
 
@@ -91,6 +100,9 @@ void LocationOnPath::nextContainer(odcore::data::Container &a_container)
     auto stateEstimate = a_container.getData<opendlv::logic::legacy::StateEstimate>();
     m_position.setX(stateEstimate.getPositionX());
     m_position.setY(stateEstimate.getPositionY());
+    m_orientation = stateEstimate.getOrientation();
+  } else if (a_container.getDataType() == opendlv::logic::legacy::VehicleSimState::ID()) {
+    m_vehicleSimState = a_container.getData<opendlv::logic::legacy::VehicleSimState>();
   }
   // if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
   //   odcore::base::Lock l(m_referenceMutex);
@@ -126,11 +138,25 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LocationOnPath::body()
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
       // Calculate location on the path
-      double x0 = m_position.getX();
-      double y0 = m_position.getY();
+      double x0 = 0, y0 = 0, h0 = 0;
+      double d = m_forwardDistance;
+      // if (m_virtualPosition) {
+      //   x0 = m_vehicleSimState.getPositionX();
+      //   y0 = m_vehicleSimState.getPositionY();
+      //   h0 = m_vehicleSimState.getOrientation();
+      // }
+      // else {
+        x0 = m_position.getX();
+        y0 = m_position.getY();
+        h0 = m_orientation;
+      // }
+
+
       double x = (b*(b*x0-a*y0)-a*c)/(pow(a,2)+pow(b,2));
       double y = (a*(-b*x0+a*y0)-b*c)/(pow(a,2)+pow(b,2));
       auto projectionPoint = opendlv::data::environment::Point3(x,y,0);
+      auto vehiclePoint = opendlv::data::environment::Point3(x0,y0,0);
+      double errDistance = (vehiclePoint-projectionPoint).lengthXY();
 
       intersectionLocation = (startPoint - m_intersectionPosition).lengthXY();
       if (((x1 < x2) && (x <= x2) && (x >= x1)) || ((x1 > x2) && (x <= x1) && (x >= x2))) {
@@ -147,11 +173,43 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LocationOnPath::body()
       }
       std::cout << "currentLocation: " << currentLocation << '\n';
       std::cout << "intersectionLocation: " << intersectionLocation << '\n';
+      std::cout << "errDistance: " << errDistance << '\n';
+
+      // Calculate forward point for steering control
+      //(x1,y1) (x2,y2) points for line perpendicularly to orientation at m_forwardDistance
+      double xd = x0+d*cos(h0);
+      double yd = y0+d*sin(h0);
+      double xd2 = xd+d*sin(h0);
+      double yd2 = yd-d*cos(h0);
+
+      //(x1,y1) (x2,y2) for road
+      double xr = x1;
+      double yr = y1;
+      // double hr = atan(a);
+      double xr2 = x2;
+      double yr2 = y2;
+
+      // point for forward goal
+      double xp = ((xr*yr2-yr*xr2)*(xd-xd2)-(xr-xr2)*(xd*yd2-yd*xd2))/((xr-xr2)*(yd-yd2)-(yr-yr2)*(xd-xd2));
+      double yp = ((xr*yr2-yr*xr2)*(yd-yd2)-(yr-yr2)*(xd*yd2-yd*xd2))/((xr-xr2)*(yd-yd2)-(yr-yr2)*(xd-xd2));
+
+      // angle to forward goal
+      double hgoal = atan((yp-y0)/(xp-x0));
+      double errAngle = h0-hgoal;
+      while (errAngle < -cartesian::Constants::PI) {
+        errAngle += 2.0 * cartesian::Constants::PI;
+      }
+      while (errAngle > cartesian::Constants::PI) {
+        errAngle -= 2.0 * cartesian::Constants::PI;
+      }
+      std::cout << "errAngle, hgoal: " << errAngle << ", " << hgoal << '\n';
 
       // Set location on the path
       opendlv::logic::legacy::LocationOnPathToIntersection locationOnPath;
       locationOnPath.setIntersectionLocation(intersectionLocation);
       locationOnPath.setCurrentLocation(currentLocation);
+      locationOnPath.setErrDistance(errDistance);
+      locationOnPath.setErrAngle(errAngle);
       odcore::data::Container initC(locationOnPath);
       getConference().send(initC);
     }
