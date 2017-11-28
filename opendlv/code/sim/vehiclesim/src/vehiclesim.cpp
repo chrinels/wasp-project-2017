@@ -147,6 +147,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
 
       // Longitudinal tire Force
       auto Fxf = vx > 0 || m_acceleration > 0 ? m*m_acceleration : 0;
+      Fxf = fmin(Fxf,muxf*Fzf);
+      Fxf = fmax(Fxf,-muxf*Fzf);
       double const Fxr = 0;
 
       // Lateral tire Force
