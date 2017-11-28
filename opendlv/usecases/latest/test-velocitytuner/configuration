@@ -129,6 +129,7 @@ logic-legacy-velocitytuner.start_velocitykmh = 25
 logic-legacy-velocitytuner.up_velocitykmh = 30
 logic-legacy-velocitytuner.down_velocitykmh = 10
 logic-legacy-velocitytuner.end_velocitykmh = 0
+logic-legacy-velocitytuner.no-scheduler = 1 #1 = test-time-to-intersection it used, 2 = message from scheduler is expected
 
 logic-legacy-velocitytuner.plan_mode = 2 #1 = predefined profile, 2 = planned profile
 logic-legacy-velocitytuner.start_mode = 2 #1 = after start_time, 2 = when test_distance_to_intersection is left

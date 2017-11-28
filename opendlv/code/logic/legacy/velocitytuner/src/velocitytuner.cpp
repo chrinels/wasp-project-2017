@@ -70,7 +70,10 @@ VelocityTuner::VelocityTuner(int32_t const &a_argc, char **a_argv)
   m_start_time(),
   m_plan_mode(0),
   m_start_mode(0),
-  m_time_segment_seconds(0)
+  m_time_segment_seconds(0),
+  m_no_scheduler(true),
+  m_timeSlotIsSet(false),
+  m_vehicleID(0)
 {
 }
 
@@ -109,7 +112,7 @@ void VelocityTuner::setUp()
   m_test_distance_to_intersection = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-velocitytuner.test_distance_to_intersection");
   double startTime = getKeyValueConfiguration().getValue<double>(
-    "logic-legacy-velocitytuner.start_time");
+      "logic-legacy-velocitytuner.start_time");
   m_start_time = currentTime + odcore::data::TimeStamp(startTime,0);
   m_plan_mode = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-velocitytuner.plan_mode");
@@ -117,6 +120,8 @@ void VelocityTuner::setUp()
     "logic-legacy-velocitytuner.start_mode");
   m_time_segment_seconds = getKeyValueConfiguration().getValue<double>(
     "logic-legacy-velocitytuner.time_segment_seconds");
+  m_no_scheduler = getKeyValueConfiguration().getValue<bool>(
+    "logic-legacy-velocitytuner.no-scheduler");
 
 }
 
@@ -136,11 +141,19 @@ void VelocityTuner::nextContainer(odcore::data::Container &a_container)
     auto timeSlot = a_container.getData<opendlv::logic::legacy::TimeSlot>();
     m_timeSlotStart = timeSlot.getEntryTime();
     cout << "Recieved TimeSlot, SlotStart: " << m_timeSlotStart << endl;
+    m_timeSlotIsSet = true;
 
   } else if (a_container.getDataType() == opendlv::logic::legacy::LocationOnPathToIntersection::ID()) {
     odcore::base::Lock l(m_stateMutex);
     auto locationOnPathToIntersection = a_container.getData<opendlv::logic::legacy::LocationOnPathToIntersection>();
     m_distanceToIntersection = locationOnPathToIntersection.getIntersectionLocation() - locationOnPathToIntersection.getCurrentLocation();
+  } else if (a_container.getDataType() == opendlv::knowledge::Insight::ID()) {
+    auto insight = a_container.getData<opendlv::knowledge::Insight>();
+    std::string insightString = insight.getInsight();
+    if(insightString.find("stationId") != std::string::npos) {
+      std::size_t found = insightString.find_first_of("0123456789");
+      m_vehicleID = std::stoi(insightString.substr(found));
+    }
   }
 }
 
@@ -206,13 +219,29 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
         getConference().send(initC);
         std::cout << "PlanHorizon: Sending constant velocityRequest: " << m_start_velocity*3.6 << '\n';
       } else {
-        if (flagOnce == false) {
-          flagOnce = true;
-          // odcore::data::TimeStamp currentTime;
-          m_timeSlotStart = currentTime + odcore::data::TimeStamp(m_timeToIntersection,0);
+        if (m_no_scheduler) {
+          //set m_timeSlotStart from config
+          if (flagOnce == false) {
+            flagOnce = true;
+            // odcore::data::TimeStamp currentTime;
+            m_timeSlotStart = currentTime + odcore::data::TimeStamp(m_timeToIntersection,0);
+            m_timeSlotIsSet = true;
+          }
+        } else {
+          //send request to the scheduler
+          opendlv::logic::coordination::IntersectionAccessRequest iar;
+          iar.setVehicleID(m_vehicleID);
+          std::string plannedTrajectory = "ES"; // TODO: Read fom config?
+          iar.setPlannedTrajectory(plannedTrajectory);
+          iar.setVelocity(m_velocity.getX());
+          iar.setDistanceToIntersection(m_distanceToIntersection);
+          cout << "Beaconing information" << endl;
+          odcore::data::Container c_intersectionAccess(iar);
+          getConference().send(c_intersectionAccess);
         }
+
         // Calculate what velocity to set
-        if (m_distanceToIntersection > 0 && currentTime < m_timeSlotStart) {
+        if (m_distanceToIntersection > 0 && currentTime < m_timeSlotStart && m_timeSlotIsSet ) {
           double s = m_distanceToIntersection;
           velocityTunerState.setS(s);
           std::cout << "s: " << s << '\n';
