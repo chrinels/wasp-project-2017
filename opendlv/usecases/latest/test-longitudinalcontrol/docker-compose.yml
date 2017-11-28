@@ -27,30 +27,36 @@ services:
       - .:/opt/opendlv.data
       command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
 
-    # Micro service for proxy-xc90.
-    proxy-xc90:
-        image: copplar.cse.chalmers.se:5043/chalmersrevere/dlv-copplar-on-dlv-autoliv-on-dlv-snowfox-on-dlv-af-on-opendlv-on-opendlv-core-on-opendavinci-on-base:v0.9.4
-        network_mode: "host"
-        privileged: true
-        depends_on:
-            - odsupercomponent
-        command: "/opt/dlv.snowfox/bin/snowfox-proxy-xc90 --cid=${CID} --freq=100"
-
-    logic-legacy-stateestimator:
+    sim-vehiclesim:
       image: ${IMAGE}
       network_mode: "host"
       depends_on:
           - odsupercomponent
-          - proxy-xc90
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-stateestimator --cid=${CID} --verbose=1 --freq=100"
+      command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=100"
+
+
+    # # Micro service for proxy-xc90.
+    # proxy-xc90:
+    #     image: copplar.cse.chalmers.se:5043/chalmersrevere/dlv-copplar-on-dlv-autoliv-on-dlv-snowfox-on-dlv-af-on-opendlv-on-opendlv-core-on-opendavinci-on-base:v0.9.4
+    #     network_mode: "host"
+    #     privileged: true
+    #     depends_on:
+    #         - odsupercomponent
+    #     command: "/opt/dlv.snowfox/bin/snowfox-proxy-xc90 --cid=${CID} --freq=100"
+
+    # logic-legacy-stateestimator:
+    #   image: ${IMAGE}
+    #   network_mode: "host"
+    #   depends_on:
+    #       - odsupercomponent
+    #       - proxy-xc90
+    #   command: "/opt/opendlv/bin/opendlv-logic-legacy-stateestimator --cid=${CID} --verbose=1 --freq=100"
 
     logic-legacy-lowlevelcontrol:
       image: ${IMAGE}
       network_mode: "host"
       depends_on:
           - odsupercomponent
-          - proxy-xc90
-          - logic-legacy-stateestimator
       command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=100"
 
     logic-legacy-velocityprofile:
@@ -61,20 +67,20 @@ services:
           - logic-legacy-lowlevelcontrol
       command: "/opt/opendlv/bin/opendlv-logic-legacy-velocityprofile --cid=${CID} --verbose=1 --freq=10"
 
-    proxy-applanix:
-        image: copplar.cse.chalmers.se:5043/chalmersrevere/dlv-copplar-on-dlv-autoliv-on-dlv-snowfox-on-dlv-af-on-opendlv-on-opendlv-core-on-opendavinci-on-base:v0.9.4
-        network_mode: "host"
-        user: root
-        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-applanix --cid=${CID}"
+    # proxy-applanix:
+    #     image: copplar.cse.chalmers.se:5043/chalmersrevere/dlv-copplar-on-dlv-autoliv-on-dlv-snowfox-on-dlv-af-on-opendlv-on-opendlv-core-on-opendavinci-on-base:v0.9.4
+    #     network_mode: "host"
+    #     user: root
+    #     command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-applanix --cid=${CID}"
 
     odrecorderh264:
-        image: copplar.cse.chalmers.se:5043/chalmersrevere/dlv-copplar-on-dlv-autoliv-on-dlv-snowfox-on-dlv-af-on-opendlv-on-opendlv-core-on-opendavinci-on-base:v0.9.4
-        depends_on:
-            - odsupercomponent
-        volumes:
-            - ~/recordings:/opt/recordings
-        user: root
-        network_mode: host
-        ipc: host
-        working_dir: "/opt/recordings"
-        command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"
+      image: ${IMAGE}
+      depends_on:
+          - odsupercomponent
+      volumes:
+          - ~/recordings:/opt/recordings
+      user: root
+      network_mode: host
+      ipc: host
+      working_dir: "/opt/recordings"
+      command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"
