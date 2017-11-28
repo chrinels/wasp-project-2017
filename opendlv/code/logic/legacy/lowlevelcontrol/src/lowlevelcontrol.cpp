@@ -260,7 +260,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
     m_steeringWheelAngle = (m_steeringWheelAngle > 3.0 * cartesian::Constants::PI) ? 9.3 : m_steeringWheelAngle;
     m_steeringWheelAngle = (m_steeringWheelAngle < -3.0 * cartesian::Constants::PI) ? -9.3 : m_steeringWheelAngle;
     std::cout << "m_steeringWheelAngle: " << m_steeringWheelAngle << std::endl;
-    m_inputSteeringWheelAngle = m_steeringWheelAngle;
+    // m_inputSteeringWheelAngle = m_steeringWheelAngle;
 
     cout << "VelocityReference: " << velocityReference << endl;
     cout << "AccelerationReference: " << accelerationReference << endl;
