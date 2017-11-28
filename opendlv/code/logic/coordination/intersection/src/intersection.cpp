@@ -51,7 +51,8 @@ Intersection::Intersection(int32_t const &a_argc, char **a_argv)
     m_allTrajectories(),
     m_trajectoryLookUp(),
     m_compatibleTrajectories(),
-    m_scheduledSlotsTable()
+    m_scheduledSlotsTable(),
+    m_rotationTime()
 {
 }
 
@@ -210,15 +211,18 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
 bool Intersection::timeRefreshSlotsTable()
 {
   odcore::base::Lock l(m_timeRefreshMutex);
+  odcore::data::TimeStamp now;
+  odcore::data::TimeStamp rotationTime = now - odcore::data::TimeStamp(m_slotDuration,0);
+  if (rotationTime >= m_rotationTime) {
+    // Shift all slots to the left
+    std::rotate(m_scheduledSlotsTable.begin(),
+                m_scheduledSlotsTable.begin() + 1,
+                m_scheduledSlotsTable.end());
 
-  // Shift all slots to the left
-  std::rotate(m_scheduledSlotsTable.begin(),
-              m_scheduledSlotsTable.begin() + 1,
-              m_scheduledSlotsTable.end());
-
-  // Assign a new empty map to the last slot
-  m_scheduledSlotsTable[m_nrofSlots - 1] = std::vector<SchedulingInfo>();
-
+    // Assign a new empty map to the last slot
+    m_scheduledSlotsTable[m_nrofSlots - 1] = std::vector<SchedulingInfo>();
+    m_rotationTime = now;
+  }
   return true;
 }
 

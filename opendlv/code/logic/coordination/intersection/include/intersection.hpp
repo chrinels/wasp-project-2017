@@ -81,6 +81,8 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   std::map<std::string, Trajectory>             m_trajectoryLookUp;
   std::map<Trajectory, std::vector<Trajectory>> m_compatibleTrajectories;
   std::vector<std::vector<SchedulingInfo>>      m_scheduledSlotsTable; // [slot [schedInfo]]
+  odcore::data::TimeStamp                       m_rotationTime;
+
 };
 
 }
