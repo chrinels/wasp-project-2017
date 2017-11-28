@@ -115,17 +115,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2IBeacon::body()
     if (!m_initialized) {
       continue;
     }
-    odcore::data::TimeStamp now;
-    opendlv::logic::coordination::IntersectionAccessRequest iar;
-    iar.setVehicleID(m_vehicleID);
-    iar.setTimeAtRequest(now);
-    iar.setPlannedTrajectory(m_plannedTrajectory);
-    iar.setVelocity(m_groundSpeed);
-    iar.setPositionX(m_positionX);
-    iar.setPositionY(m_positionX);
-    cout << "Beaconing information" << endl;
-    odcore::data::Container c_intersectionAccess(iar);
-    getConference().send(c_intersectionAccess);
+
+    if (m_groundSpeed > 1) {
+      opendlv::logic::coordination::IntersectionAccessRequest iar;
+      iar.setVehicleID(m_vehicleID);
+      iar.setPlannedTrajectory(m_plannedTrajectory);
+      iar.setVelocity(m_groundSpeed);
+      iar.setPositionX(m_positionX);
+      iar.setPositionY(m_positionY);
+      cout << "Beaconing information" << endl;
+      odcore::data::Container c_intersectionAccess(iar);
+      getConference().send(c_intersectionAccess);
+    }
   }
 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
