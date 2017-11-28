@@ -209,7 +209,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LocationOnPath::body()
       locationOnPath.setIntersectionLocation(intersectionLocation);
       locationOnPath.setCurrentLocation(currentLocation);
       locationOnPath.setErrDistance(errDistance);
-      locationOnPath.setErrAngle(errAngle);
+      locationOnPath.setErrAngle(-errAngle);
       odcore::data::Container initC(locationOnPath);
       getConference().send(initC);
     }
