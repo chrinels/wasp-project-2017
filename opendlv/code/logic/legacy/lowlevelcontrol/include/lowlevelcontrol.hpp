@@ -66,6 +66,10 @@ class LowLevelControl : public odcore::base::module::TimeTriggeredConferenceClie
   double m_minAccelerationLimit;
   double m_velocitySumLimit;
   double m_accelerationSmoothing;
+  opendlv::logic::legacy::LocationOnPathToIntersection m_locationOnPath;
+  double m_aimPointGain;
+  double m_steeringFilterCoefficient;
+  double m_steeringWheelAngle;
 
   opendlv::logic::legacy::VelocityHorizon m_velocityHorizon;
   bool m_velocityHorizonIsValid;
