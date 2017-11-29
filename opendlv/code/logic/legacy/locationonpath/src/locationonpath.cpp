@@ -53,9 +53,9 @@ LocationOnPath::LocationOnPath(int32_t const &a_argc, char **a_argv)
   m_wgs84Reference(),
   m_referenceMutex(),
   m_intersectionPosition(0,0,0),
-  // m_virtualPosition(false),
   m_vehicleSimState(),
-  m_forwardDistance(0)
+  m_forwardDistance(0),
+  m_road()
 {
 }
 
@@ -70,23 +70,18 @@ void LocationOnPath::setUp()
   double const longitude = getKeyValueConfiguration().getValue<double>(
       "global.reference.WGS84.longitude");
   m_wgs84Reference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
-  // double testTimeToIntersection = getKeyValueConfiguration().getValue<double>(
-  //   "global.intlat");
-  // std::cout << "testTimeToIntersection" << testTimeToIntersection << '\n';
-  double const latitudeIntersection = getKeyValueConfiguration().getValue<double>(
-      "logic-legacy-locationonpath.intersection-latitude");
-  double const longitudeIntersection = getKeyValueConfiguration().getValue<double>(
-      "logic-legacy-locationonpath.intersection-longitude");
-  auto wgs84IntersectionPosition = opendlv::data::environment::WGS84Coordinate(latitudeIntersection,longitudeIntersection);
-  m_intersectionPosition = m_wgs84Reference.transform(wgs84IntersectionPosition);
-  std::cout << "m_intersectionPosition" << m_intersectionPosition.getX() << ", " << m_intersectionPosition.getY() << '\n';
-  // int32_t virtual_position = getKeyValueConfiguration().getValue<int32_t>(
-  //     "logic-legacy-locationonpath.virtualPosition");
-  // if (virtual_position == 1)
-  //   m_virtualPosition = true;
+
   m_forwardDistance = getKeyValueConfiguration().getValue<double>(
       "logic-legacy-locationonpath.forward-distance");
 
+ //  vector<std::string> pathstring getKeyValueConfiguration().getSubsetForSection("logic-legacy-locationonpath.pathcoord");
+ //  for (std::string key : pathstring) {
+ //  	au
+	// m_road.push()
+ //  }
+  m_road.push(opendlv::data::environment::Point3(0.0,0.0,0.0));
+  m_road.push(opendlv::data::environment::Point3(20.0,0.0,0.0));
+  m_road.push(opendlv::data::environment::Point3(20.0,20.0,0.0));
 }
 
 void LocationOnPath::tearDown()
@@ -101,59 +96,18 @@ void LocationOnPath::nextContainer(odcore::data::Container &a_container)
     m_position.setX(stateEstimate.getPositionX());
     m_position.setY(stateEstimate.getPositionY());
     m_orientation = stateEstimate.getOrientation();
-  } else if (a_container.getDataType() == opendlv::logic::legacy::VehicleSimState::ID()) {
-    m_vehicleSimState = a_container.getData<opendlv::logic::legacy::VehicleSimState>();
-  }
-  // if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
-  //   odcore::base::Lock l(m_referenceMutex);
-  //   auto currentPosition = a_container.getData<opendlv::data::environment::WGS84Coordinate>();
-  //   m_position = m_wgs84Reference.transform(currentPosition);
-  //   cout << "LOP: Recieved WGS84Coordinate (X, Y): " << m_position.getX() << ", " << m_position.getY() << endl;
-
-  // } else if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
-
-  // } else if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
-
-  // } else if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()) {
-
-  // }
+  } 
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LocationOnPath::body()
 {
-  auto startPoint = opendlv::data::environment::Point3(0,0,0);
-  double currentLocation = 0, intersectionLocation = 0;
-  // Line ax+by+c=0 via start (0,0) and m_intersectionPosition
-  double x1 = 0, y1 = 0, x2 = m_intersectionPosition.getX(), y2 = m_intersectionPosition.getY();
-  double a = 0, b = 0, c = 0;
-  if (x1>x2 || x1<x2) {
-    a = (y1-y2)/(x1-x2);
-    b = -1;
-    c = y1-a*x1;
-    std::cout << "Line for the road:" << a << ", " << b << ", " << c << '\n';
-  } else {
-    std::cout << "x1 is equal to x2" << '\n';
-  }
-
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
       // Calculate location on the path
-      double x0 = 0, y0 = 0, h0 = 0;
-      double d = m_forwardDistance;
-      // if (m_virtualPosition) {
-      //   x0 = m_vehicleSimState.getPositionX();
-      //   y0 = m_vehicleSimState.getPositionY();
-      //   h0 = m_vehicleSimState.getOrientation();
-      // }
-      // else {
-        x0 = m_position.getX();
-        y0 = m_position.getY();
-        h0 = m_orientation;
-      // }
 
+  	  
+      
 
-      double x = (b*(b*x0-a*y0)-a*c)/(pow(a,2)+pow(b,2));
-      double y = (a*(-b*x0+a*y0)-b*c)/(pow(a,2)+pow(b,2));
       auto projectionPoint = opendlv::data::environment::Point3(x,y,0);
       auto vehiclePoint = opendlv::data::environment::Point3(x0,y0,0);
       double errDistance = (vehiclePoint-projectionPoint).lengthXY();

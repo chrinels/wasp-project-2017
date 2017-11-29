@@ -55,9 +55,10 @@ class LocationOnPath : public odcore::base::module::TimeTriggeredConferenceClien
   odcore::base::Mutex m_referenceMutex;
 
   opendlv::data::environment::Point3 m_intersectionPosition;
-  // bool m_virtualPosition;
   opendlv::logic::legacy::VehicleSimState m_vehicleSimState;
   double m_forwardDistance;
+
+  std::vector<opendlv::data::environment::Point3> m_road;
 };
 
 }
