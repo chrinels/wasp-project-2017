@@ -240,7 +240,7 @@ void Intersection::addScheduledVehicleToSlot(int a_slot, SchedulingInfo a_info)
   m_scheduledSlotsTable[a_slot] = atslot;
 }
 
-void Intersection::printTimeSlotTable() const 
+void Intersection::printTimeSlotTable() 
 {
   cout << setw(5) << "Slot" << setw(20) << "Scheduled" << endl;
 
@@ -260,6 +260,13 @@ void Intersection::printTimeSlotTable() const
       int32_t accessMicrosends = scheduledVehicle.intersectionAccessTime - accessSeconds*1000*1000;
       odcore::data::TimeStamp accessTime(accessSeconds, accessMicrosends);
       cout <<  setw(5) << i+1 << "," << j+1 << setw(20) << scheduledVehicle.vehicleID << "\tAccess Time: "<< accessTime.getYYYYMMDD_HHMMSS() << endl;
+
+      opendlv::logic::coordination::IntersectionSchedulerDebug debugMsg;
+      debugMsg.setVehicleID(scheduledVehicle.vehicleID);
+      debugMsg.setTime(accessTime);
+      debugMsg.setTimeSlot(i);
+      odcore::data::Container c_debugMsg(debugMsg);
+      getConference().send(c_debugMsg);
     }
   }
 }

@@ -299,3 +299,9 @@ message opendlv.logic.coordination.IntersectionAccessRequest [id = 363] {
   double velocity [id = 3];
   double distanceToIntersection [id = 4];
 }
+
+message opendlv.logic.coordination.IntersectionSchedulerDebug [id = 364] {
+  uint32 vehicleID [id = 1];
+  odcore::data::TimeStamp time [id = 2];
+  uint8 timeSlot [id = 3];
+}

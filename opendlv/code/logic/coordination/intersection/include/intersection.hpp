@@ -69,7 +69,7 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   void addScheduledVehicleToSlot(int, SchedulingInfo);
   bool contains(const std::vector<Trajectory> &, Trajectory) const;
   bool timeRefreshSlotsTable();
-  void printTimeSlotTable() const;
+  void printTimeSlotTable();
 
   //! Member variables
   odcore::base::Mutex m_timeRefreshMutex;
