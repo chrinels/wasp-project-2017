@@ -241,7 +241,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
         }
 
         // Calculate what velocity to set
-        if (m_distanceToIntersection > 0 && currentTime < m_timeSlotStart && m_timeSlotIsSet ) {
+        if (m_distanceToIntersection > 0 && currentTime + 4 < m_timeSlotStart && m_timeSlotIsSet ) {
           double s = m_distanceToIntersection;
           velocityTunerState.setS(s);
           std::cout << "s: " << s << '\n';
