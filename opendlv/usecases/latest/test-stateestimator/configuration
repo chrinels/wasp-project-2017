@@ -1,0 +1,178 @@
+# This is the "one-and-only" configuration for OpenDaVINCI.
+# Its format is like:
+#
+# section.key=value
+#
+# If you have several modules of the same type, the following configuration
+# scheme applies:
+#
+# global.key=value # <-- This configuration applies for all modules.
+#
+# section.key=value # <-- This configuration applies for all modules of type "section".
+#
+# section:ID.key=value # <-- This configuration applies for the module "ID" of type "section".
+
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+
+# The following attributes define the buffer sizes for recording and
+# replaying. You need to adjust these parameters depending on the
+# camera resolution for example (640x480x3 --> 1000000 for memorySegment,
+# 1280x720x3 --> 2800000).
+global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
+global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
+
+# The following key describes the list of modules expected to participate in this --cid session.
+global.session.expectedModules = knowledge-scene,perception-detectlane,core-tool-camera-replay
+
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS.
+#
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODSUPERCOMPONENT
+#
+
+# If the managed level is pulse_shift, all connected modules will be informed
+# about the supercomponent's real time by this increment per module. Thus, the
+# execution times per modules are better aligned with supercomponent and the
+# data exchange is somewhat more predictable.
+#odsupercomponent.pulseshift.shift = 10000 # (in microseconds)
+
+# If the managed level is pulse_time_ack, this is the timeout for waiting for
+# an ACK message from a connected client.
+#odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
+
+# If the managed level is pulse_time_ack, the modules are triggered sequentially
+# by sending pulses and waiting for acknowledgment messages. To allow the modules
+# to deliver their respective containers, this yielding time is used to sleep
+# before supercomponent sends the pulse messages the next module in this execution
+# cycle. This value needs to be adjusted for networked simulations to ensure
+# deterministic execution.
+#odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
+
+# List of modules (without blanks) that will not get a pulse message from odsupercomponent.
+#odsupercomponent.pulsetimeack.exclude = odcockpit
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS.
+#
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+
+#global.scenario = file://Track.scnx
+
+# AstaZero Garage Area:
+#global.reference.WGS84.latitude = 57.777025
+#global.reference.WGS84.longitude = 12.781155
+
+# AstaZero High Speed Area:
+#global.reference.WGS84.latitude = 57.780860
+#global.reference.WGS84.longitude = 12.773900
+
+# AstaZero City Area:
+global.reference.WGS84.latitude = 57.77338154493465
+global.reference.WGS84.longitude = 12.76686512235394
+
+# AstaZero Rural Road:
+#global.reference.WGS84.latitude = 57.77145065
+#global.reference.WGS84.longitude = 12.77508563
+
+# Revere lab:
+#global.reference.WGS84.latitude = 57.709134
+#global.reference.WGS84.longitude = 11.947603
+
+# Umea:
+#global.reference.WGS84.latitude = 63.792379
+#global.reference.WGS84.longitude = 20.285961
+
+
+# The following attributes define the buffer sizes for recording and
+# replaying. You need to adjust these parameters depending on the
+# camera resolution for example (640x480x3 --> 1000000 for memorySegment,
+# 1280x720x3 --> 2800000).
+global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
+global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
+
+# The following key describes the list of modules expected to participate in this --cid session.
+global.session.expectedModules = example
+
+logic-legacy-lowlevelcontrol.longitudinal-gain = 0.5
+logic-legacy-lowlevelcontrol.longitudinal-max-acceleration = 3
+logic-legacy-lowlevelcontrol.longitudinal-min-acceleration = -3
+logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum = 1
+logic-legacy-lowlevelcontrol.longitudinal-acceleration-smoothing = 1
+logic-legacy-lowlevelcontrol.aim_point_gain = 1
+logic-legacy-lowlevelcontrol.steering_filter_coefficient = 1
+
+#logic-legacy-velocitytuner.max-acceleration = 1.25
+logic-legacy-velocitytuner.max-acceleration = 2.5
+logic-legacy-velocitytuner.acceleration-planning-factor = 0.8
+logic-legacy-velocitytuner.test-time-to-intersection = 10 #s
+logic-legacy-velocitytuner.target-velocity-at-intersectionkmh = 30 #kmh
+logic-legacy-velocitytuner.max-velocitykmh = 50 #kmh
+logic-legacy-velocitytuner.test_distance_to_intersection = 100 #m
+logic-legacy-velocitytuner.start_time = 10 #s
+logic-legacy-velocitytuner.start_velocitykmh = 25
+logic-legacy-velocitytuner.up_velocitykmh = 30
+logic-legacy-velocitytuner.down_velocitykmh = 10
+logic-legacy-velocitytuner.end_velocitykmh = 0
+
+logic-legacy-velocitytuner.plan_mode = 2 #1 = predefined profile, 2 = planned profile
+logic-legacy-velocitytuner.start_mode = 2 #1 = after start_time, 2 = when test_distance_to_intersection is left
+
+logic-legacy-velocitytuner.time_segment_seconds = 5
+
+#
+# CONFIGURATION FOR state estimator
+#
+logic-legacy-stateestimator.position.smoothing = 0.1;
+logic-legacy-stateestimator.velocity.smoothing = 0.1;
+
+
+#
+# CONFIGURATION FOR proxy-xc90
+#
+proxy-xc90.devicenode = can0        # Socket CAN device.
+proxy-xc90.debug = 0                # Enable debug output to console.
+proxy-xc90.record_gcm = 0           # 1 = Dump generic CAN messages.
+proxy-xc90.record_mapped_data = 0   # 1 = Record mapped containers.
+proxy-xc90.record_asc = 0           # 1 = Dump ASC data from CAN.
+proxy-xc90.read-only = 0            # 1 = read-only , 0 = read/write
+
+
+
+#
+# CONFIGURATION FOR ODRECORDERH264
+#
+#odrecorderh264.output = file://recorder.rec #
+odrecorderh264.remoteControl = 0;
+odrecorderh264.dumpSharedData = 1;
+odrecorderh264.lossless = 1;
+odrecorderh264.portbaseforchildprocesses = 29000;
+
+###############################################################################
+#
+# CONFIGURATION FOR proxy-applanix
+#
+proxy-applanix.ip = 10.42.42.40    # Change to Applanix IP.
+proxy-applanix.port = 5602
+
+logic-legacy-locationonpath.intersection-latitude = 57.77311000919249
+logic-legacy-locationonpath.intersection-longitude = 12.76892092885846
+logic-legacy-locationonpath.virtualPosition = 1 # 0 = position from StateEstimate, 1 = position from vehicleSimState
+logic-legacy-locationonpath.forward-distance = 10 #m
