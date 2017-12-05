@@ -116,7 +116,7 @@ logic-legacy-lowlevelcontrol.longitudinal-max-acceleration = 3
 logic-legacy-lowlevelcontrol.longitudinal-min-acceleration = -3
 logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum = 1
 logic-legacy-lowlevelcontrol.longitudinal-acceleration-smoothing = 1
-logic-legacy-lowlevelcontrol.aim_point_gain = 1
+logic-legacy-lowlevelcontrol.aim_point_gain = 2
 logic-legacy-lowlevelcontrol.steering_filter_coefficient = 2
 
 #logic-legacy-velocitytuner.max-acceleration = 1.25
@@ -127,16 +127,16 @@ logic-legacy-velocitytuner.target-velocity-at-intersectionkmh = 30 #kmh
 logic-legacy-velocitytuner.max-velocitykmh = 50 #kmh
 logic-legacy-velocitytuner.test_distance_to_intersection = 100 #m
 logic-legacy-velocitytuner.start_time = 10 #s
-logic-legacy-velocitytuner.start_velocitykmh = 25
-logic-legacy-velocitytuner.up_velocitykmh = 30
-logic-legacy-velocitytuner.down_velocitykmh = 10
+logic-legacy-velocitytuner.start_velocitykmh = 30
+logic-legacy-velocitytuner.up_velocitykmh = 32
+logic-legacy-velocitytuner.down_velocitykmh = 30
 logic-legacy-velocitytuner.end_velocitykmh = 0
-logic-legacy-velocitytuner.no-scheduler = 0 #1 = test-time-to-intersection it used, 0 = message from scheduler is expected
+logic-legacy-velocitytuner.no-scheduler = 1 #1 = test-time-to-intersection it used, 0 = message from scheduler is expected
 
 logic-legacy-velocitytuner.plan_mode = 1 #1 = predefined profile, 2 = planned profile
 logic-legacy-velocitytuner.start_mode = 1 #1 = after start_time, 2 = when test_distance_to_intersection is left
 
-logic-legacy-velocitytuner.time_segment_seconds = 5
+logic-legacy-velocitytuner.time_segment_seconds = 10
 
 #
 # CONFIGURATION FOR state estimator
@@ -173,10 +173,10 @@ odrecorderh264.portbaseforchildprocesses = 29000;
 proxy-applanix.ip = 10.42.42.40    # Change to Applanix IP.
 proxy-applanix.port = 5602
 
-logic-legacy-locationonpath.intersection-latitude = 57.77311000919249
-logic-legacy-locationonpath.intersection-longitude = 12.76892092885846
+logic-legacy-locationonpath.intersection-latitude = 57.773064722885330
+logic-legacy-locationonpath.intersection-longitude = 12.768919003548130
 logic-legacy-locationonpath.virtualPosition = 1 # 0 = position from StateEstimate, 1 = position from vehicleSimState
-logic-legacy-locationonpath.forward-distance = 20 #m
+logic-legacy-locationonpath.forward-distance = 40 #m
 
 #
 # CONFIGURATION FOR intersection scheduler

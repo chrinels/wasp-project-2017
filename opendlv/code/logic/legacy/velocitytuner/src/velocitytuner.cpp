@@ -220,12 +220,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
         std::cout << "PlanHorizon: Sending constant velocityRequest: " << m_start_velocity*3.6 << '\n';
       } else {
         if (m_no_scheduler) {
+          std::cout << "no scheduler " << '\n';
           //set m_timeSlotStart from config
           if (flagOnce == false) {
             flagOnce = true;
             // odcore::data::TimeStamp currentTime;
             m_timeSlotStart = currentTime + odcore::data::TimeStamp(m_timeToIntersection,0);
             m_timeSlotIsSet = true;
+            std::cout << "Setting m_timeSlotIsSet" << '\n';
           }
         } else {
           //send request to the scheduler
@@ -241,7 +243,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
         }
 
         // Calculate what velocity to set
-        if (m_distanceToIntersection > 0 && currentTime + 4 < m_timeSlotStart && m_timeSlotIsSet ) {
+        if (m_distanceToIntersection > 0 && (currentTime + odcore::data::TimeStamp(4,0)) < m_timeSlotStart && m_timeSlotIsSet ) {
           double s = m_distanceToIntersection;
           velocityTunerState.setS(s);
           std::cout << "s: " << s << '\n';
