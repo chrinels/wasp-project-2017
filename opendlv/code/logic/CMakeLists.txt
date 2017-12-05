@@ -73,23 +73,12 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
 
 ###########################################################################
 # Add subfolders with sources.
-#add_subdirectory(action/act)
-#add_subdirectory(action/communicate)
-#add_subdirectory(action/keepobjectalignment)
-#add_subdirectory(action/keepobjectsize)
-#add_subdirectory(action/setgroundspeed)
-#add_subdirectory(action/setopticalrotation)
 add_subdirectory(knowledge/identity)
-#add_subdirectory(knowledge/scene)
-#add_subdirectory(knowledge/v2vcam)
-#add_subdirectory(knowledge/v2vdenm)
-#add_subdirectory(legacy/simpledriver)
 add_subdirectory(legacy/lowlevelcontrol)
 add_subdirectory(legacy/velocitytuner)
 add_subdirectory(legacy/stateestimator)
 add_subdirectory(legacy/velocityprofile)
 add_subdirectory(legacy/locationonpath)
-#add_subdirectory(coordination/v2ibeacon)
 add_subdirectory(coordination/intersection)
 
 ###########################################################################

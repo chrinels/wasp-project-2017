@@ -110,15 +110,15 @@ services:
       command: "/opt/opendlv/bin/opendlv-logic-coordination-intersection --cid=${CID} --verbose=1 --freq=10"
 
     v2x-out:
-        image: seresearch/opendlv-core-on-opendavinci-on-base:latest
-        network_mode: "host"
-        depends_on:
-            - odsupercomponent
-        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2xout --cid=${CID}"
+      image: ${IMAGE}
+      network_mode: "host"
+      depends_on:
+        - odsupercomponent
+      command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2xout --cid=${CID}"
 
     v2x-in:
-        image: seresearch/opendlv-core-on-opendavinci-on-base:latest
-        network_mode: "host"
-        depends_on:
-            - odsupercomponent
-        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2xin --cid=${CID} --freq=1 --verbose=1"
+      image: ${IMAGE}
+      network_mode: "host"
+      depends_on:
+        - odsupercomponent
+      command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2xin --cid=${CID} --freq=1 --verbose=1"
