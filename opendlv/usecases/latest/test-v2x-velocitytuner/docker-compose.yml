@@ -36,13 +36,13 @@ services:
     #         - odsupercomponent
     #     command: "/opt/dlv.snowfox/bin/snowfox-proxy-xc90 --cid=${CID} --freq=100"
 
-    logic-legacy-stateestimator:
-      image: ${IMAGE}
-      network_mode: "host"
-      depends_on:
-         - odsupercomponent
-         # - proxy-xc90
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-stateestimator --cid=${CID} --verbose=1 --freq=100"
+    # logic-legacy-stateestimator:
+    #   image: ${IMAGE}
+    #   network_mode: "host"
+    #   depends_on:
+    #      - odsupercomponent
+    #      # - proxy-xc90
+    #   command: "/opt/opendlv/bin/opendlv-logic-legacy-stateestimator --cid=${CID} --verbose=1 --freq=100"
 
     sim-vehiclesim:
       image: ${IMAGE}
@@ -69,12 +69,14 @@ services:
       working_dir: "/opt/recordings"
       command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"
 
+
     logic-legacy-locationonpath:
       image: ${IMAGE}
       network_mode: "host"
       depends_on:
           - odsupercomponent
       command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=100"
+
 
     logic-legacy-velocitytuner:
       image: ${IMAGE}
@@ -100,9 +102,16 @@ services:
           - odsupercomponent
       command: "/opt/opendlv/bin/opendlv-logic-knowledge-identity --cid=${CID} --freq=1"
 
-    logic-coordination-intersection:
+    v2x-out:
       image: ${IMAGE}
       network_mode: "host"
       depends_on:
         - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-logic-coordination-intersection --cid=${CID} --verbose=1 --freq=10"
+      command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2xout --cid=${CID}"
+
+    v2x-in:
+      image: ${IMAGE}
+      network_mode: "host"
+      depends_on:
+        - odsupercomponent
+      command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2xin --cid=${CID} --freq=1 --verbose=1"

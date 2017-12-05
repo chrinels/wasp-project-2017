@@ -179,12 +179,6 @@ logic-legacy-locationonpath.virtualPosition = 1 # 0 = position from StateEstimat
 logic-legacy-locationonpath.forward-distance = 40 #m
 
 #
-# CONFIGURATION FOR intersection scheduler
-#
-logic-coordination-intersection.slot_duration = 5
-logic-coordination-intersection.nrof_slots = 20
-
-#
 # CONFIGURATION FOR knowledge-identity
 #
 logic-knowledge-identity.stationId = 110
@@ -193,3 +187,18 @@ logic-knowledge-identity.vehicleLength = 7.3
 logic-knowledge-identity.vehicleWidth = 2.55
 logic-knowledge-identity.vehicleRole = 0
 logic-knowledge-identity.rearAxleLocation = 5.0
+
+
+
+###############################################################################
+#
+# CONFIGURATION FOR v2x-out
+#
+proxy-v2xout.adapter = enp1s0
+proxy-v2xout.sender-id = 111
+proxy-v2xout.filter-sender-ids = 111,115
+proxy-v2xout.filter-message-ids = 463,464
+
+proxy-v2xin.adapter = enp1s0
+proxy-v2xin.filter-sender-ids = 111,115
+proxy-v2xin.filter-message-ids = 401
