@@ -228,24 +228,24 @@ message opendlv.system.diagnostics.HealthStatus [id = 200] {
     map<string,string> status [id = 1];
 }
 
-message opendlv.logic.legacy.TimeSlot [id = 201] {
+message opendlv.logic.legacy.TimeSlot [id = 401] {
   uint32 vehicleID [id = 1];
 	odcore::data::TimeStamp entryTime [id = 2];
 	odcore::data::TimeStamp exitTime [id = 3];
 }
 
-message opendlv.logic.legacy.VelocityRequest [id = 202] {
+message opendlv.logic.legacy.VelocityRequest [id = 402] {
   double velocity [id = 1];
 }
 
-message opendlv.logic.legacy.LocationOnPathToIntersection [id = 203]{
+message opendlv.logic.legacy.LocationOnPathToIntersection [id = 403]{
 	double currentLocation [id = 1];
 	double intersectionLocation [id = 2];
   double errAngle [id = 3];
   double errDistance [id = 4];
 }
 
-message opendlv.logic.legacy.StateEstimate [id = 204] {
+message opendlv.logic.legacy.StateEstimate [id = 404] {
   double positionX [id = 1];
   double positionY [id = 2];
   double velocityX [id = 3];
@@ -254,12 +254,12 @@ message opendlv.logic.legacy.StateEstimate [id = 204] {
   double yawRate [id = 6];
 }
 
-message opendlv.logic.legacy.VelocityHorizon [id = 205] {
+message opendlv.logic.legacy.VelocityHorizon [id = 405] {
   list<double> velocity [id = 1];
   list<odcore::data::TimeStamp> timeStamp [id = 2];
 }
 
-message opendlv.logic.legacy.VelocityTunerState [id = 206] {
+message opendlv.logic.legacy.VelocityTunerState [id = 406] {
   double t1 [id = 1];
   double t2 [id = 2];
   double t3 [id = 3];
@@ -283,7 +283,7 @@ message opendlv.logic.legacy.VelocityTunerState [id = 206] {
   double mm [id = 21];
 }
 
-message opendlv.logic.legacy.VehicleSimState [id = 207] {
+message opendlv.logic.legacy.VehicleSimState [id = 407] {
   double positionX [id = 1];
   double positionY [id = 2];
   double velocityX [id = 3];
@@ -293,14 +293,14 @@ message opendlv.logic.legacy.VehicleSimState [id = 207] {
 }
 
 
-message opendlv.logic.coordination.IntersectionAccessRequest [id = 363] {
+message opendlv.logic.coordination.IntersectionAccessRequest [id = 463] {
   uint32 vehicleID [id = 1];
   string plannedTrajectory [id = 2];
   double velocity [id = 3];
   double distanceToIntersection [id = 4];
 }
 
-message opendlv.logic.coordination.IntersectionSchedulerDebug [id = 364] {
+message opendlv.logic.coordination.IntersectionSchedulerDebug [id = 464] {
   uint32 vehicleID [id = 1];
   odcore::data::TimeStamp time [id = 2];
   uint8 timeSlot [id = 3];

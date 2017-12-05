@@ -264,7 +264,7 @@ void Intersection::printTimeSlotTable()
       opendlv::logic::coordination::IntersectionSchedulerDebug debugMsg;
       debugMsg.setVehicleID(scheduledVehicle.vehicleID);
       debugMsg.setTime(accessTime);
-      debugMsg.setTimeSlot(i);
+      debugMsg.setTimeSlot(i+1);
       odcore::data::Container c_debugMsg(debugMsg);
       getConference().send(c_debugMsg);
     }

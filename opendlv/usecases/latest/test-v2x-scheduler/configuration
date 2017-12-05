@@ -65,21 +65,29 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 ###############################################################################
 ###############################################################################
 #
-# CONFIGURATION FOR OPENDLV
+# NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS. 
 #
 
-sensation-geolocation.debug = 1
+###############################################################################
+#
+# CONFIGURATION FOR intersection scheduler
+#
+################################################################################
+logic-coordination-intersection.slot_duration = 5
+logic-coordination-intersection.nrof_slots = 20
 
-# proxy-trimble
-proxy-trimble.ip = 10.42.42.23
-proxy-trimble.port = 9999
-proxy-trimble.debug = 0
+###############################################################################
+#
+# CONFIGURATION FOR v2x-out and v2x-in
+#
+################################################################################
+proxy-v2xout.adapter = enp1s0
+proxy-v2xout.sender-id = 111
+proxy-v2xout.filter-sender-ids = 111,115
+proxy-v2xout.filter-message-ids = 401
+
+proxy-v2xin.adapter = enp1s0
+proxy-v2xin.filter-sender-ids = 111,115
+proxy-v2xin.filter-message-ids = 463,464
 
 
-proxy-imu.type = pololu.altimu10
-proxy-imu.pololu.altimu10.device_node = /dev/i2c-2
-proxy-imu.calibrationfile = /opt/opendlv.core.configuration/calibration.txt
-proxy-imu.mount.roll = 0.0
-proxy-imu.mount.pitch = 0.0
-proxy-imu.mount.yaw = 0.0
-proxy-imu.debug = 1
