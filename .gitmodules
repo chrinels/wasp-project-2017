@@ -1,0 +1,3 @@
+[submodule "opendlv.core"]
+	path = opendlv.core
+	url = git@github.com:chalmers-revere/opendlv.core.git
