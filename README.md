@@ -8,6 +8,28 @@ Group members:
 - Vidit Saxena (Royal Institute of Technology, KTH)
 - Christian Nelson (Lund University, LTH) 
 
+## Install
+
+Follwing commands will remove all docker images and containers on your computer
+```
+cd ~
+
+docker kill $(docker ps -q)
+docker rm $(docker ps -a -q)
+docker rmi -f $(docker images -q)
+
+git clone git@github.com:chrinels/wasp-project-2017.git
+git submodule update
+
+cd opendlv.core/docker
+make buildComplete createDockerImage
+
+cd ../..
+cd opendlv/docker
+make buildComplete createDockerImage
+
+```
+
 ## Links
 - [HackMD.io](https://hackmd.io/MYEwnADALATBDMBaYBDFFFQEYoGaIA4BGLAU0TCwFYB2EeEFANixviA=)
 - [MIT Senseable City Lab - lightTraffic](http://senseable.mit.edu)
