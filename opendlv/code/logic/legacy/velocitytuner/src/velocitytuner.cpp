@@ -122,6 +122,8 @@ void VelocityTuner::setUp()
     "logic-legacy-velocitytuner.time_segment_seconds");
   m_no_scheduler = getKeyValueConfiguration().getValue<bool>(
     "logic-legacy-velocitytuner.no-scheduler");
+  m_vehicleID = getKeyValueConfiguration().getValue<int>(
+    "logic-legacy-velocitytuner.vehicleId");
 
 }
 
@@ -147,13 +149,6 @@ void VelocityTuner::nextContainer(odcore::data::Container &a_container)
     odcore::base::Lock l(m_stateMutex);
     auto locationOnPathToIntersection = a_container.getData<opendlv::logic::legacy::LocationOnPathToIntersection>();
     m_distanceToIntersection = locationOnPathToIntersection.getIntersectionLocation() - locationOnPathToIntersection.getCurrentLocation();
-  } else if (a_container.getDataType() == opendlv::knowledge::Insight::ID()) {
-    auto insight = a_container.getData<opendlv::knowledge::Insight>();
-    std::string insightString = insight.getInsight();
-    if(insightString.find("stationId") != std::string::npos) {
-      std::size_t found = insightString.find_first_of("0123456789");
-      m_vehicleID = std::stoi(insightString.substr(found));
-    }
   }
 }
 

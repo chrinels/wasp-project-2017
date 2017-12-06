@@ -73,7 +73,6 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
 
 ###########################################################################
 # Add subfolders with sources.
-add_subdirectory(knowledge/identity)
 add_subdirectory(legacy/lowlevelcontrol)
 add_subdirectory(legacy/velocitytuner)
 add_subdirectory(legacy/stateestimator)

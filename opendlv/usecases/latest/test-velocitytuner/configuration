@@ -184,12 +184,4 @@ logic-legacy-locationonpath.forward-distance = 40 #m
 logic-coordination-intersection.slot_duration = 5
 logic-coordination-intersection.nrof_slots = 20
 
-#
-# CONFIGURATION FOR knowledge-identity
-#
-logic-knowledge-identity.stationId = 110
-logic-knowledge-identity.stationType = 8 #heavy truck
-logic-knowledge-identity.vehicleLength = 7.3
-logic-knowledge-identity.vehicleWidth = 2.55
-logic-knowledge-identity.vehicleRole = 0
-logic-knowledge-identity.rearAxleLocation = 5.0
+logic-legacy-velocitytuner.vehicleId = 111
