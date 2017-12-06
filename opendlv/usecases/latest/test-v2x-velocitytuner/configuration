@@ -131,9 +131,9 @@ logic-legacy-velocitytuner.start_velocitykmh = 30
 logic-legacy-velocitytuner.up_velocitykmh = 32
 logic-legacy-velocitytuner.down_velocitykmh = 30
 logic-legacy-velocitytuner.end_velocitykmh = 0
-logic-legacy-velocitytuner.no-scheduler = 1 #1 = test-time-to-intersection it used, 0 = message from scheduler is expected
+logic-legacy-velocitytuner.no-scheduler = 0 #1 = test-time-to-intersection it used, 0 = message from scheduler is expected
 
-logic-legacy-velocitytuner.plan_mode = 1 #1 = predefined profile, 2 = planned profile
+logic-legacy-velocitytuner.plan_mode = 2 #1 = predefined profile, 2 = planned profile
 logic-legacy-velocitytuner.start_mode = 1 #1 = after start_time, 2 = when test_distance_to_intersection is left
 
 logic-legacy-velocitytuner.time_segment_seconds = 10
@@ -178,16 +178,6 @@ logic-legacy-locationonpath.intersection-longitude = 12.768919003548130
 logic-legacy-locationonpath.virtualPosition = 1 # 0 = position from StateEstimate, 1 = position from vehicleSimState
 logic-legacy-locationonpath.forward-distance = 40 #m
 
-#
-# CONFIGURATION FOR knowledge-identity
-#
-logic-knowledge-identity.stationId = 110
-logic-knowledge-identity.stationType = 8 #heavy truck
-logic-knowledge-identity.vehicleLength = 7.3
-logic-knowledge-identity.vehicleWidth = 2.55
-logic-knowledge-identity.vehicleRole = 0
-logic-knowledge-identity.rearAxleLocation = 5.0
-
 
 
 ###############################################################################
@@ -195,7 +185,7 @@ logic-knowledge-identity.rearAxleLocation = 5.0
 # CONFIGURATION FOR v2x-out
 #
 proxy-v2xout.adapter = enp1s0
-proxy-v2xout.sender-id = 111
+proxy-v2xout.sender-id = 115
 logic-legacy-velocitytuner.vehicleId = 111
 proxy-v2xout.filter-sender-ids = 111,115
 proxy-v2xout.filter-message-ids = 463,464
