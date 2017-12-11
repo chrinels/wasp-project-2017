@@ -35,6 +35,8 @@ namespace opendlv {
 namespace logic {
 namespace coordination {
 
+struct SchedulingInfo; // forward declaration
+
 class Intersection : public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
   Intersection(int32_t const &, char **);
@@ -42,9 +44,6 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   Intersection &operator=(Intersection const &) = delete;
   virtual ~Intersection();
 
-  virtual void nextContainer(odcore::data::Container &c);
-
- private:
   //! Enumeration of valid trajectories
   //! [W]est/[S]outh/[N]orth/[E]ast - direction of approach
   //! [S]traight/[L]eft/[R]ight - Path plan
@@ -53,17 +52,14 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
                     NS, NR, NL,
                     ES, ER, EL };
 
-  struct SchedulingInfo
-  {
-    int vehicleID;
-    double intersectionAccessTime;
-    Trajectory trajectory;
-  };
-
   void setUp();
+  virtual void nextContainer(odcore::data::Container &c);
+
+ private:
   void setUpTrajectories();
   void tearDown();
 
+  odcore::data::TimeStamp getSlotAbsoluteTime(int slot);
   bool vehicleAlreadyScheduled(int vehicleID);
   bool scheduleVehicle(const opendlv::logic::coordination::IntersectionAccessRequest &);
 
@@ -82,9 +78,27 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   std::map<std::string, Trajectory>             m_trajectoryLookUp;
   std::map<Trajectory, std::vector<Trajectory>> m_compatibleTrajectories;
   std::vector<std::vector<SchedulingInfo>>      m_scheduledSlotsTable; // [slot [schedInfo]]
-  odcore::data::TimeStamp                       m_rotationTime;
+  odcore::data::TimeStamp                       m_slotTableAbsoluteTime;
 
 };
+
+struct SchedulingInfo
+{
+  SchedulingInfo();
+
+  int vehicleID;
+  Intersection::Trajectory trajectory;
+  odcore::data::TimeStamp  scheduledSlotStartTime;
+  odcore::data::TimeStamp  intersectionAccessTime;
+};
+
+inline SchedulingInfo::SchedulingInfo()
+  : vehicleID(-1),
+    trajectory(),
+    scheduledSlotStartTime(),
+    intersectionAccessTime() 
+{
+}
 
 }
 }

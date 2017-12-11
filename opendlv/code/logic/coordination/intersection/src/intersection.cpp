@@ -52,7 +52,7 @@ Intersection::Intersection(int32_t const &a_argc, char **a_argv)
     m_trajectoryLookUp(),
     m_compatibleTrajectories(),
     m_scheduledSlotsTable(),
-    m_rotationTime()
+    m_slotTableAbsoluteTime()
 {
 }
 
@@ -61,6 +61,7 @@ Intersection::~Intersection()
 {
 }
 
+//-----------------------------------------------------------------------------
 void Intersection::setUp()
 {
   // Extract parameter values
@@ -72,7 +73,9 @@ void Intersection::setUp()
 
   setUpTrajectories();
 
-  // Create empty maps to store trajectory information for each slot
+  // Initialize slot table that stores scheduling information
+  odcore::data::TimeStamp currentTime;
+  m_slotTableAbsoluteTime = currentTime;
   for(int slot = 0; slot < m_nrofSlots; ++slot) {
     m_scheduledSlotsTable.push_back(std::vector<SchedulingInfo>());
   }
@@ -92,10 +95,13 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
     return;
   }
 
+
   auto timeSent = a_container.getSentTimeStamp();
   auto timeReceived = a_container.getReceivedTimeStamp();
 
   if (a_container.getDataType() == opendlv::logic::coordination::IntersectionAccessRequest::ID()) {
+
+    timeRefreshSlotsTable();
 
     auto accessRequest = a_container.getData<opendlv::logic::coordination::IntersectionAccessRequest>();
 
@@ -109,11 +115,17 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
     int vehicleID = accessRequest.getVehicleID();
     if(!vehicleAlreadyScheduled(vehicleID)) {
       cout << "|Scheduler| Attempting to schedule vehicle " << vehicleID << endl;
-     // timeRefreshSlotsTable(accessRequest.)
       scheduleVehicle(accessRequest);
       printTimeSlotTable();  
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+odcore::data::TimeStamp Intersection::getSlotAbsoluteTime(int slot)
+{
+  
+   return m_slotTableAbsoluteTime + odcore::data::TimeStamp(slot * m_slotDuration, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -143,7 +155,13 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
   int vehicleID = a_accessReq.getVehicleID();
   double currentVelocity = a_accessReq.getVelocity();
   double distanceToIntersection = a_accessReq.getDistanceToIntersection();
+  double timeToIntersection = distanceToIntersection / currentVelocity; // [s]
+  
+  cout << "|Scheduler| Time to intersection [s]: " << timeToIntersection << endl;
 
+  odcore::data::TimeStamp currentTime;
+  odcore::data::TimeStamp intersectionAccessTime = currentTime + odcore::data::TimeStamp(timeToIntersection, 0);
+             
   Trajectory plannedTrajectory = m_trajectoryLookUp[a_accessReq.getPlannedTrajectory()];
 
   if (currentVelocity <= 0.0) {
@@ -151,20 +169,20 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
     return false; // Cannot schedule
   }
 
-  double intersectionAccessTime = distanceToIntersection/currentVelocity; // Distance in seconds
-  if (std::isnan(intersectionAccessTime) || intersectionAccessTime < 1.0) {
-    cout << "|Scheduler| Invalid access time " << intersectionAccessTime << endl;
+  if (std::isnan(timeToIntersection) || timeToIntersection < 1.0) {
+    cout << "|Scheduler| Invalid time to intersection " << timeToIntersection << endl;
     return false;  // Cannot schedule
   }
 
   // Determine the first slot after the vehicle's access time
-  int startSlot = ceil(intersectionAccessTime/(m_slotDuration*1000*1000)) + 1;
+  int startSlot = ceil(timeToIntersection / m_slotDuration);
   
   if(startSlot < 0 || startSlot > m_nrofSlots) {
     cout << "|Scheduler| Invalid start slot " << startSlot << endl;
     return false; // Cannot schedule
   }
 
+  // Create a container to store scheduling info
   SchedulingInfo schedInfo;
 
   // Find the first slot that does not contain any incompatible trajectories
@@ -204,10 +222,10 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
 
     if (slotIsCompatible) {
       // Generate the scheduling info
-      //schedInfo.intersectionAccessTime = intersectionAccessTime;
-      schedInfo.intersectionAccessTime = double(currentSlot * m_slotDuration); 
-      schedInfo.trajectory = plannedTrajectory;
       schedInfo.vehicleID = vehicleID;
+      schedInfo.trajectory = plannedTrajectory;
+      schedInfo.scheduledSlotStartTime = getSlotAbsoluteTime(currentSlot); 
+      schedInfo.intersectionAccessTime = intersectionAccessTime; 
 
       addScheduledVehicleToSlot(currentSlot, schedInfo);
       schedulingSuccessful = true;
@@ -219,8 +237,7 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
   }
 
   if (schedulingSuccessful) {
-    odcore::data::TimeStamp now;
-    odcore::data::TimeStamp entryTime = now + odcore::data::TimeStamp(ceil(schedInfo.intersectionAccessTime), 0);
+    odcore::data::TimeStamp entryTime = schedInfo.scheduledSlotStartTime;
     odcore::data::TimeStamp exitTime = entryTime + odcore::data::TimeStamp(m_slotDuration, 0);
     opendlv::logic::legacy::TimeSlot timeSlot;
     timeSlot.setVehicleID(vehicleID);
@@ -241,18 +258,28 @@ bool Intersection::scheduleVehicle(const opendlv::logic::coordination::Intersect
 bool Intersection::timeRefreshSlotsTable()
 {
   odcore::base::Lock l(m_timeRefreshMutex);
-  odcore::data::TimeStamp now;
-  odcore::data::TimeStamp rotationTime = now - odcore::data::TimeStamp(m_slotDuration,0);
-  if (rotationTime >= m_rotationTime) {
-    // Shift all slots to the left
+  odcore::data::TimeStamp currentTime;
+  double elapsedTime = (currentTime - m_slotTableAbsoluteTime).toMicroseconds()*1.0/1000000L;
+
+  int elapsedSlots = floor(elapsedTime / m_slotDuration);
+
+  if (elapsedSlots > 0) {
+
+    cout << "|Scheduler| Updating slots. Elapsed (time, slots): (" 
+         << elapsedTime << "," << elapsedSlots << ")" << "\n";
+
     std::rotate(m_scheduledSlotsTable.begin(),
-                m_scheduledSlotsTable.begin() + 1,
+                m_scheduledSlotsTable.begin() + elapsedSlots,
                 m_scheduledSlotsTable.end());
 
     // Assign a new empty map to the last slot
     m_scheduledSlotsTable[m_nrofSlots - 1] = std::vector<SchedulingInfo>();
-    m_rotationTime = now;
+
+    m_slotTableAbsoluteTime = currentTime;
+
+    printTimeSlotTable();
   }
+
   return true;
 }
 
@@ -274,30 +301,32 @@ void Intersection::addScheduledVehicleToSlot(int a_slot, SchedulingInfo a_info)
 void Intersection::printTimeSlotTable() 
 {
   cout << "|Scheduler| ---------Time Slot Table--------\n";
-  cout << setw(5) << "Slot" << setw(20) << "Scheduled" << setw(20) << "Start Time\n";
+  cout << "Slot \t Vehicle ID \t\t Start / Access Time\n";
 
   for(unsigned int slot = 0; slot < m_nrofSlots; ++slot) {
     
     std::vector<SchedulingInfo> scheduledAtSlot = m_scheduledSlotsTable[slot];
 
-    if(scheduledAtSlot.empty()) {
-      cout << setw(5) << slot+1 << setw(20) << "-" << "\n";
-    } else {
+    cout << slot + 1<< "\t\t" << "-" << "\t\t"
+         << getSlotAbsoluteTime(slot).getYYYYMMDD_HHMMSS() << "\n";
 
+    // Print scheduled vehicle info, if any
+    if(!scheduledAtSlot.empty()) {
       for(unsigned int i = 0; i < scheduledAtSlot.size(); ++i) {
         SchedulingInfo scheduledVehicle = scheduledAtSlot[i];
 
-        int32_t accessSeconds = floor(scheduledVehicle.intersectionAccessTime/(1000*1000));
-        int32_t accessMicrosends = scheduledVehicle.intersectionAccessTime - accessSeconds*1000*1000;
-        odcore::data::TimeStamp accessTime(accessSeconds, accessMicrosends);
-        cout <<  setw(5) << slot << "," << i+1 << setw(20) << scheduledVehicle.vehicleID << "\tAccess Time: "<< accessTime.getYYYYMMDD_HHMMSS() << "\n";
+        cout << slot + 1 << "," << i+1 << "\t\t" 
+             << scheduledVehicle.vehicleID << "\t\t-> "
+             << scheduledVehicle.intersectionAccessTime.getYYYYMMDD_HHMMSS() 
+             << " (original estimate)"
+             << "\n";
 
-        opendlv::logic::coordination::IntersectionSchedulerDebug debugMsg;
-        debugMsg.setVehicleID(scheduledVehicle.vehicleID);
-        debugMsg.setTime(accessTime);
-        debugMsg.setTimeSlot(slot);
-        odcore::data::Container c_debugMsg(debugMsg);
-        getConference().send(c_debugMsg);
+        //opendlv::logic::coordination::IntersectionSchedulerDebug debugMsg;
+        //debugMsg.setVehicleID(scheduledVehicle.vehicleID);
+        //debugMsg.setTime(accessTime);
+        //debugMsg.setTimeSlot(slot);
+        //odcore::data::Container c_debugMsg(debugMsg);
+        //getConference().send(c_debugMsg);
       }
     }
   }
