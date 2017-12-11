@@ -12,13 +12,13 @@ Group members:
 
 Follwing commands will remove all docker images and containers on your computer
 ```
-cd ~
-
 docker kill $(docker ps -q)
 docker rm $(docker ps -a -q)
 docker rmi -f $(docker images -q)
 
+cd ~
 git clone git@github.com:chrinels/wasp-project-2017.git
+cd ~/wasp-project-2017
 git submodule update --init
 
 cd ~/wasp-project-2017/opendlv.core/docker
