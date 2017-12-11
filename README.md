@@ -19,7 +19,7 @@ docker rm $(docker ps -a -q)
 docker rmi -f $(docker images -q)
 
 git clone git@github.com:chrinels/wasp-project-2017.git
-git submodule update
+git submodule update --init
 
 cd ~/wasp-project-2017/opendlv.core/docker
 make buildComplete createDockerImage
