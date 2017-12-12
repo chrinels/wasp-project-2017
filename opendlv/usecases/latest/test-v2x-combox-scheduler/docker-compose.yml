@@ -20,16 +20,12 @@
 version: '2'
 
 services:
-    odsupercomponent:
-        image: seresearch/opendlv-core-on-opendavinci-on-base:latest
-        network_mode: "host"
-        volumes:
-        - .:/opt/opendlv.data
-        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
+    v2x-out:
+      image: ${IMAGE}
+      network_mode: "host"
+      command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2xout --cid=${CID}"
 
-    logic-coordination-intersection:
-        image: ${IMAGE}
-        network_mode: "host"
-        depends_on:
-            - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-logic-coordination-intersection --cid=${CID} --verbose=1 --freq=10"
+    v2x-in:
+      image: ${IMAGE}
+      network_mode: "host"
+      command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2xin --cid=${CID} --freq=10 --verbose=1"

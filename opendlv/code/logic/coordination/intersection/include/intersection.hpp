@@ -64,6 +64,7 @@ class Intersection : public odcore::base::module::DataTriggeredConferenceClientM
   void setUpTrajectories();
   void tearDown();
 
+  bool vehicleAlreadyScheduled(int vehicleID);
   bool scheduleVehicle(const opendlv::logic::coordination::IntersectionAccessRequest &);
 
   void addScheduledVehicleToSlot(int, SchedulingInfo);

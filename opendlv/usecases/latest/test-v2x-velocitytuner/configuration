@@ -122,10 +122,10 @@ logic-legacy-lowlevelcontrol.steering_filter_coefficient = 2
 #logic-legacy-velocitytuner.max-acceleration = 1.25
 logic-legacy-velocitytuner.max-acceleration = 2.5
 logic-legacy-velocitytuner.acceleration-planning-factor = 0.8
-logic-legacy-velocitytuner.test-time-to-intersection = 10 #s
+logic-legacy-velocitytuner.test-time-to-intersection = 30 #s
 logic-legacy-velocitytuner.target-velocity-at-intersectionkmh = 30 #kmh
 logic-legacy-velocitytuner.max-velocitykmh = 50 #kmh
-logic-legacy-velocitytuner.test_distance_to_intersection = 100 #m
+logic-legacy-velocitytuner.test_distance_to_intersection = 300 #m
 logic-legacy-velocitytuner.start_time = 10 #s
 logic-legacy-velocitytuner.start_velocitykmh = 30
 logic-legacy-velocitytuner.up_velocitykmh = 32
@@ -179,17 +179,23 @@ logic-legacy-locationonpath.virtualPosition = 1 # 0 = position from StateEstimat
 logic-legacy-locationonpath.forward-distance = 40 #m
 
 
+#
+# CONFIGURATION FOR intersection scheduler
+#
+logic-coordination-intersection.slot_duration = 5
+logic-coordination-intersection.nrof_slots = 20
+
 
 ###############################################################################
 #
 # CONFIGURATION FOR v2x-out
 #
-proxy-v2xout.adapter = enp1s0
+proxy-v2xout.adapter = enp0s3
 proxy-v2xout.sender-id = 115
 logic-legacy-velocitytuner.vehicleId = 111
 proxy-v2xout.filter-sender-ids = 111,115
 proxy-v2xout.filter-message-ids = 463,464
 
-proxy-v2xin.adapter = enp1s0
+proxy-v2xin.adapter = enp0s3
 proxy-v2xin.filter-sender-ids = 111,115
 proxy-v2xin.filter-message-ids = 401

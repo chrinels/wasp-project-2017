@@ -126,7 +126,9 @@ void StateEstimator::nextContainer(odcore::data::Container &a_container)
       auto smoothing_factor = fmin(dt/m_orientationSmoothing,1.0);
       double orientation_i = distanceTravelled.getAngleXY();
 
-      cout << "received orientation: " << orientation_i << endl;
+      if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+        cout << "received orientation: " << orientation_i << endl;
+      }
 
       double const pi = 3.1415926;
       // Correct orientation_input
@@ -140,7 +142,9 @@ void StateEstimator::nextContainer(odcore::data::Container &a_container)
       while (m_orientation > pi) m_orientation -= 2*pi;
       m_orientationReadingTimeStamp = currentTime;
 
-      cout << "new orienation: " << m_orientation << endl;
+      if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+        cout << "new orienation: " << m_orientation << endl;
+      }
     }
 
 
@@ -175,12 +179,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode StateEstimator::body()
 
       // Predict
 
-
-      // Print current state
-      std::cout << "position: (" << std::to_string(m_position.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;
-      std::cout << "velocity: (" << std::to_string(m_velocity.getX()) << ", " << std::to_string(m_velocity.getY()) << ")" << std::endl;
-      std::cout << "orientation: " << std::to_string(m_orientation) << std::endl;
-      std::cout << "yaw rate: " << std::to_string(m_yawRate) << std::endl;
+      if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+        // Print current state
+        std::cout << "position: (" << std::to_string(m_position.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;
+        std::cout << "velocity: (" << std::to_string(m_velocity.getX()) << ", " << std::to_string(m_velocity.getY()) << ")" << std::endl;
+        std::cout << "orientation: " << std::to_string(m_orientation) << std::endl;
+        std::cout << "yaw rate: " << std::to_string(m_yawRate) << std::endl;
+      }
 
       // Send StateEstimate
       opendlv::logic::legacy::StateEstimate se;
