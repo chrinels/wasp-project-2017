@@ -68,6 +68,7 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 # NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS. 
 #
 
+
 ###############################################################################
 #
 # CONFIGURATION FOR intersection scheduler
@@ -87,7 +88,7 @@ proxy-v2xout.filter-sender-ids = 115
 proxy-v2xout.filter-message-ids = 401
 
 proxy-v2xin.adapter = wlp4s0
-proxy-v2xin.filter-sender-ids = 113,114,116
-proxy-v2xin.filter-message-ids = 463,464
+proxy-v2xin.filter-sender-ids = 113,120,121,122,123
+proxy-v2xin.filter-message-ids = 463
 
 

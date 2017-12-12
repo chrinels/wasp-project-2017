@@ -21,7 +21,7 @@ version: '2'
 
 services:
     odsupercomponent:
-        image: seresearch/opendlv-core-on-opendavinci-on-base:latest
+        image: ${IMAGE}
         network_mode: "host"
         volumes:
         - .:/opt/opendlv.data
