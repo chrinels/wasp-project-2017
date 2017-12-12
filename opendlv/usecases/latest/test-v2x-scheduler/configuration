@@ -81,13 +81,13 @@ logic-coordination-intersection.nrof_slots = 20
 # CONFIGURATION FOR v2x-out and v2x-in
 #
 ################################################################################
-proxy-v2xout.adapter = enp1s0
-proxy-v2xout.sender-id = 111
-proxy-v2xout.filter-sender-ids = 111,115
+proxy-v2xout.adapter = wlp4s0
+proxy-v2xout.sender-id = 115
+proxy-v2xout.filter-sender-ids = 115
 proxy-v2xout.filter-message-ids = 401
 
-proxy-v2xin.adapter = enp1s0
-proxy-v2xin.filter-sender-ids = 111,115
+proxy-v2xin.adapter = wlp4s0
+proxy-v2xin.filter-sender-ids = 113,114,116
 proxy-v2xin.filter-message-ids = 463,464
 
 
