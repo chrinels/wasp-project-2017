@@ -23,13 +23,9 @@ services:
     v2x-out:
       image: ${IMAGE}
       network_mode: "host"
-      depends_on:
-        - odsupercomponent
       command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2xout --cid=${CID}"
 
     v2x-in:
       image: ${IMAGE}
       network_mode: "host"
-      depends_on:
-        - odsupercomponent
       command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2xin --cid=${CID} --freq=10 --verbose=1"
