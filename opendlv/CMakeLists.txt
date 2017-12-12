@@ -64,16 +64,6 @@ ExternalProject_Add (libodvdopendlvdata
   TEST_COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_PARAMETERS}
   INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libodvdopendlvdata-prefix/src/libodvdopendlvdata-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libodvdopendlvdata-prefix/src/libodvdopendlvdata-build --target ${MAKE_PACKAGE})
 
-ExternalProject_Add (gui
-  DEPENDS libodvdopendlvdata
-  DOWNLOAD_COMMAND ""
-  UPDATE_COMMAND ""
-  SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/gui"
-    CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
-    CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
-    CMAKE_ARGS "-DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}"
-  TEST_BEFORE_INSTALL 1
-  INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/gui-prefix/src/gui-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/gui-prefix/src/gui-build --target ${MAKE_PACKAGE})
 
 ExternalProject_Add (logic
   DEPENDS libodvdopendlvdata
@@ -94,17 +84,6 @@ ExternalProject_Add (logic
   CMAKE_ARGS "-DTINYCNN_INCLUDE_DIR=${TINYCNN_INCLUDE_DIR}"
   TEST_BEFORE_INSTALL 1
   INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/logic-prefix/src/logic-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/logic-prefix/src/logic-build --target ${MAKE_PACKAGE})
-
-ExternalProject_Add (tool
-  DEPENDS libodvdopendlvdata
-  DOWNLOAD_COMMAND ""
-  UPDATE_COMMAND ""
-  SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/tool"
-  CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
-  CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
-  CMAKE_ARGS "-DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}"
-  TEST_BEFORE_INSTALL 1
-  INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/tool-prefix/src/tool-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/tool-prefix/src/tool-build --target ${MAKE_PACKAGE})
 
 ExternalProject_Add (sim
   DEPENDS libodvdopendlvdata
