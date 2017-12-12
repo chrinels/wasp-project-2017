@@ -221,10 +221,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleSim::body()
       }
 
       auto pos = m_wgs84Reference.transform(wgs84Coordinate);
-      std::cout << "position: (" << std::to_string(m_position.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;
-      std::cout << "velocity: (" << std::to_string(m_velocity.getX()) << ", " << std::to_string(m_velocity.getY()) << ")" << std::endl;
-      std::cout << "orientation: " << std::to_string(m_orientation) << std::endl;
-      std::cout << "yaw rate: " << std::to_string(m_yawrate) << std::endl;
+      if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+        std::cout << "position: (" << std::to_string(m_position.getX()) << ", " << std::to_string(m_position.getY()) << ")" << std::endl;
+        std::cout << "velocity: (" << std::to_string(m_velocity.getX()) << ", " << std::to_string(m_velocity.getY()) << ")" << std::endl;
+        std::cout << "orientation: " << std::to_string(m_orientation) << std::endl;
+        std::cout << "yaw rate: " << std::to_string(m_yawrate) << std::endl;
+      }
     }
 
   }

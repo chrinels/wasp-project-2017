@@ -110,18 +110,24 @@ void LowLevelControl::nextContainer(odcore::data::Container &a_container)
     odcore::base::Lock l(m_stateMutex);
     auto stateEstimate = a_container.getData<opendlv::logic::legacy::StateEstimate>();
     m_velocity.setX(stateEstimate.getVelocityX());
-    cout << "Recieved velocity: " << m_velocity.getX() << endl;
+    if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+      cout << "Recieved velocity: " << m_velocity.getX() << endl;
+    }
 
   } else if (a_container.getDataType() == opendlv::logic::legacy::VelocityRequest::ID()) {
     odcore::base::Lock l(m_referenceMutex);
     auto velocityRequest = a_container.getData<opendlv::logic::legacy::VelocityRequest>();
     m_velocityReference = velocityRequest.getVelocity();
     m_velocityHorizonIsValid = false;
-    cout << "Recieved VelocityReference: " << m_velocityReference << endl;
+    if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+      cout << "Recieved VelocityReference: " << m_velocityReference << endl;
+    }
 
   } else if (a_container.getDataType() == opendlv::logic::legacy::LocationOnPathToIntersection::ID()) {
       m_locationOnPath = a_container.getData<opendlv::logic::legacy::LocationOnPathToIntersection>();
-      std::cout << "Received LocationOnPath, errAngle: " << m_locationOnPath.getErrAngle() << std::endl;
+      if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+        std::cout << "Received LocationOnPath, errAngle: " << m_locationOnPath.getErrAngle() << std::endl;
+      }
 
   } else if (a_container.getDataType() == opendlv::logic::legacy::VelocityHorizon::ID()) {
     odcore::base::Lock l(m_referenceMutex);
@@ -132,8 +138,10 @@ void LowLevelControl::nextContainer(odcore::data::Container &a_container)
     } else {
         m_velocityHorizonIsValid = true;
     }
-    cout << "Size of Velocity " << m_velocityHorizon.getSize_ListOfVelocity() << endl;
-    cout << "Size of TimeStamp " << m_velocityHorizon.getSize_ListOfTimeStamp() << endl;
+    if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+      cout << "Size of Velocity " << m_velocityHorizon.getSize_ListOfVelocity() << endl;
+      cout << "Size of TimeStamp " << m_velocityHorizon.getSize_ListOfTimeStamp() << endl;
+    }
 
   }
 
@@ -259,16 +267,19 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LowLevelControl::body(
     m_steeringWheelAngle += steeringWheelAngleRate * dt;
     m_steeringWheelAngle = (m_steeringWheelAngle > 3.0 * cartesian::Constants::PI) ? 9.3 : m_steeringWheelAngle;
     m_steeringWheelAngle = (m_steeringWheelAngle < -3.0 * cartesian::Constants::PI) ? -9.3 : m_steeringWheelAngle;
-    std::cout << "m_steeringWheelAngle: " << m_steeringWheelAngle << std::endl;
     m_inputSteeringWheelAngle = m_steeringWheelAngle;
 
-    cout << "VelocityReference: " << velocityReference << endl;
-    cout << "AccelerationReference: " << accelerationReference << endl;
+    if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+      cout << "m_steeringWheelAngle: " << m_steeringWheelAngle << std::endl;
+
+      cout << "VelocityReference: " << velocityReference << endl;
+      cout << "AccelerationReference: " << accelerationReference << endl;
 
 
-    cout << "Send AccelerationRequest: " << m_inputAcceleration << endl;
-    cout << "Send SteeringRequest: " << m_inputSteeringWheelAngle << endl;
+      cout << "Send AccelerationRequest: " << m_inputAcceleration << endl;
+      cout << "Send SteeringRequest: " << m_inputSteeringWheelAngle << endl;
 
+    }
     // Send ActuationRequest
     opendlv::proxy::ActuationRequest ar;
     ar.setAcceleration(static_cast<float>(m_inputAcceleration));

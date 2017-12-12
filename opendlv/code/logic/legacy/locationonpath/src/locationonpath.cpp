@@ -79,7 +79,9 @@ void LocationOnPath::setUp()
       "logic-legacy-locationonpath.intersection-longitude");
   auto wgs84IntersectionPosition = opendlv::data::environment::WGS84Coordinate(latitudeIntersection,longitudeIntersection);
   m_intersectionPosition = m_wgs84Reference.transform(wgs84IntersectionPosition);
-  std::cout << "m_intersectionPosition" << m_intersectionPosition.getX() << ", " << m_intersectionPosition.getY() << '\n';
+  if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+    std::cout << "m_intersectionPosition" << m_intersectionPosition.getX() << ", " << m_intersectionPosition.getY() << '\n';
+  }
   // int32_t virtual_position = getKeyValueConfiguration().getValue<int32_t>(
   //     "logic-legacy-locationonpath.virtualPosition");
   // if (virtual_position == 1)
@@ -130,9 +132,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LocationOnPath::body()
     a = (y1-y2)/(x1-x2);
     b = -1;
     c = y1-a*x1;
-    std::cout << "Line for the road:" << a << ", " << b << ", " << c << '\n';
+    if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+      std::cout << "Line for the road:" << a << ", " << b << ", " << c << '\n';
+    }
   } else {
-    std::cout << "x1 is equal to x2" << '\n';
+    if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+      std::cout << "x1 is equal to x2" << '\n';
+    }
   }
 
 
@@ -171,9 +177,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LocationOnPath::body()
         //point outside of the segment, the intersection was passed
         currentLocation = intersectionLocation + (m_intersectionPosition-projectionPoint).lengthXY();
       }
-      std::cout << "currentLocation: " << currentLocation << '\n';
-      std::cout << "intersectionLocation: " << intersectionLocation << '\n';
-      std::cout << "errDistance: " << errDistance << '\n';
+      if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+        std::cout << "currentLocation: " << currentLocation << '\n';
+        std::cout << "intersectionLocation: " << intersectionLocation << '\n';
+        std::cout << "errDistance: " << errDistance << '\n';
+      }
 
       // Calculate forward point for steering control
       //(x1,y1) (x2,y2) points for line perpendicularly to orientation at m_forwardDistance
@@ -202,7 +210,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LocationOnPath::body()
       while (errAngle > cartesian::Constants::PI) {
         errAngle -= 2.0 * cartesian::Constants::PI;
       }
-      std::cout << "errAngle, hgoal: " << errAngle << ", " << hgoal << '\n';
+      if(odcore::base::module::AbstractCIDModule::isVerbose()) {
+        std::cout << "errAngle, hgoal: " << errAngle << ", " << hgoal << '\n';
+      }
 
       // Set location on the path
       opendlv::logic::legacy::LocationOnPathToIntersection locationOnPath;
