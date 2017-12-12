@@ -73,7 +73,9 @@ VelocityTuner::VelocityTuner(int32_t const &a_argc, char **a_argv)
   m_time_segment_seconds(0),
   m_no_scheduler(true),
   m_timeSlotIsSet(false),
-  m_vehicleID(0)
+  m_vehicleID(0),
+  m_plannedTrajectory(),
+  m_stopPlanningTime(0)
 {
 }
 
@@ -124,6 +126,10 @@ void VelocityTuner::setUp()
     "logic-legacy-velocitytuner.no-scheduler");
   m_vehicleID = getKeyValueConfiguration().getValue<int>(
     "logic-legacy-velocitytuner.vehicleId");
+  m_plannedTrajectory = getKeyValueConfiguration().getValue<std::string>(
+    "logic-legacy-velocitytuner.plannedTrajectory");
+  m_stopPlanningTime = getKeyValueConfiguration().getValue<double>(
+    "logic-legacy-velocitytuner.stop-plannning-seconds");
 
 }
 
@@ -226,19 +232,22 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
           }
         } else {
           //send request to the scheduler
-          opendlv::logic::coordination::IntersectionAccessRequest iar;
-          iar.setVehicleID(m_vehicleID);
-          std::string plannedTrajectory = "ES"; // TODO: Read fom config?
-          iar.setPlannedTrajectory(plannedTrajectory);
-          iar.setVelocity(m_velocity.getX());
-          iar.setDistanceToIntersection(m_distanceToIntersection);
-          cout << "Beaconing information" << endl;
-          odcore::data::Container c_intersectionAccess(iar);
-          getConference().send(c_intersectionAccess);
+          if (m_distanceToIntersection > 0) {
+            opendlv::logic::coordination::IntersectionAccessRequest iar;
+            iar.setVehicleID(m_vehicleID);
+            std::string plannedTrajectory = m_plannedTrajectory;
+            std::cout << "plannedTrajectory " << plannedTrajectory << '\n';
+            iar.setPlannedTrajectory(plannedTrajectory);
+            iar.setVelocity(m_velocity.getX());
+            iar.setDistanceToIntersection(m_distanceToIntersection);
+            cout << "Beaconing information" << endl;
+            odcore::data::Container c_intersectionAccess(iar);
+            getConference().send(c_intersectionAccess);
+          }
         }
 
         // Calculate what velocity to set
-        if (m_distanceToIntersection > 0 && (currentTime + odcore::data::TimeStamp(4,0)) < m_timeSlotStart && m_timeSlotIsSet ) {
+        if (m_distanceToIntersection > 0 && (currentTime + odcore::data::TimeStamp(m_stopPlanningTime,0)) < m_timeSlotStart && m_timeSlotIsSet ) {
           double s = m_distanceToIntersection;
           velocityTunerState.setS(s);
           std::cout << "s: " << s << '\n';

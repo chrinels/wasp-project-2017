@@ -74,6 +74,8 @@ class VelocityTuner : public odcore::base::module::TimeTriggeredConferenceClient
   bool m_no_scheduler;
   bool m_timeSlotIsSet;
   uint32_t m_vehicleID;
+  std::string m_plannedTrajectory;
+  double m_stopPlanningTime;
 };
 
 }
