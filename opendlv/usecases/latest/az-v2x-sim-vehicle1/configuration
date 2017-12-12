@@ -138,6 +138,10 @@ logic-legacy-velocitytuner.start_mode = 1 #1 = after start_time, 2 = when test_d
 
 logic-legacy-velocitytuner.time_segment_seconds = 10
 
+logic-legacy-velocitytuner.plannedTrajectory = ES 
+logic-legacy-velocitytuner.stop-plannning-seconds = 4 
+
+
 #
 # CONFIGURATION FOR state estimator
 #
