@@ -320,7 +320,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VelocityTuner::body()
                 velocityTunerState.setMm(6);
               }
             } else {
-                std::cout << "equal velocities, what to do?" << '\n';
+                cout << "equal velocities, what to do?" << '\n';
               }
           } else {
             //could be done with maneuvers like __/, /--
