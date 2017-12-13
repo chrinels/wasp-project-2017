@@ -85,8 +85,8 @@ global.session.expectedModules = knowledge-scene,perception-detectlane,core-tool
 #global.reference.WGS84.longitude = 12.773900
 
 # AstaZero City Area:
-global.reference.WGS84.latitude = 57.77338154493465
-global.reference.WGS84.longitude = 12.76686512235394
+global.reference.WGS84.latitude = 57.7733874425051
+global.reference.WGS84.longitude = 12.7668927221955
 
 # AstaZero Rural Road:
 #global.reference.WGS84.latitude = 57.77145065
