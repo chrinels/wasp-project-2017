@@ -32,11 +32,11 @@ services:
       network_mode: "host"
       command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=100"
 
-    proxy-applanix:
-      image: ${IMAGE}
-      network_mode: "host"
-      user: root
-      command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-applanix --cid=${CID}"
+    # proxy-applanix:
+    #   image: ${IMAGE}
+    #   network_mode: "host"
+    #   user: root
+    #   command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-applanix --cid=${CID}"
 
     odrecorderh264:
       image: ${IMAGE}
