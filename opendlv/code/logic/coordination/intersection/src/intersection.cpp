@@ -289,7 +289,9 @@ bool Intersection::timeRefreshSlotsTable()
                 m_scheduledSlotsTable.end());
 
     // Assign a new empty map to the last slot
-    m_scheduledSlotsTable[m_nrofSlots - 1] = std::vector<SchedulingInfo>();
+    for (int i = 0; i < elapsedSlots; ++i) {
+      m_scheduledSlotsTable[(m_nrofSlots - 1) - i] = std::vector<SchedulingInfo>();
+    }
 
     m_slotTableAbsoluteTime = currentTime;
 
