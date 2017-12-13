@@ -28,13 +28,13 @@ services:
       command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
 
 # Micro service for proxy-xc90.
-    # proxy-xc90:
-    #     image: copplar.cse.chalmers.se:5043/chalmersrevere/dlv-copplar-on-dlv-autoliv-on-dlv-snowfox-on-dlv-af-on-opendlv-on-opendlv-core-on-opendavinci-on-base:v0.9.4
-    #     network_mode: "host"
-    #     privileged: true
-    #     depends_on:
-    #         - odsupercomponent
-    #     command: "/opt/dlv.snowfox/bin/snowfox-proxy-xc90 --cid=${CID} --freq=100"
+    proxy-xc90:
+        image: copplar.cse.chalmers.se:5043/chalmersrevere/dlv-copplar-on-dlv-autoliv-on-dlv-snowfox-on-dlv-af-on-opendlv-on-opendlv-core-on-opendavinci-on-base:v0.9.4
+        network_mode: "host"
+        privileged: true
+        depends_on:
+            - odsupercomponent
+        command: "/opt/dlv.snowfox/bin/snowfox-proxy-xc90 --cid=${CID} --freq=100"
 
     logic-legacy-stateestimator:
       image: ${IMAGE}
@@ -44,12 +44,12 @@ services:
          # - proxy-xc90
       command: "/opt/opendlv/bin/opendlv-logic-legacy-stateestimator --cid=${CID} --verbose=1 --freq=100"
 
-    sim-vehiclesim:
-      image: ${IMAGE}
-      network_mode: "host"
-      depends_on:
-          - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=100"
+    # sim-vehiclesim:
+    #   image: ${IMAGE}
+    #   network_mode: "host"
+    #   depends_on:
+    #       - odsupercomponent
+    #   command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=100"
 
     proxy-applanix:
       image: ${IMAGE}

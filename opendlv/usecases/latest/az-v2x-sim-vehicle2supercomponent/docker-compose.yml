@@ -20,17 +20,19 @@
 version: '2'
 
 services:
-    # odsupercomponent:
-    #   build: .
-    #   network_mode: "host"
-    #   volumes:
-    #   - .:/opt/opendlv.data
-    #   command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
-
-    sim-vehiclesim:
-      image: ${IMAGE}
+    odsupercomponent:
+      build: .
       network_mode: "host"
-      command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=100"
+      volumes:
+      - .:/opt/opendlv.data
+      command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
+
+    # sim-vehiclesim:
+    #   image: ${IMAGE}
+    #   network_mode: "host"
+    #   depends_on:
+    #       - odsupercomponent
+    #   command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=100"
 
     # proxy-applanix:
     #   image: ${IMAGE}
@@ -38,32 +40,40 @@ services:
     #   user: root
     #   command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-applanix --cid=${CID}"
 
-    odrecorderh264:
-      image: ${IMAGE}
-      volumes:
-          - ~/recordings:/opt/recordings
-      user: root
-      network_mode: host
-      ipc: host
-      working_dir: "/opt/recordings"
-      command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"
+    # odrecorderh264:
+    #   image: ${IMAGE}
+    #   depends_on:
+    #       - odsupercomponent
+    #   volumes:
+    #       - ~/recordings:/opt/recordings
+    #   user: root
+    #   network_mode: host
+    #   ipc: host
+    #   working_dir: "/opt/recordings"
+    #   command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"
 
 
-    logic-legacy-locationonpath:
-      image: ${IMAGE}
-      network_mode: "host"
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=100"
+    # logic-legacy-locationonpath:
+    #   image: ${IMAGE}
+    #   network_mode: "host"
+    #   depends_on:
+    #       - odsupercomponent
+    #   command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=100"
 
 
-    logic-legacy-velocitytuner:
-      image: ${IMAGE}
-      network_mode: "host"
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-velocitytuner --cid=${CID} --verbose=1 --freq=1"
+    # logic-legacy-velocitytuner:
+    #   image: ${IMAGE}
+    #   network_mode: "host"
+    #   depends_on:
+    #       - odsupercomponent
+    #   command: "/opt/opendlv/bin/opendlv-logic-legacy-velocitytuner --cid=${CID} --verbose=1 --freq=1"
 
-    logic-legacy-lowlevelcontrol:
-      image: ${IMAGE}
-      network_mode: "host"
-      command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=100"
+    # logic-legacy-lowlevelcontrol:
+    #   image: ${IMAGE}
+    #   network_mode: "host"
+    #   depends_on:
+    #       - odsupercomponent
+    #   command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=100"
 
     # logic-coordination-intersection:
     #   image: ${IMAGE}
