@@ -31,7 +31,7 @@ services:
       image: ${IMAGE}
       network_mode: "host"
       depends_on:
-          - odsupercomponent
+          # - odsupercomponent
       command: "/opt/opendlv/bin/opendlv-sim-vehiclesim --cid=${CID} --verbose=1 --freq=100"
 
     proxy-applanix:
@@ -43,7 +43,7 @@ services:
     odrecorderh264:
       image: ${IMAGE}
       depends_on:
-          - odsupercomponent
+          # - odsupercomponent
       volumes:
           - ~/recordings:/opt/recordings
       user: root
@@ -57,7 +57,7 @@ services:
       image: ${IMAGE}
       network_mode: "host"
       depends_on:
-          - odsupercomponent
+          # - odsupercomponent
       command: "/opt/opendlv/bin/opendlv-logic-legacy-locationonpath --cid=${CID} --verbose=1 --freq=100"
 
 
@@ -65,14 +65,14 @@ services:
       image: ${IMAGE}
       network_mode: "host"
       depends_on:
-          - odsupercomponent
+          # - odsupercomponent
       command: "/opt/opendlv/bin/opendlv-logic-legacy-velocitytuner --cid=${CID} --verbose=1 --freq=1"
 
     logic-legacy-lowlevelcontrol:
       image: ${IMAGE}
       network_mode: "host"
       depends_on:
-          - odsupercomponent
+          # - odsupercomponent
       command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=100"
 
     # logic-coordination-intersection:
