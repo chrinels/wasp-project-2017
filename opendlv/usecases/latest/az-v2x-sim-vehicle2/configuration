@@ -176,8 +176,8 @@ odrecorderh264.portbaseforchildprocesses = 29000;
 proxy-applanix.ip = 10.42.42.40    # Change to Applanix IP.
 proxy-applanix.port = 5602
 
-logic-legacy-locationonpath.intersection-latitude = 57.773064722885330
-logic-legacy-locationonpath.intersection-longitude = 12.768919003548130
+logic-legacy-locationonpath.intersection-latitude = 57.7729308111767
+logic-legacy-locationonpath.intersection-longitude = 12.7698433031107
 logic-legacy-locationonpath.virtualPosition = 1 # 0 = position from StateEstimate, 1 = position from vehicleSimState
 logic-legacy-locationonpath.forward-distance = 40 #m
 
