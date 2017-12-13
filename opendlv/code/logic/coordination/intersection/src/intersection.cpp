@@ -279,6 +279,10 @@ bool Intersection::timeRefreshSlotsTable()
 
   int elapsedSlots = floor(elapsedTime / m_slotDuration);
 
+  if (elapsedSlots > 20) {
+    elapsedSlots = 20;
+  }
+
   if (elapsedSlots > 0) {
 
     cout << "|Scheduler| Updating slots. Elapsed (time, slots): (" 
