@@ -116,7 +116,7 @@ logic-legacy-lowlevelcontrol.longitudinal-max-acceleration = 3
 logic-legacy-lowlevelcontrol.longitudinal-min-acceleration = -3
 logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum = 1
 logic-legacy-lowlevelcontrol.longitudinal-acceleration-smoothing = 2
-logic-legacy-lowlevelcontrol.aim_point_gain = 2
+logic-legacy-lowlevelcontrol.aim_point_gain = 8
 logic-legacy-lowlevelcontrol.steering_filter_coefficient = 0.2
 
 #logic-legacy-velocitytuner.max-acceleration = 1.25
