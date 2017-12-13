@@ -85,8 +85,8 @@ global.session.expectedModules = knowledge-scene,perception-detectlane,core-tool
 #global.reference.WGS84.longitude = 12.773900
 
 # AstaZero City Area:
-global.reference.WGS84.latitude = 57.77338154493465
-global.reference.WGS84.longitude = 12.76686512235394
+global.reference.WGS84.latitude = 57.7733874425051
+global.reference.WGS84.longitude = 12.7668927221955
 
 # AstaZero Rural Road:
 #global.reference.WGS84.latitude = 57.77145065
@@ -115,29 +115,30 @@ logic-legacy-lowlevelcontrol.longitudinal-gain = 0.5
 logic-legacy-lowlevelcontrol.longitudinal-max-acceleration = 3
 logic-legacy-lowlevelcontrol.longitudinal-min-acceleration = -3
 logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum = 1
-logic-legacy-lowlevelcontrol.longitudinal-acceleration-smoothing = 1
+logic-legacy-lowlevelcontrol.longitudinal-acceleration-smoothing = 2
 logic-legacy-lowlevelcontrol.aim_point_gain = 2
-logic-legacy-lowlevelcontrol.steering_filter_coefficient = 2
+logic-legacy-lowlevelcontrol.steering_filter_coefficient = 0.2
 
 #logic-legacy-velocitytuner.max-acceleration = 1.25
 logic-legacy-velocitytuner.max-acceleration = 2.5
 logic-legacy-velocitytuner.acceleration-planning-factor = 0.8
-logic-legacy-velocitytuner.test-time-to-intersection = 10 #s
-logic-legacy-velocitytuner.target-velocity-at-intersectionkmh = 30 #kmh
+logic-legacy-velocitytuner.test-time-to-intersection = 30 #s
+logic-legacy-velocitytuner.target-velocity-at-intersectionkmh = 40 #kmh
 logic-legacy-velocitytuner.max-velocitykmh = 50 #kmh
-logic-legacy-velocitytuner.test_distance_to_intersection = 100 #m
-logic-legacy-velocitytuner.start_time = 5 #s
-logic-legacy-velocitytuner.start_velocitykmh = 30
+logic-legacy-velocitytuner.test_distance_to_intersection = 300 #m
+logic-legacy-velocitytuner.start_time = 10 #s
+logic-legacy-velocitytuner.start_velocitykmh = 40
 logic-legacy-velocitytuner.up_velocitykmh = 32
 logic-legacy-velocitytuner.down_velocitykmh = 30
 logic-legacy-velocitytuner.end_velocitykmh = 0
 logic-legacy-velocitytuner.no-scheduler = 0 #1 = test-time-to-intersection it used, 0 = message from scheduler is expected
 
 logic-legacy-velocitytuner.plan_mode = 2 #1 = predefined profile, 2 = planned profile
-logic-legacy-velocitytuner.start_mode = 2 #1 = after start_time, 2 = when test_distance_to_intersection is left
+logic-legacy-velocitytuner.start_mode = 1 #1 = after start_time, 2 = when test_distance_to_intersection is left
 
 logic-legacy-velocitytuner.time_segment_seconds = 10
-logic-legacy-velocitytuner.plannedTrajectory = ES
+
+logic-legacy-velocitytuner.plannedTrajectory = WS 
 logic-legacy-velocitytuner.stop-plannning-seconds = 4
 
 #
@@ -175,10 +176,11 @@ odrecorderh264.portbaseforchildprocesses = 29000;
 proxy-applanix.ip = 10.42.42.40    # Change to Applanix IP.
 proxy-applanix.port = 5602
 
-logic-legacy-locationonpath.intersection-latitude = 57.773064722885330
-logic-legacy-locationonpath.intersection-longitude = 12.768919003548130
+logic-legacy-locationonpath.intersection-latitude = 57.7729308111767
+logic-legacy-locationonpath.intersection-longitude = 12.7698433031107
 logic-legacy-locationonpath.virtualPosition = 1 # 0 = position from StateEstimate, 1 = position from vehicleSimState
 logic-legacy-locationonpath.forward-distance = 40 #m
+
 
 #
 # CONFIGURATION FOR intersection scheduler
@@ -186,4 +188,17 @@ logic-legacy-locationonpath.forward-distance = 40 #m
 logic-coordination-intersection.slot_duration = 5
 logic-coordination-intersection.nrof_slots = 20
 
-logic-legacy-velocitytuner.vehicleId = 111
+
+###############################################################################
+#
+# CONFIGURATION FOR v2x-out
+#
+proxy-v2xout.adapter = wlp4s0
+proxy-v2xout.sender-id = 113
+logic-legacy-velocitytuner.vehicleId = 113
+proxy-v2xout.filter-sender-ids = 113
+proxy-v2xout.filter-message-ids = 463
+
+proxy-v2xin.adapter = wlp4s0
+proxy-v2xin.filter-sender-ids = 115
+proxy-v2xin.filter-message-ids = 401
