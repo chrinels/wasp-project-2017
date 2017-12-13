@@ -92,12 +92,12 @@ services:
           - odsupercomponent
       command: "/opt/opendlv/bin/opendlv-logic-legacy-lowlevelcontrol --cid=${CID} --verbose=1 --freq=100"
 
-    logic-coordination-intersection:
-      image: ${IMAGE}
-      network_mode: "host"
-      depends_on:
-        - odsupercomponent
-      command: "/opt/opendlv/bin/opendlv-logic-coordination-intersection --cid=${CID} --verbose=1 --freq=10"
+    # logic-coordination-intersection:
+    #   image: ${IMAGE}
+    #   network_mode: "host"
+    #   depends_on:
+    #     - odsupercomponent
+    #   command: "/opt/opendlv/bin/opendlv-logic-coordination-intersection --cid=${CID} --verbose=1 --freq=10"
 
     # v2x-out:
     #   image: ${IMAGE}
