@@ -33,3 +33,15 @@ services:
         depends_on:
             - odsupercomponent
         command: "/opt/opendlv/bin/opendlv-logic-coordination-intersection --cid=${CID} --verbose=1 --freq=10"
+
+    odrecorderh264:
+      image: ${IMAGE}
+      depends_on:
+          - odsupercomponent
+      volumes:
+          - ~/recordings:/opt/recordings
+      user: root
+      network_mode: host
+      ipc: host
+      working_dir: "/opt/recordings"
+      command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"

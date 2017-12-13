@@ -92,3 +92,11 @@ proxy-v2xin.filter-sender-ids = 113,120,121,122,123
 proxy-v2xin.filter-message-ids = 463
 
 
+#
+# CONFIGURATION FOR ODRECORDERH264
+#
+#odrecorderh264.output = file://recorder.rec #
+odrecorderh264.remoteControl = 0;
+odrecorderh264.dumpSharedData = 1;
+odrecorderh264.lossless = 1;
+odrecorderh264.portbaseforchildprocesses = 29000;
