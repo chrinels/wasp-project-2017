@@ -147,9 +147,11 @@ void VelocityTuner::nextContainer(odcore::data::Container &a_container)
   } else if (a_container.getDataType() == opendlv::logic::legacy::TimeSlot::ID()) {
     odcore::base::Lock l(m_referenceMutex);
     auto timeSlot = a_container.getData<opendlv::logic::legacy::TimeSlot>();
-    m_timeSlotStart = timeSlot.getEntryTime();
-    cout << "Recieved TimeSlot, SlotStart: " << m_timeSlotStart << endl;
-    m_timeSlotIsSet = true;
+    if (m_vehicleID == timeSlot.getVehicleID()) {
+      m_timeSlotStart = timeSlot.getEntryTime();
+      cout << "Recieved TimeSlot, SlotStart: " << m_timeSlotStart << endl;
+      m_timeSlotIsSet = true;
+    }
 
   } else if (a_container.getDataType() == opendlv::logic::legacy::LocationOnPathToIntersection::ID()) {
     odcore::base::Lock l(m_stateMutex);
