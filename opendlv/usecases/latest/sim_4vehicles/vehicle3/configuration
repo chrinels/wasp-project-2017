@@ -117,7 +117,7 @@ logic-legacy-lowlevelcontrol.longitudinal-min-acceleration = -3
 logic-legacy-lowlevelcontrol.longitudinal-max-velocitysum = 1
 logic-legacy-lowlevelcontrol.longitudinal-acceleration-smoothing = 2
 logic-legacy-lowlevelcontrol.aim_point_gain = 2
-logic-legacy-lowlevelcontrol.steering_filter_coefficient = 0.2
+logic-legacy-lowlevelcontrol.steering_filter_coefficient = 2
 
 #logic-legacy-velocitytuner.max-acceleration = 1.25
 logic-legacy-velocitytuner.max-acceleration = 2.5
@@ -125,8 +125,8 @@ logic-legacy-velocitytuner.acceleration-planning-factor = 0.8
 logic-legacy-velocitytuner.test-time-to-intersection = 30 #s
 logic-legacy-velocitytuner.target-velocity-at-intersectionkmh = 40 #kmh
 logic-legacy-velocitytuner.max-velocitykmh = 50 #kmh
-logic-legacy-velocitytuner.test_distance_to_intersection = 300 #m
-logic-legacy-velocitytuner.start_time = 10 #s
+logic-legacy-velocitytuner.test_distance_to_intersection = 100 #m
+logic-legacy-velocitytuner.start_time = 5 #s
 logic-legacy-velocitytuner.start_velocitykmh = 40
 logic-legacy-velocitytuner.up_velocitykmh = 32
 logic-legacy-velocitytuner.down_velocitykmh = 30
@@ -134,7 +134,7 @@ logic-legacy-velocitytuner.end_velocitykmh = 0
 logic-legacy-velocitytuner.no-scheduler = 0 #1 = test-time-to-intersection it used, 0 = message from scheduler is expected
 
 logic-legacy-velocitytuner.plan_mode = 2 #1 = predefined profile, 2 = planned profile
-logic-legacy-velocitytuner.start_mode = 1 #1 = after start_time, 2 = when test_distance_to_intersection is left
+logic-legacy-velocitytuner.start_mode = 2 #1 = after start_time, 2 = when test_distance_to_intersection is left
 
 logic-legacy-velocitytuner.time_segment_seconds = 10
 

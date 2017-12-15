@@ -47,7 +47,7 @@ VehicleSim::VehicleSim(int32_t const &a_argc, char **a_argv)
       "sim-vehiclesim"),
   m_stateMutex(),
   m_position(0,0,0),
-  m_orientation(-0.2423),
+  m_orientation(-0.2783),
   m_velocity(5,0,0),
   m_yawrate(0),
   m_acceleration(0),
