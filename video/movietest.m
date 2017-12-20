@@ -9,6 +9,12 @@ sim2_state = loadStateEstimate('sim car2/opendlv.logic.legacy.StateEstimate-0.cs
 sim3_state = loadStateEstimate('sim car3/opendlv.logic.legacy.StateEstimate-0.csv');
 sim4_state = loadStateEstimate('sim car4/opendlv.logic.legacy.StateEstimate-0.csv');
 
+real_tunerState = loadTunerState('real car/opendlv.logic.legacy.VelocityTunerState-0.csv');
+sim1_tunerState = loadTunerState('sim car1/opendlv.logic.legacy.VelocityTunerState-0.csv');
+sim2_tunerState = loadTunerState('sim car2/opendlv.logic.legacy.VelocityTunerState-0.csv');
+sim3_tunerState = loadTunerState('sim car3/opendlv.logic.legacy.VelocityTunerState-0.csv');
+sim4_tunerState = loadTunerState('sim car4/opendlv.logic.legacy.VelocityTunerState-0.csv');
+
 t_ref = sim1_state.SampleTimeStamp(1);
 
 real_speed = loadGroundSpeed('real car/opendlv.proxy.GroundSpeedReading-0.csv');
@@ -59,6 +65,14 @@ hold on
 plot(sim2_state.positionX, sim2_state.positionY)
 plot(sim3_state.positionX, sim3_state.positionY)
 plot(sim4_state.positionX, sim4_state.positionY)
+
+figure;
+plot(real_state.SampleTimeStamp+real_offset, real_state.positionY)
+hold on
+% plot(sim1_state.positionX, sim1_state.positionY)
+plot(sim2_state.SampleTimeStamp-t_ref, sim2_state.positionY)
+plot(sim3_state.SampleTimeStamp-t_ref, sim3_state.positionY)
+plot(sim4_state.SampleTimeStamp-t_ref, sim4_state.positionY)
 
 
 %% Movie Test.
