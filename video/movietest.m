@@ -204,7 +204,7 @@ WS.start = [-lane_halfwidth,intersection_halfwidth];
 WS.traj =  [0 -intersection_halfwidth*2];
         
 scale_factor = 0.5;
-for t = t_start:(1/writerObj.FrameRate)*10:t_end
+for t = t_start:(1/writerObj.FrameRate):t_end
 % for t = 32.2
     t
     
