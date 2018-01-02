@@ -42,7 +42,7 @@ sim2_exitTime = sim_timeSlot.exitTimeseconds(idx)...
     - t_ref;
 
 % Time instant where the vehicles are scheduled
-dummy_offset = 8; % For nice graphics
+dummy_offset = 5; % For nice graphics
 sim1_schedulingTime = sim_timeSlot.SentTimeStamp(find(sim_timeSlot.vehicleID == 120,1,'first')) - t_ref + dummy_offset;
 sim2_schedulingTime = sim_timeSlot.SentTimeStamp(find(sim_timeSlot.vehicleID == 121,1,'first')) - t_ref + dummy_offset;
 sim3_schedulingTime = sim_timeSlot.SentTimeStamp(find(sim_timeSlot.vehicleID == 122,1,'first')) - t_ref + dummy_offset;
@@ -203,7 +203,8 @@ ES.traj =  [0 intersection_halfwidth*2];
 WS.start = [-lane_halfwidth,intersection_halfwidth];
 WS.traj =  [0 -intersection_halfwidth*2];
         
-for t = 22:(1/writerObj.FrameRate):t_end
+scale_factor = 0.5;
+for t = t_start:(1/writerObj.FrameRate):t_end
 % for t = 32.2
     t
     
@@ -264,42 +265,38 @@ for t = 22:(1/writerObj.FrameRate):t_end
 
     
     % Draw scheduled trajectories
-    if t > sim1_schedulingTime && t < sim1_entryTime
-        ns_color = 'yellow';
-    elseif  t > sim1_entryTime && t < sim1_exitTime
+    if t > sim1_schedulingTime && t < sim2_entryTime
         ns_color = 'green';
     else
         ns_color = 0.5*[1 1 1];
     end
     
-    if t > sim2_schedulingTime && t < sim2_entryTime && t > sim1_entryTime
-        es_color = 'yellow';
+    if t > sim2_schedulingTime && t < sim1_exitTime
+        ws_color = 'yellow';
     elseif  t > sim2_entryTime && t < sim2_exitTime
-        es_color = 'green';
+        ws_color = 'green';
     else
-        es_color = 0.5*[1 1 1];
+        ws_color = 0.5*[1 1 1];
     end
     
-    if t > sim3_schedulingTime && t < sim1_entryTime
-        ss_color = 'yellow';
-    elseif t > sim1_entryTime && t < sim1_exitTime
+    if t > sim3_schedulingTime && t < sim2_entryTime
         ss_color = 'green';
     else
         ss_color = 0.5*[1 1 1];
     end
     
-    if t > sim4_schedulingTime && t < sim2_entryTime && t > sim1_entryTime
-        ws_color = 'yellow';
+    if t > sim4_schedulingTime && t < sim1_exitTime
+        es_color = 'yellow';
     elseif t > sim2_entryTime && t < sim2_exitTime
-        ws_color = 'green';
+        es_color = 'green';
     else
-        ws_color = 0.5*[1 1 1];
+        es_color = 0.5*[1 1 1];
     end
         
     quiver(NS.start(1), NS.start(2), NS.traj(1), NS.traj(2), 0, 'Color', ns_color, 'LineWidth', 2, 'MaxHeadSize', 0.5)
-    quiver(ES.start(1), ES.start(2), ES.traj(1), ES.traj(2), 0, 'Color', es_color, 'LineWidth', 2, 'MaxHeadSize', 0.5)
     quiver(SS.start(1), SS.start(2), SS.traj(1), SS.traj(2), 0, 'Color', ss_color, 'LineWidth', 2, 'MaxHeadSize', 0.5)
     quiver(WS.start(1), WS.start(2), WS.traj(1), WS.traj(2), 0, 'Color', ws_color, 'LineWidth', 2, 'MaxHeadSize', 0.5)
+    quiver(ES.start(1), ES.start(2), ES.traj(1), ES.traj(2), 0, 'Color', es_color, 'LineWidth', 2, 'MaxHeadSize', 0.5)
     
     % Draw vehicles
     % Red:    Unscheduled
@@ -308,15 +305,13 @@ for t = 22:(1/writerObj.FrameRate):t_end
     L = 4.8;
     W = 1.9;
 
-    if t > sim1_schedulingTime && t < sim1_entryTime
-        color1 = 'yellow';
-    elseif t > sim1_entryTime && t < sim1_exitTime
+    if t > sim1_schedulingTime && t < sim2_entryTime
         color1 = 'green';
     else
         color1 = 'red';
     end
     
-    if t > sim2_schedulingTime && t < sim2_entryTime && t > sim1_entryTime
+    if t > sim2_schedulingTime && t < sim1_exitTime
         color2 = 'yellow';
     elseif t > sim2_entryTime && t < sim2_exitTime
         color2 = 'green';
@@ -324,15 +319,13 @@ for t = 22:(1/writerObj.FrameRate):t_end
         color2 = 'red';
     end
     
-    if t > sim3_schedulingTime && t < sim1_entryTime
-        color3 = 'yellow';
-    elseif t > sim1_entryTime && t < sim1_exitTime
+    if t > sim3_schedulingTime && t < sim2_entryTime
         color3 = 'green';
     else
         color3 = 'red';
     end
     
-    if t > sim4_schedulingTime && t < sim2_entryTime && t > sim1_entryTime
+    if t > sim4_schedulingTime && t < sim1_exitTime
         color4 = 'yellow';
     elseif t > sim2_entryTime && t < sim2_exitTime
         color4 = 'green';
@@ -340,19 +333,19 @@ for t = 22:(1/writerObj.FrameRate):t_end
         color4 = 'red';
     end
 
-    rectangle('Position',[xx1-L,yy1-W/2,L, W],'LineWidth',2,'FaceColor',color1)
-    rectangle('Position',[xx2-W/2,yy2, W,L]  ,'LineWidth',2,'FaceColor',color2)
-    rectangle('Position',[xx3+L,yy3-W/2,L, W],'LineWidth',2,'FaceColor',color3)
-    rectangle('Position',[xx4-W/2,yy4-L, W,L],'LineWidth',2,'FaceColor',color4)
+    rectangle('Position',[xx1*scale_factor-L,yy1-W/2,L, W],'LineWidth',2,'FaceColor',color1)
+    rectangle('Position',[xx2-W/2,yy2*scale_factor, W,L]  ,'LineWidth',2,'FaceColor',color2)
+    rectangle('Position',[xx3*scale_factor+L,yy3-W/2,L, W],'LineWidth',2,'FaceColor',color3)
+    rectangle('Position',[xx4-W/2,yy4*scale_factor-L, W,L],'LineWidth',2,'FaceColor',color4)
 
     % Legend and annotations
     delete(findall(gcf,'type','annotation'))
     
     rectangle('Position',[12 45 1 1],'FaceColor','red')
-    rectangle('Position',[12 42 1 1],'FaceColor','yellow')
-    rectangle('Position',[12 39 1 1],'FaceColor','green')
+    rectangle('Position',[12 42 1 1],'FaceColor','green')
+    rectangle('Position',[12 39 1 1],'FaceColor','yellow')
     dim = [.65 .6 .9 .3];
-    annotation('textbox',dim,'String',{'    Unscheduled';'    Scheduled in next slot';'    Scheduled in current slot'},'FitBoxToText','on', 'FontSize', 11);
+    annotation('textbox',dim,'String',{'    Unscheduled';'    Scheduled in SLOT1';'    Scheduled in SLOT2'},'FitBoxToText','on', 'FontSize', 11);
     
     t_str = 'Time = ' + string(t) + 's';
     annotation('textbox',[0.2 0.6 0.3 0.3],'String',t_str,'FitBoxToText','on', 'FontSize', 11);
