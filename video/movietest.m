@@ -204,7 +204,7 @@ WS.start = [-lane_halfwidth,intersection_halfwidth];
 WS.traj =  [0 -intersection_halfwidth*2];
         
 scale_factor = 0.5;
-for t = t_start:(1/writerObj.FrameRate):t_end
+for t = t_start:(1/writerObj.FrameRate)*10:t_end
 % for t = 32.2
     t
     
@@ -301,30 +301,26 @@ for t = t_start:(1/writerObj.FrameRate):t_end
     L = 4.8;
     W = 1.9;
 
-    if t > sim1_schedulingTime && t < sim2_entryTime
+    if t > sim1_schedulingTime && t < sim1_exitTime
         color1 = 'green';
     else
         color1 = 'red';
     end
     
-    if t > sim2_schedulingTime && t < sim1_exitTime
+    if t > sim2_schedulingTime && t < sim2_exitTime
         color2 = 'yellow';
-    elseif t > sim2_entryTime && t < sim2_exitTime
-        color2 = 'green';
     else
         color2 = 'red';
     end
     
-    if t > sim3_schedulingTime && t < sim2_entryTime
+    if t > sim3_schedulingTime && t < sim1_exitTime
         color3 = 'green';
     else
         color3 = 'red';
     end
     
-    if t > sim4_schedulingTime && t < sim1_exitTime
+    if t > sim4_schedulingTime && t < sim2_exitTime
         color4 = 'yellow';
-    elseif t > sim2_entryTime && t < sim2_exitTime
-        color4 = 'green';
     else
         color4 = 'red';
     end
