@@ -265,30 +265,26 @@ for t = t_start:(1/writerObj.FrameRate):t_end
 
     
     % Draw scheduled trajectories
-    if t > sim1_schedulingTime && t < sim2_entryTime
+    if t > sim1_schedulingTime && t < sim1_exitTime
         ns_color = 'green';
     else
         ns_color = 0.5*[1 1 1];
     end
     
-    if t > sim2_schedulingTime && t < sim1_exitTime
+    if t > sim2_schedulingTime && t < sim2_exitTime
         ws_color = 'yellow';
-    elseif  t > sim2_entryTime && t < sim2_exitTime
-        ws_color = 'green';
     else
         ws_color = 0.5*[1 1 1];
     end
     
-    if t > sim3_schedulingTime && t < sim2_entryTime
+    if t > sim3_schedulingTime && t < sim1_exitTime
         ss_color = 'green';
     else
         ss_color = 0.5*[1 1 1];
     end
     
-    if t > sim4_schedulingTime && t < sim1_exitTime
+    if t > sim4_schedulingTime && t < sim2_exitTime
         es_color = 'yellow';
-    elseif t > sim2_entryTime && t < sim2_exitTime
-        es_color = 'green';
     else
         es_color = 0.5*[1 1 1];
     end
@@ -347,13 +343,13 @@ for t = t_start:(1/writerObj.FrameRate):t_end
     dim = [.65 .6 .9 .3];
     annotation('textbox',dim,'String',{'    Unscheduled';'    Scheduled in SLOT1';'    Scheduled in SLOT2'},'FitBoxToText','on', 'FontSize', 11);
     
-    t_str = 'Time = ' + string(t) + 's';
+    t_str = sprintf('Time = %0.2f s',t);
     annotation('textbox',[0.2 0.6 0.3 0.3],'String',t_str,'FitBoxToText','on', 'FontSize', 11);
     
     if t > sim1_entryTime && t < sim1_exitTime
-        annotation('textbox',[0.2 0.55 0.3 0.3],'String','SLOT 1 ACTIVE','FitBoxToText','on', 'FontSize', 11);
+        annotation('textbox',[0.2 0.55 0.3 0.3],'String','SLOT 1 ACTIVE','FitBoxToText','on', 'FontSize', 11, 'BackgroundColor', 'green');
     elseif t > sim2_entryTime && t < sim2_exitTime
-        annotation('textbox',[0.2 0.55 0.3 0.3],'String','SLOT 2 ACTIVE','FitBoxToText','on', 'FontSize', 11);
+        annotation('textbox',[0.2 0.55 0.3 0.3],'String','SLOT 2 ACTIVE','FitBoxToText','on', 'FontSize', 11, 'BackgroundColor', 'yellow');
     end
     
     ylim([-50 50])
