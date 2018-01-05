@@ -205,7 +205,7 @@ WS.traj =  [0 -intersection_halfwidth*2];
         
 scale_factor = 0.5;
 for t = t_start:(1/writerObj.FrameRate):t_end
-% for t = 32.2
+% for t = 31.5
     t
     
     t1 = real_state.SampleTimeStamp+real_offset;
@@ -215,13 +215,13 @@ for t = t_start:(1/writerObj.FrameRate):t_end
     
     figure(fh2)
 
-    intersection_halfwidth = 10;
+    intersection_halfwidth = 8;
     lane_halfwidth = 3;
 
     x1 = real_state.positionX-x_real_cross;
     y1 = real_state.positionY-y_real_cross;
     ang1 = atan2(y_real_cross-y1(1),x_real_cross-x1(1));
-    xo1 = -intersection_halfwidth;
+    xo1 = -intersection_halfwidth/scale_factor;
     yo1 = -lane_halfwidth;
     xx1n = interp1(t1,x1*cos(ang1)+y1*sin(ang1)+xo1,t);
     yy1n = interp1(t1,-x1*sin(ang1)+y1*cos(ang1)+yo1,t);
@@ -234,14 +234,14 @@ for t = t_start:(1/writerObj.FrameRate):t_end
     y2 = sim2_state.positionY-y_sim2_cross;
     ang2 = atan2(y_sim2_cross-y2(1),x_sim2_cross-x2(1))+pi/2;
     xo2 = -lane_halfwidth;
-    yo2 = intersection_halfwidth;
+    yo2 = intersection_halfwidth/scale_factor;
     xx2=interp1(t2,x2*cos(ang2)+y2*sin(ang2)+xo2,t);
     yy2=interp1(t2,-x2*sin(ang2)+y2*cos(ang2)+yo2,t);
 
     x3 = sim3_state.positionX-x_sim3_cross;
     y3 = sim3_state.positionY-y_sim3_cross;
     ang3 = atan2(y_sim3_cross-y3(1),x_sim3_cross-x3(1))+pi;
-    xo3 = intersection_halfwidth;
+    xo3 = intersection_halfwidth/scale_factor;
     yo3 = lane_halfwidth;
     xx3=interp1(t3,x3*cos(ang3)+y3*sin(ang3)+xo3,t);
     yy3=interp1(t3,-x3*sin(ang3)+y3*cos(ang3)+yo3,t);
@@ -250,7 +250,7 @@ for t = t_start:(1/writerObj.FrameRate):t_end
     y4 = sim4_state.positionY-y_sim4_cross;
     ang4 = atan2(y_sim4_cross-y4(1),x_sim4_cross-x4(1))+3*pi/2;
     xo4 = lane_halfwidth;
-    yo4 = -intersection_halfwidth;
+    yo4 = -intersection_halfwidth/scale_factor;
     xx4=interp1(t4,x4*cos(ang4)+y4*sin(ang4)+xo4,t);
     yy4=interp1(t4,-x4*sin(ang4)+y4*cos(ang4)+yo4,t);
     
@@ -333,9 +333,9 @@ for t = t_start:(1/writerObj.FrameRate):t_end
     % Legend and annotations
     delete(findall(gcf,'type','annotation'))
     
-    rectangle('Position',[12 45 1 1],'FaceColor','red')
-    rectangle('Position',[12 42 1 1],'FaceColor','green')
-    rectangle('Position',[12 39 1 1],'FaceColor','yellow')
+    annotation('rectangle',[.66 .88 .008 .008],'FaceColor','red')
+    annotation('rectangle',[.66 .86 .008 .008],'FaceColor','green')
+    annotation('rectangle',[.66 .84 .008 .008],'FaceColor','yellow')
     dim = [.65 .6 .9 .3];
     annotation('textbox',dim,'String',{'    Unscheduled';'    Scheduled in SLOT1';'    Scheduled in SLOT2'},'FitBoxToText','on', 'FontSize', 11);
     
