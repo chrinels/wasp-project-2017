@@ -141,47 +141,51 @@ axis equal
 
  
 %% Set up the movie.
-% writerObj = VideoWriter('velocities.avi'); % Name it.
-% writerObj.FrameRate = 25; % How many frames per second.
-% open(writerObj); 
-% 
-% fh1 = figure('units','pixels','position',[0 0 1920 1080]);
-%  
-% for t = t_start:(1/writerObj.FrameRate):t_end
-%     
-%     t1 = real_speed.SampleTimeStamp+real_offset;
-%     ii1 = t1 >= t_start & t1 <= t;
-%     t2 = sim2_state.SampleTimeStamp-sim1_state.SampleTimeStamp(1);
-%     ii2 = t2 >= t_start & t2 <= t;
-%     t3 = sim3_state.SampleTimeStamp-sim1_state.SampleTimeStamp(1);
-%     ii3 = t3 >= t_start & t3 <= t;
-%     t4 = sim4_state.SampleTimeStamp-sim1_state.SampleTimeStamp(1);
-%     ii4 = t4 >= t_start & t4 <= t;
-%     
-%     figure(fh1)
-%     plot(t1(ii1)-t,real_speed.groundSpeed(ii1)*3.6,'b-')
-%     hold on
-%     plot(t2(ii2)-t,sim2_state.velocityX(ii2)*3.6,'r-')
-%     plot(t3(ii3)-t,sim3_state.velocityX(ii3)*3.6,'b--')
-%     plot(t4(ii4)-t,sim4_state.velocityX(ii4)*3.6,'r--')
-%     xlim([t_start-t t_end-t])
-%     ylim([0 50])
-%     set(findall(gca, 'Type', 'Line'),'LineWidth',2);
-%     xlabel('Time [s]')
-%     ylabel('Velocity [m/s]')
-%     
-%     % Timeslot
-%     rectangle('Position',[sim1_entryTime-t,-10,sim1_exitTime-sim1_entryTime,100],'FaceColor',[0 0 1 0.1],'EdgeColor','k','LineWidth',1)
-%     rectangle('Position',[sim2_entryTime-t,-10,sim2_exitTime-sim2_entryTime,100],'FaceColor',[1 0 0 0.1],'EdgeColor','k','LineWidth',1)
-%     
-%     hold off
-%     
+writerObj = VideoWriter('velocities.avi'); % Name it.
+writerObj.FrameRate = 25; % How many frames per second.
+open(writerObj); 
+
+fh1 = figure('units','pixels','position',[0 0 1920 1080]);
+ 
+for t = t_start:(1/writerObj.FrameRate):t_end
+    
+    t1 = real_speed.SampleTimeStamp+real_offset;
+    ii1 = t1 >= t_start & t1 <= t;
+    t2 = sim2_state.SampleTimeStamp-sim1_state.SampleTimeStamp(1);
+    ii2 = t2 >= t_start & t2 <= t;
+    t3 = sim3_state.SampleTimeStamp-sim1_state.SampleTimeStamp(1);
+    ii3 = t3 >= t_start & t3 <= t;
+    t4 = sim4_state.SampleTimeStamp-sim1_state.SampleTimeStamp(1);
+    ii4 = t4 >= t_start & t4 <= t;
+    
+    figure(fh1)
+    plot(t1(ii1),real_speed.groundSpeed(ii1)*3.6,'b-')
+    hold on
+    plot(t2(ii2),sim2_state.velocityX(ii2)*3.6,'r-')
+    plot(t3(ii3),sim3_state.velocityX(ii3)*3.6,'b--')
+    plot(t4(ii4),sim4_state.velocityX(ii4)*3.6,'r--')
+    xlim([t_start t_end])
+    ylim([0 50])
+    set(findall(gca, 'Type', 'Line'),'LineWidth',2);
+    xlabel('Time [s]')
+    ylabel('Velocity [km/h]')
+    
+    % Timeslot
+    rectangle('Position',[sim1_entryTime,-10,sim1_exitTime-sim1_entryTime,100],'FaceColor',[0 0 1 0.1],'EdgeColor','k','LineWidth',1)
+    rectangle('Position',[sim2_entryTime,-10,sim2_exitTime-sim2_entryTime,100],'FaceColor',[1 0 0 0.1],'EdgeColor','k','LineWidth',1)
+    
+    hold off
+    
 %     frame = getframe(gcf);
 %     writeVideo(writerObj, frame);
-%  
-% end
-% hold off
-% close(writerObj); % Saves the movie.
+    set(fh1,'GraphicsSmoothing','on')
+    print(fh1,'video_image.png','-dpng')
+    img = imread('video_image.png');
+    writeVideo(writerObj, img);
+ 
+end
+hold off
+close(writerObj); % Saves the movie.
 
 
 %%
