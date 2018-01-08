@@ -11,18 +11,18 @@
   <property name="mlt_service">kdenlivetitle</property>
   <property name="kdenlive:clipname">Title</property>
   <property name="kdenlive:folderid">-1</property>
-  <property name="xmldata">&lt;kdenlivetitle width="1920" duration="125" out="125" height="1080" LC_NUMERIC="sv_SE.UTF-8">
- &lt;item z-index="0" type="QGraphicsTextItem">
-  &lt;position x="68" y="240">
-   &lt;transform>1,0,0,0,1,0,0,0,1&lt;/transform>
-  &lt;/position>
-  &lt;content font-italic="0" letter-spacing="0" font-weight="50" box-height="160" shadow="1;#64000000;5;5;5" font="Ubuntu" font-underline="0" font-pixel-size="70" line-spacing="0" box-width="1774.22" font-color="255,255,255,255" alignment="4">Coordination of Autonomous Vehicles at an Intersection
-with Centralized V2X-based Scheduling&lt;/content>
- &lt;/item>
- &lt;startviewport rect="0,0,1920,1080"/>
- &lt;endviewport rect="0,0,1920,1080"/>
- &lt;background color="0,0,0,0"/>
-&lt;/kdenlivetitle>
+  <property name="xmldata">&lt;kdenlivetitle width="1920" duration="125" out="125" height="1080" LC_NUMERIC="sv_SE.UTF-8">&#xd;
+ &lt;item z-index="0" type="QGraphicsTextItem">&#xd;
+  &lt;position x="68" y="240">&#xd;
+   &lt;transform>1,0,0,0,1,0,0,0,1&lt;/transform>&#xd;
+  &lt;/position>&#xd;
+  &lt;content font-italic="0" letter-spacing="0" font-weight="50" box-height="160" shadow="1;#64000000;5;5;5" font="Ubuntu" font-underline="0" font-pixel-size="70" line-spacing="0" box-width="1774.22" font-color="255,255,255,255" alignment="4">Coordination of Autonomous Vehicles at an Intersection&#xd;
+with Centralized V2X-based Scheduling&lt;/content>&#xd;
+ &lt;/item>&#xd;
+ &lt;startviewport rect="0,0,1920,1080"/>&#xd;
+ &lt;endviewport rect="0,0,1920,1080"/>&#xd;
+ &lt;background color="0,0,0,0"/>&#xd;
+&lt;/kdenlivetitle>&#xd;
 </property>
   <property name="kdenlive:duration">125</property>
   <property name="force_reload">0</property>
@@ -405,15 +405,19 @@ with Centralized V2X-based Scheduling&lt;/content>
   <property name="meta.media.progressive">1</property>
  </producer>
  <producer id="9" title="Anonymous Submission" out="700" in="0">
-  <property name="length">701</property>
+  <property name="length">00:00:28:01</property>
   <property name="eof">pause</property>
   <property name="resource">videofiles/topview.avi</property>
+  <property name="audio_index">-1</property>
+  <property name="video_index">0</property>
+  <property name="mute_on_pause">1</property>
+  <property name="mlt_service">avformat-novalidate</property>
   <property name="meta.media.nb_streams">1</property>
   <property name="meta.media.0.stream.type">video</property>
   <property name="meta.media.0.stream.frame_rate">25</property>
   <property name="meta.media.0.stream.sample_aspect_ratio">0</property>
-  <property name="meta.media.0.codec.width">1080</property>
-  <property name="meta.media.0.codec.height">1007</property>
+  <property name="meta.media.0.codec.width">1090</property>
+  <property name="meta.media.0.codec.height">1093</property>
   <property name="meta.media.0.codec.rotate">0</property>
   <property name="meta.media.0.codec.frame_rate">25</property>
   <property name="meta.media.0.codec.pix_fmt">yuvj420p</property>
@@ -421,22 +425,18 @@ with Centralized V2X-based Scheduling&lt;/content>
   <property name="meta.media.0.codec.colorspace">601</property>
   <property name="meta.media.0.codec.name">mjpeg</property>
   <property name="meta.media.0.codec.long_name">MJPEG (Motion JPEG)</property>
-  <property name="meta.media.0.codec.bit_rate">5442305</property>
+  <property name="meta.media.0.codec.bit_rate">8001394</property>
   <property name="seekable">1</property>
   <property name="meta.media.sample_aspect_num">1</property>
   <property name="meta.media.sample_aspect_den">1</property>
   <property name="aspect_ratio">1</property>
-  <property name="audio_index">-1</property>
-  <property name="video_index">0</property>
-  <property name="mute_on_pause">1</property>
-  <property name="mlt_service">avformat-novalidate</property>
   <property name="kdenlive:folderid">-1</property>
   <property name="meta.media.frame_rate_num">25</property>
   <property name="meta.media.frame_rate_den">1</property>
   <property name="meta.media.colorspace">601</property>
   <property name="meta.media.color_trc">2</property>
-  <property name="meta.media.width">1080</property>
-  <property name="meta.media.height">1007</property>
+  <property name="meta.media.width">1090</property>
+  <property name="meta.media.height">1093</property>
   <property name="meta.media.top_field_first">0</property>
   <property name="meta.media.progressive">1</property>
   <property name="kdenlive:file_size">19136362</property>
@@ -488,7 +488,7 @@ with Centralized V2X-based Scheduling&lt;/content>
   <property name="kdenlive:docproperties.rendertcoverlay">0</property>
   <property name="kdenlive:docproperties.rendertctype">0</property>
   <property name="kdenlive:docproperties.rendertwopass">0</property>
-  <property name="kdenlive:docproperties.renderurl">videofiles/output2.webm</property>
+  <property name="kdenlive:docproperties.renderurl">videofiles/output5.mp4</property>
   <property name="kdenlive:docproperties.renderzone">0</property>
   <property name="xml_retain">1</property>
   <entry out="124" producer="7" in="0"/>
@@ -1275,8 +1275,8 @@ with Centralized V2X-based Scheduling&lt;/content>
   <property name="meta.media.0.stream.type">video</property>
   <property name="meta.media.0.stream.frame_rate">25</property>
   <property name="meta.media.0.stream.sample_aspect_ratio">0</property>
-  <property name="meta.media.0.codec.width">1080</property>
-  <property name="meta.media.0.codec.height">1007</property>
+  <property name="meta.media.0.codec.width">1090</property>
+  <property name="meta.media.0.codec.height">1093</property>
   <property name="meta.media.0.codec.rotate">0</property>
   <property name="meta.media.0.codec.frame_rate">25</property>
   <property name="meta.media.0.codec.pix_fmt">yuvj420p</property>
@@ -1284,15 +1284,15 @@ with Centralized V2X-based Scheduling&lt;/content>
   <property name="meta.media.0.codec.colorspace">601</property>
   <property name="meta.media.0.codec.name">mjpeg</property>
   <property name="meta.media.0.codec.long_name">MJPEG (Motion JPEG)</property>
-  <property name="meta.media.0.codec.bit_rate">5442305</property>
+  <property name="meta.media.0.codec.bit_rate">8001394</property>
   <property name="meta.media.sample_aspect_num">1</property>
   <property name="meta.media.sample_aspect_den">1</property>
   <property name="meta.media.frame_rate_num">25</property>
   <property name="meta.media.frame_rate_den">1</property>
   <property name="meta.media.colorspace">601</property>
   <property name="meta.media.color_trc">2</property>
-  <property name="meta.media.width">1080</property>
-  <property name="meta.media.height">1007</property>
+  <property name="meta.media.width">1090</property>
+  <property name="meta.media.height">1093</property>
   <property name="meta.media.top_field_first">0</property>
   <property name="meta.media.progressive">1</property>
  </producer>
@@ -1456,6 +1456,7 @@ with Centralized V2X-based Scheduling&lt;/content>
    <property name="distort">0</property>
    <property name="rotate_center">0</property>
    <property name="mlt_service">qtblend</property>
+   <property name="rotate_center">0</property>
    <property name="always_active">1</property>
    <property name="internal_added">237</property>
   </transition>
@@ -1466,6 +1467,7 @@ with Centralized V2X-based Scheduling&lt;/content>
    <property name="distort">0</property>
    <property name="rotate_center">0</property>
    <property name="mlt_service">qtblend</property>
+   <property name="rotate_center">0</property>
    <property name="always_active">1</property>
    <property name="internal_added">237</property>
   </transition>
@@ -1476,6 +1478,7 @@ with Centralized V2X-based Scheduling&lt;/content>
    <property name="distort">0</property>
    <property name="rotate_center">0</property>
    <property name="mlt_service">qtblend</property>
+   <property name="rotate_center">0</property>
    <property name="always_active">1</property>
    <property name="internal_added">237</property>
   </transition>
@@ -1486,6 +1489,7 @@ with Centralized V2X-based Scheduling&lt;/content>
    <property name="distort">0</property>
    <property name="rotate_center">0</property>
    <property name="mlt_service">qtblend</property>
+   <property name="rotate_center">0</property>
    <property name="always_active">1</property>
    <property name="internal_added">237</property>
   </transition>
@@ -1496,6 +1500,7 @@ with Centralized V2X-based Scheduling&lt;/content>
    <property name="distort">0</property>
    <property name="rotate_center">0</property>
    <property name="mlt_service">qtblend</property>
+   <property name="rotate_center">0</property>
    <property name="always_active">1</property>
    <property name="internal_added">237</property>
   </transition>
@@ -1506,6 +1511,7 @@ with Centralized V2X-based Scheduling&lt;/content>
    <property name="distort">0</property>
    <property name="rotate_center">0</property>
    <property name="mlt_service">qtblend</property>
+   <property name="rotate_center">0</property>
    <property name="always_active">1</property>
    <property name="internal_added">237</property>
   </transition>
@@ -1516,6 +1522,7 @@ with Centralized V2X-based Scheduling&lt;/content>
    <property name="distort">0</property>
    <property name="rotate_center">0</property>
    <property name="mlt_service">qtblend</property>
+   <property name="rotate_center">0</property>
    <property name="always_active">1</property>
    <property name="internal_added">237</property>
   </transition>
@@ -1524,8 +1531,8 @@ with Centralized V2X-based Scheduling&lt;/content>
    <property name="b_track">10</property>
    <property name="compositing">0</property>
    <property name="distort">0</property>
-   <property name="rotate_center">0</property>
    <property name="mlt_service">qtblend</property>
+   <property name="rotate_center">0</property>
    <property name="always_active">1</property>
    <property name="internal_added">237</property>
   </transition>

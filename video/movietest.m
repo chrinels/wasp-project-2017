@@ -3,6 +3,8 @@
 t_start = 12.0;
 t_end = 40;
 
+real_locOnPath = loadLocOnPath('real car/opendlv.logic.legacy.LocationOnPathToIntersection-0.csv');
+
 real_state = loadStateEstimate('real car/opendlv.logic.legacy.StateEstimate-0.csv');
 sim1_state = loadStateEstimate('sim car1/opendlv.logic.legacy.StateEstimate-0.csv');
 sim2_state = loadStateEstimate('sim car2/opendlv.logic.legacy.StateEstimate-0.csv');
@@ -14,8 +16,6 @@ sim1_tunerState = loadTunerState('sim car1/opendlv.logic.legacy.VelocityTunerSta
 sim2_tunerState = loadTunerState('sim car2/opendlv.logic.legacy.VelocityTunerState-0.csv');
 sim3_tunerState = loadTunerState('sim car3/opendlv.logic.legacy.VelocityTunerState-0.csv');
 sim4_tunerState = loadTunerState('sim car4/opendlv.logic.legacy.VelocityTunerState-0.csv');
-
-t_ref = sim1_state.SampleTimeStamp(1);
 
 real_speed = loadGroundSpeed('real car/opendlv.proxy.GroundSpeedReading-0.csv');
 
@@ -361,6 +361,71 @@ for t = t_start:(1/writerObj.FrameRate):t_end
     print(fh2,'video_image.png','-dpng')
     img = imread('video_image.png');
     writeVideo(writerObj, img);
+ 
+end
+hold off
+close(writerObj); % Saves the movie.
+
+%% Set up the movie.
+writerObj = VideoWriter('VT.avi'); % Name it.
+writerObj.FrameRate = 25; % How many frames per second.
+open(writerObj); 
+
+fh1 = figure('units','pixels','position',[0 0 1920 1080]);
+ 
+flag = false;
+ 
+for t = (t_start+0.2):(1/writerObj.FrameRate):(t_end-7) 
+    
+    t1 = real_speed.SampleTimeStamp+real_offset;
+    ii1 = t1 >= t_start & t1 <= t;
+    t1_temp = t1(ii1);
+    t1_last = t1_temp(end);
+    ii1_vt = find(real_tunerState.SampleTimeStamp+real_offset<=t1_last,1,'last');
+    if real_tunerState.t1(ii1_vt)~=0
+        flag = true;
+        vecT = real_tunerState.SampleTimeStamp(ii1_vt) + real_offset +...
+            [0, real_tunerState.t1(ii1_vt),real_tunerState.t2(ii1_vt),real_tunerState.t3(ii1_vt),sim2_entryTime];
+        vecV = [real_tunerState.v1(ii1_vt),real_tunerState.v2(ii1_vt),real_tunerState.v3(ii1_vt),real_tunerState.v4(ii1_vt),real_tunerState.v4(ii1_vt)];
+    end
+    t2 = sim2_state.SampleTimeStamp-sim1_state.SampleTimeStamp(1);
+    ii2 = t2 >= t_start & t2 <= t;
+    t3 = sim3_state.SampleTimeStamp-sim1_state.SampleTimeStamp(1);
+    ii3 = t3 >= t_start & t3 <= t;
+    t4 = sim4_state.SampleTimeStamp-sim1_state.SampleTimeStamp(1);
+    ii4 = t4 >= t_start & t4 <= t;
+    
+    figure(fh1)
+    plot(t1(ii1),real_speed.groundSpeed(ii1)*3.6,'b-')
+    hold on
+    if flag == true
+        plot(vecT,vecV*3.6,'or--')
+    end
+%     plot(t2(ii2)-t,sim2_state.velocityX(ii2)*3.6,'r-')
+%     plot(t3(ii3)-t,sim3_state.velocityX(ii3)*3.6,'b--')
+%     plot(t4(ii4)-t,sim4_state.velocityX(ii4)*3.6,'r--')
+    xlim([t_start t_end])
+    ylim([0 50])
+    set(findall(gca, 'Type', 'Line'),'LineWidth',2);
+    xlabel('Time [s]')
+    ylabel('Velocity [km/h]')
+    delete(findall(gcf,'type','annotation'))
+    iil = find(real_locOnPath.SampleTimeStamp+real_offset<=t1_last,1,'last');
+    t_str = sprintf('Distance to the intersection, S = %0.2f m',real_locOnPath.intersectionLocation(iil)-real_locOnPath.currentLocation(iil));
+    annotation('textbox',[0.2 0.6 0.3 0.3],'String',t_str,'FitBoxToText','on', 'FontSize', 11);
+    
+    % Timeslot
+    rectangle('Position',[sim1_entryTime,-10,sim1_exitTime-sim1_entryTime,100],'FaceColor',[0 0 1 0.1],'EdgeColor','k','LineWidth',1)
+    rectangle('Position',[sim2_entryTime,-10,sim2_exitTime-sim2_entryTime,100],'FaceColor',[1 0 0 0.1],'EdgeColor','k','LineWidth',1)
+    
+    hold off
+%     
+    set(fh1,'GraphicsSmoothing','on')
+    print(fh1,'video_image.png','-dpng')
+    img = imread('video_image.png');
+    writeVideo(writerObj, img);
+%     frame = getframe(gcf);
+%     writeVideo(writerObj, frame);
  
 end
 hold off
