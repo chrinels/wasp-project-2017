@@ -191,7 +191,7 @@ writerObj = VideoWriter('topview.avi'); % Name it.
 writerObj.FrameRate = 25; % How many frames per second.
 open(writerObj); 
 
-fh2 = figure('units','pixels','position',[0 0 1080 1080]);
+fh2 = figure('units','pixels','position',[0 0 1920 1080]);
  
 % Define trajectory vectors
 NS.start = [-intersection_halfwidth,-lane_halfwidth];
@@ -206,6 +206,7 @@ WS.traj =  [0 -intersection_halfwidth*2];
 scale_factor = 0.5;
 for t = t_start:(1/writerObj.FrameRate):t_end
 % for t = 31.5
+    clf(fh2)
     t
     
     t1 = real_state.SampleTimeStamp+real_offset;
@@ -213,7 +214,7 @@ for t = t_start:(1/writerObj.FrameRate):t_end
     t3 = sim3_state.SampleTimeStamp-sim1_state.SampleTimeStamp(1);
     t4 = sim4_state.SampleTimeStamp-sim1_state.SampleTimeStamp(1);
     
-    figure(fh2)
+%     figure(fh2)
 
     intersection_halfwidth = 8;
     lane_halfwidth = 3;
@@ -258,10 +259,10 @@ for t = t_start:(1/writerObj.FrameRate):t_end
     hold on
     rectangle('Position',[-lane_halfwidth*2,-150,lane_halfwidth*4,300],'FaceColor',0.5*[1 1 1],'EdgeColor','none')
 
-    plot([-intersection_halfwidth -150], [0 0], 'w--','LineWidth',1)
-    plot([intersection_halfwidth 150], [0 0], 'w--','LineWidth',1)
-    plot([0 0], [intersection_halfwidth 150], 'w--','LineWidth',1)
-    plot([0 0], [-intersection_halfwidth -150], 'w--','LineWidth',1)
+    plot([-intersection_halfwidth -150], [0 0], '--','LineWidth',1.5,'Color',[.99 .99 .99])
+    plot([intersection_halfwidth 150], [0 0], '--','LineWidth',1.5,'Color',[.99 .99 .99])
+    plot([0 0], [intersection_halfwidth 150], '--','LineWidth',1.5,'Color',[.99 .99 .99])
+    plot([0 0], [-intersection_halfwidth -150], '--','LineWidth',1.5,'Color',[.99 .99 .99])
 
     
     % Draw scheduled trajectories
@@ -333,9 +334,9 @@ for t = t_start:(1/writerObj.FrameRate):t_end
     % Legend and annotations
     delete(findall(gcf,'type','annotation'))
     
-    annotation('rectangle',[.66 .88 .008 .008],'FaceColor','red')
-    annotation('rectangle',[.66 .86 .008 .008],'FaceColor','green')
-    annotation('rectangle',[.66 .84 .008 .008],'FaceColor','yellow')
+    annotation('rectangle',[.654 .885 .008 .008],'FaceColor','red')
+    annotation('rectangle',[.654 .868 .008 .008],'FaceColor','green')
+    annotation('rectangle',[.654 .851 .008 .008],'FaceColor','yellow')
     dim = [.65 .6 .9 .3];
     annotation('textbox',dim,'String',{'    Unscheduled';'    Scheduled in SLOT1';'    Scheduled in SLOT2'},'FitBoxToText','on', 'FontSize', 11);
     
@@ -350,13 +351,16 @@ for t = t_start:(1/writerObj.FrameRate):t_end
     
     ylim([-50 50])
     axis equal
-    xlim([-60 40])
+    xlim([-70 70])
     axis off
     
     hold off
     
-    frame = getframe(gcf);
-    writeVideo(writerObj, frame);
+%     frame = getframe(gcf);
+    set(fh2,'GraphicsSmoothing','on')
+    print(fh2,'video_image.png','-dpng')
+    img = imread('video_image.png');
+    writeVideo(writerObj, img);
  
 end
 hold off
